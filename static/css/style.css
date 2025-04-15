@@ -103,6 +103,10 @@ th {
     resize: vertical;
 }
 
+.form-checkbox {
+    margin: 10px 0;
+}
+
 .form-group {
     margin-bottom: 15px;
 }

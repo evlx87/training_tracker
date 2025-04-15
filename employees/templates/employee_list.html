@@ -6,7 +6,9 @@
 
 {% block content %}
 <h1>Сотрудники</h1>
+<a href="{% url 'employees:employee_create' %}" class="action-button">Добавить сотрудника</a>
 <a href="{% url 'employees:index' %}" class="back-button">На главную</a>
+{% if employees %}
 <table>
     <tr>
         <th>Фамилия</th>
@@ -17,6 +19,8 @@
         <th>Подразделение</th>
         <th>Уволен</th>
         <th>В декрете</th>
+        <th>Внешний совместитель</th>
+        <th>Действия</th>
     </tr>
     {% for employee in employees %}
     <tr>
@@ -28,7 +32,15 @@
         <td>{{ employee.department }}</td>
         <td>{{ employee.is_dismissed|yesno:"Да,Нет" }}</td>
         <td>{{ employee.is_on_maternity_leave|yesno:"Да,Нет" }}</td>
+        <td>{{ employee.is_external_part_time|yesno:"Да,Нет" }}</td>
+        <td>
+            <a href="{% url 'employees:employee_edit' employee.pk %}" class="action-button">Редактировать</a>
+            <a href="{% url 'employees:employee_delete' employee.pk %}" class="delete-button">Удалить</a>
+        </td>
     </tr>
     {% endfor %}
 </table>
+{% else %}
+<p>Сотрудники отсутствуют.</p>
+{% endif %}
 {% endblock %}
