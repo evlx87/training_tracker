@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список сотрудников</title>
+</head>
+<body>
+    <h1>Сотрудники</h1>
+    <table border="1">
+        <tr>
+            <th>Фамилия</th>
+            <th>Имя</th>
+            <th>Отчество</th>
+            <th>Дата рождения</th>
+            <th>Должность</th>
+            <th>Подразделение</th>
+            <th>Уволен</th>
+            <th>В декрете</th>
+        </tr>
+        {% for employee in employees %}
+        <tr>
+            <td>{{ employee.last_name }}</td>
+            <td>{{ employee.first_name }}</td>
+            <td>{{ employee.middle_name }}</td>
+            <td>{{ employee.birth_date|date:"d.m.Y" }}</td>
+            <td>{{ employee.position }}</td>
+            <td>{{ employee.department }}</td>
+            <td>{{ employee.is_dismissed|yesno:"Да,Нет" }}</td>
+            <td>{{ employee.is_on_maternity_leave|yesno:"Да,Нет" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
