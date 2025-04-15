@@ -44,3 +44,26 @@ class Employee(models.Model):
     class Meta:
         verbose_name = "Сотрудник"
         verbose_name_plural = "Сотрудники"
+
+
+class Department(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название подразделения")
+    description = models.TextField(blank=True, verbose_name="Описание", null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Подразделение"
+        verbose_name_plural = "Подразделения"
+
+
+class Position(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название должности")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Должность"
+        verbose_name_plural = "Должности"

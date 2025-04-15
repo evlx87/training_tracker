@@ -61,18 +61,48 @@ th {
     background-color: #f2f2f2;
 }
 
-.back-button {
+.back-button, .action-button, .submit-button, .delete-button {
     display: inline-block;
     padding: 10px 20px;
-    margin: 20px auto;
+    margin: 10px 5px;
     background-color: #4CAF50;
     color: white;
     text-decoration: none;
     border-radius: 5px;
     text-align: center;
-    width: 120px;
 }
 
-.back-button:hover {
+.back-button:hover, .action-button:hover, .submit-button:hover {
     background-color: #45a049;
+}
+
+.delete-button {
+    background-color: #f44336;
+}
+
+.delete-button:hover {
+    background-color: #d32f2f;
+}
+
+.form-container {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.form-input, .form-textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.form-group {
+    margin-bottom: 15px;
 }

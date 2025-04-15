@@ -6,6 +6,27 @@
 
 {% block content %}
 <h1>Структурные подразделения</h1>
-<p>Страница в разработке.</p>
+<a href="{% url 'employees:department_create' %}" class="action-button">Добавить подразделение</a>
 <a href="{% url 'employees:index' %}" class="back-button">На главную</a>
+{% if departments %}
+<table>
+    <tr>
+        <th>Название</th>
+        <th>Описание</th>
+        <th>Действия</th>
+    </tr>
+    {% for department in departments %}
+    <tr>
+        <td>{{ department.name }}</td>
+        <td>{{ department.description|default:"—" }}</td>
+        <td>
+            <a href="{% url 'employees:department_edit' department.pk %}" class="action-button">Редактировать</a>
+            <a href="{% url 'employees:department_delete' department.pk %}" class="delete-button">Удалить</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Подразделения отсутствуют.</p>
+{% endif %}
 {% endblock %}

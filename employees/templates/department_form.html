@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ action }} подразделение
+{% endblock %}
+
+{% block content %}
+<h1>{{ action }} подразделение</h1>
+<div class="form-container">
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.name.id_for_label }}">Название:</label>
+            {{ form.name }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">Описание:</label>
+            {{ form.description }}
+        </div>
+        <button type="submit" class="submit-button">Сохранить</button>
+        <a href="{% url 'employees:department_list' %}" class="back-button">Отмена</a>
+    </form>
+</div>
+{% endblock %}

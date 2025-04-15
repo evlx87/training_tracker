@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Должности
+{% endblock %}
+
+{% block content %}
+<h1>Должности</h1>
+<a href="{% url 'employees:position_create' %}" class="action-button">Добавить должность</a>
+<a href="{% url 'employees:index' %}" class="back-button">На главную</a>
+{% if positions %}
+<table>
+    <tr>
+        <th>Название</th>
+        <th>Действия</th>
+    </tr>
+    {% for position in positions %}
+    <tr>
+        <td>{{ position.name }}</td>
+        <td>
+            <a href="{% url 'employees:position_edit' position.pk %}" class="action-button">Редактировать</a>
+            <a href="{% url 'employees:position_delete' position.pk %}" class="delete-button">Удалить</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Должности отсутствуют.</p>
+{% endif %}
+{% endblock %}
