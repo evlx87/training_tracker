@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Главная страница
+{% endblock %}
+
+{% block content %}
+<h1>Добро пожаловать в систему учета сотрудников и обучения</h1>
+<div class="button-container">
+    <a href="{% url 'employees:employee_list' %}" class="button">Список<br>сотрудников</a>
+    <a href="{% url 'employees:departments' %}" class="button">Структурные<br>подразделения</a>
+    <a href="{% url 'employees:trainings' %}" class="button">Данные<br>об обучении</a>
+    <a href="{% url 'employees:reports' %}" class="button">Отчеты</a>
+</div>
+{% endblock %}
