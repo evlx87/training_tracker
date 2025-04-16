@@ -1,5 +1,5 @@
 from django import forms
-from .models import Employee
+from .models import Employee, TrainingProgram
 
 
 class EmployeeForm(forms.ModelForm):
@@ -41,3 +41,13 @@ class EmployeeForm(forms.ModelForm):
         if not is_dismissed and dismissal_date:
             raise forms.ValidationError("Дата увольнения указывается только для уволенных сотрудников.")
         return cleaned_data
+
+
+class TrainingProgramForm(forms.ModelForm):
+    class Meta:
+        model = TrainingProgram
+        fields = ['name', 'recurrence_period']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-input'}),
+            'recurrence_period': forms.NumberInput(attrs={'class': 'form-input', 'min': '0'}),
+        }

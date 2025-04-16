@@ -43,3 +43,20 @@ class Employee(models.Model):
     class Meta:
         verbose_name = "Сотрудник"
         verbose_name_plural = "Сотрудники"
+
+
+class TrainingProgram(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Название программы")
+    recurrence_period = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name="Периодичность повторного обучения (годы)",
+        help_text="Укажите, через сколько лет требуется повторное обучение (оставьте пустым, если не требуется)."
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Программа обучения"
+        verbose_name_plural = "Программы обучения"

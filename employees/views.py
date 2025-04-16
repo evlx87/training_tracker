@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Employee, Department, Position
-from .forms import EmployeeForm
+from .models import Employee, Department, Position, TrainingProgram
+from .forms import EmployeeForm, TrainingProgramForm
 from django import forms
 
 # Формы для подразделений и должностей (как было ранее)
@@ -126,3 +126,35 @@ def trainings(request):
 
 def reports(request):
     return render(request, 'reports.html')
+
+def training_list(request):
+    trainings = TrainingProgram.objects.all()
+    return render(request, 'trainings.html', {'trainings': trainings})
+
+def training_create(request):
+    if request.method == 'POST':
+        form = TrainingProgramForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('employees:training_list')
+    else:
+        form = TrainingProgramForm()
+    return render(request, 'training_form.html', {'form': form, 'action': 'Добавить'})
+
+def training_edit(request, pk):
+    training = get_object_or_404(TrainingProgram, pk=pk)
+    if request.method == 'POST':
+        form = TrainingProgramForm(request.POST, instance=training)
+        if form.is_valid():
+            form.save()
+            return redirect('employees:training_list')
+    else:
+        form = TrainingProgramForm(instance=training)
+    return render(request, 'training_form.html', {'form': form, 'action': 'Редактировать'})
+
+def training_delete(request, pk):
+    training = get_object_or_404(TrainingProgram, pk=pk)
+    if request.method == 'POST':
+        training.delete()
+        return redirect('employees:training_list')
+    return render(request, 'training_confirm_delete.html', {'training': training})

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Employee, Department, Position
+from .models import Employee, Department, Position, TrainingProgram
+
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
@@ -26,4 +27,9 @@ class DepartmentAdmin(admin.ModelAdmin):
 @admin.register(Position)
 class PositionAdmin(admin.ModelAdmin):
     list_display = ('name',)
+    search_fields = ('name',)
+
+@admin.register(TrainingProgram)
+class TrainingProgramAdmin(admin.ModelAdmin):
+    list_display = ('name', 'recurrence_period')
     search_fields = ('name',)

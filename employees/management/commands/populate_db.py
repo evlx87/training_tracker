@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-from employees.models import Department, Position
+from employees.models import Department, Position, TrainingProgram
+
 
 class Command(BaseCommand):
     help = 'Заполняет базу данных предопределенными подразделениями и должностями'
@@ -58,6 +59,13 @@ class Command(BaseCommand):
             {"name": "Руководитель отделения"},
         ]
 
+        # Список программ обучения
+        training_programs = [
+            {"name": "Охрана труда", "recurrence_period": 3},
+            {"name": "Пожарная безопасность", "recurrence_period": 3},
+            {"name": "Оказание первой помощи", "recurrence_period": 3},
+        ]
+
         # Заполнение подразделений
         self.stdout.write("Заполнение подразделений...")
         for dept in departments:
@@ -80,5 +88,17 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f'Добавлена должность: {pos["name"]}'))
             else:
                 self.stdout.write(f'Должность "{pos["name"]}" уже существует')
+
+        # Заполнение программ обучения
+        self.stdout.write("\nЗаполнение программ обучения...")
+        for prog in training_programs:
+            if not TrainingProgram.objects.filter(name=prog["name"]).exists():
+                TrainingProgram.objects.create(
+                    name=prog["name"],
+                    recurrence_period=prog["recurrence_period"]
+                )
+                self.stdout.write(self.style.SUCCESS(f'Добавлена программа: {prog["name"]}'))
+            else:
+                self.stdout.write(f'Программа "{prog["name"]}" уже существует')
 
         self.stdout.write(self.style.SUCCESS('\nЗаполнение базы данных завершено!'))
