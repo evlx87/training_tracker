@@ -60,3 +60,18 @@ class TrainingProgram(models.Model):
     class Meta:
         verbose_name = "Программа обучения"
         verbose_name_plural = "Программы обучения"
+
+
+class TrainingRecord(models.Model):
+    employee = models.ForeignKey('employees.Employee', on_delete=models.CASCADE, verbose_name="Сотрудник")
+    training_program = models.ForeignKey('employees.TrainingProgram', on_delete=models.CASCADE,
+                                         verbose_name="Программа обучения")
+    completion_date = models.DateField(verbose_name="Дата прохождения")
+
+    def __str__(self):
+        return f"{self.employee} - {self.training_program} ({self.completion_date})"
+
+    class Meta:
+        verbose_name = "Запись об обучении"
+        verbose_name_plural = "Записи об обучении"
+        unique_together = ['employee', 'training_program', 'completion_date']

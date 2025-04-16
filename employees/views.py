@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Employee, Department, Position, TrainingProgram
-from .forms import EmployeeForm, TrainingProgramForm
+from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
+from .forms import EmployeeForm, TrainingProgramForm, TrainingRecordForm
 from django import forms
 
 # Формы для подразделений и должностей (как было ранее)
@@ -56,6 +56,58 @@ def employee_delete(request, pk):
         employee.delete()
         return redirect('employees:employee_list')
     return render(request, 'employee_confirm_delete.html', {'employee': employee})
+
+def employee_trainings(request, pk):
+    employee = get_object_or_404(Employee, pk=pk)
+    training_records = TrainingRecord.objects.filter(employee=employee)
+    return render(request, 'employee_trainings.html', {
+        'employee': employee,
+        'training_records': training_records
+    })
+
+def training_record_create(request, employee_pk):
+    employee = get_object_or_404(Employee, pk=employee_pk)
+    if request.method == 'POST':
+        form = TrainingRecordForm(request.POST)
+        if form.is_valid():
+            training_record = form.save(commit=False)
+            training_record.employee = employee
+            training_record.save()
+            return redirect('employees:employee_trainings', pk=employee_pk)
+    else:
+        form = TrainingRecordForm()
+    return render(request, 'training_record_form.html', {
+        'form': form,
+        'employee': employee,
+        'action': 'Добавить'
+    })
+
+def training_record_edit(request, pk):
+    training_record = get_object_or_404(TrainingRecord, pk=pk)
+    employee = training_record.employee
+    if request.method == 'POST':
+        form = TrainingRecordForm(request.POST, instance=training_record)
+        if form.is_valid():
+            form.save()
+            return redirect('employees:employee_trainings', pk=employee.pk)
+    else:
+        form = TrainingRecordForm(instance=training_record)
+    return render(request, 'training_record_form.html', {
+        'form': form,
+        'employee': employee,
+        'action': 'Редактировать'
+    })
+
+def training_record_delete(request, pk):
+    training_record = get_object_or_404(TrainingRecord, pk=pk)
+    employee = training_record.employee
+    if request.method == 'POST':
+        training_record.delete()
+        return redirect('employees:employee_trainings', pk=employee.pk)
+    return render(request, 'training_record_confirm_delete.html', {
+        'training_record': training_record,
+        'employee': employee
+    })
 
 def department_list(request):
     departments = Department.objects.all()

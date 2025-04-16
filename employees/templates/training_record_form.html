@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ action }} запись об обучении
+{% endblock %}
+
+{% block content %}
+<h1>{{ action }} запись об обучении для {{ employee.last_name }} {{ employee.first_name }}</h1>
+<div class="form-container">
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.training_program.id_for_label }}">Программа обучения:</label>
+            {{ form.training_program }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.completion_date.id_for_label }}">Дата прохождения:</label>
+            {{ form.completion_date }}
+        </div>
+        <button type="submit" class="submit-button">Сохранить</button>
+        <a href="{% url 'employees:employee_trainings' employee.pk %}" class="back-button">Отмена</a>
+    </form>
+</div>
+{% endblock %}

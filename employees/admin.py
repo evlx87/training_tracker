@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Employee, Department, Position, TrainingProgram
+from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
 
 
 @admin.register(Employee)
@@ -33,3 +33,10 @@ class PositionAdmin(admin.ModelAdmin):
 class TrainingProgramAdmin(admin.ModelAdmin):
     list_display = ('name', 'recurrence_period')
     search_fields = ('name',)
+
+@admin.register(TrainingRecord)
+class TrainingRecordAdmin(admin.ModelAdmin):
+    list_display = ('employee', 'training_program', 'completion_date')
+    list_filter = ('training_program', 'completion_date')
+    search_fields = ('employee__last_name', 'employee__first_name', 'training_program__name')
+    date_hierarchy = 'completion_date'

@@ -20,6 +20,7 @@
         <th>Уволен</th>
         <th>В декрете</th>
         <th>Внешний совместитель</th>
+        <th>Обучение</th>
         <th>Действия</th>
     </tr>
     {% for employee in employees %}
@@ -33,6 +34,9 @@
         <td>{{ employee.is_dismissed|yesno:"Да,Нет" }}</td>
         <td>{{ employee.is_on_maternity_leave|yesno:"Да,Нет" }}</td>
         <td>{{ employee.is_external_part_time|yesno:"Да,Нет" }}</td>
+        <td>
+            <a href="{% url 'employees:employee_trainings' employee.pk %}" class="action-button">Просмотреть</a>
+        </td>
         <td>
             <a href="{% url 'employees:employee_edit' employee.pk %}" class="action-button">Редактировать</a>
             <a href="{% url 'employees:employee_delete' employee.pk %}" class="delete-button">Удалить</a>

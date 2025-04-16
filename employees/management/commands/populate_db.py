@@ -1,5 +1,7 @@
+from datetime import date
+
 from django.core.management.base import BaseCommand
-from employees.models import Department, Position, TrainingProgram
+from employees.models import Department, Position, TrainingProgram, Employee, TrainingRecord
 
 
 class Command(BaseCommand):
@@ -66,6 +68,47 @@ class Command(BaseCommand):
             {"name": "Оказание первой помощи", "recurrence_period": 3},
         ]
 
+
+        # Тестовые сотрудники
+        employees = [
+            {
+                "last_name": "Иванов",
+                "first_name": "Иван",
+                "middle_name": "Иванович",
+                "birth_date": date(1980, 1, 1),
+                "position": "Директор",
+                "department": "Руководство",
+            },
+            {
+                "last_name": "Петрова",
+                "first_name": "Анна",
+                "middle_name": "Сергеевна",
+                "birth_date": date(1985, 5, 15),
+                "position": "Учитель",
+                "department": "УМО",
+            },
+        ]
+
+        # Тестовые записи об обучении
+        training_records = [
+            {
+                "employee": {"last_name": "Иванов", "first_name": "Иван"},
+                "training_program": "Охрана труда",
+                "completion_date": date(2023, 6, 1),
+            },
+            {
+                "employee": {"last_name": "Иванов", "first_name": "Иван"},
+                "training_program": "Пожарная безопасность",
+                "completion_date": date(2024, 3, 15),
+            },
+            {
+                "employee": {"last_name": "Петрова", "first_name": "Анна"},
+                "training_program": "Оказание первой помощи",
+                "completion_date": date(2022, 9, 10),
+            },
+        ]
+
+
         # Заполнение подразделений
         self.stdout.write("Заполнение подразделений...")
         for dept in departments:
@@ -100,5 +143,49 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f'Добавлена программа: {prog["name"]}'))
             else:
                 self.stdout.write(f'Программа "{prog["name"]}" уже существует')
+
+        # Заполнение сотрудников
+        self.stdout.write("\nЗаполнение сотрудников...")
+        for emp in employees:
+            position = Position.objects.get(name=emp["position"])
+            department = Department.objects.get(name=emp["department"])
+            if not Employee.objects.filter(last_name=emp["last_name"], first_name=emp["first_name"]).exists():
+                Employee.objects.create(
+                    last_name=emp["last_name"],
+                    first_name=emp["first_name"],
+                    middle_name=emp["middle_name"],
+                    birth_date=emp["birth_date"],
+                    position=position,
+                    department=department,
+                )
+                self.stdout.write(self.style.SUCCESS(f'Добавлен сотрудник: {emp["last_name"]} {emp["first_name"]}'))
+            else:
+                self.stdout.write(f'Сотрудник "{emp["last_name"]} {emp["first_name"]}" уже существует')
+
+        # Заполнение записей об обучении
+        self.stdout.write("\nЗаполнение записей об обучении...")
+        for record in training_records:
+            employee = Employee.objects.get(
+                last_name=record["employee"]["last_name"],
+                first_name=record["employee"]["first_name"]
+            )
+            training_program = TrainingProgram.objects.get(name=record["training_program"])
+            if not TrainingRecord.objects.filter(
+                employee=employee,
+                training_program=training_program,
+                completion_date=record["completion_date"]
+            ).exists():
+                TrainingRecord.objects.create(
+                    employee=employee,
+                    training_program=training_program,
+                    completion_date=record["completion_date"]
+                )
+                self.stdout.write(self.style.SUCCESS(
+                    f'Добавлена запись: {employee} - {training_program} ({record["completion_date"]})'
+                ))
+            else:
+                self.stdout.write(
+                    f'Запись "{employee} - {training_program} ({record["completion_date"]})" уже существует'
+                )
 
         self.stdout.write(self.style.SUCCESS('\nЗаполнение базы данных завершено!'))

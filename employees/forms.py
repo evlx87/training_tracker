@@ -1,5 +1,5 @@
 from django import forms
-from .models import Employee, TrainingProgram
+from .models import Employee, TrainingProgram, TrainingRecord
 
 
 class EmployeeForm(forms.ModelForm):
@@ -50,4 +50,18 @@ class TrainingProgramForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-input'}),
             'recurrence_period': forms.NumberInput(attrs={'class': 'form-input', 'min': '0'}),
+        }
+
+
+class TrainingRecordForm(forms.ModelForm):
+    completion_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+        label="Дата прохождения"
+    )
+
+    class Meta:
+        model = TrainingRecord
+        fields = ['training_program', 'completion_date']
+        widgets = {
+            'training_program': forms.Select(attrs={'class': 'form-input'}),
         }
