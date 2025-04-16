@@ -116,61 +116,69 @@ th {
     font-size: 0.9em;
 }
 
+/* Стили для легенды */
 .legend {
-    margin: 20px auto;
-    max-width: 600px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
 }
 
-.legend h3 {
-    margin-bottom: 10px;
+.legend-item {
+    width: 200px;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: black;
+    font-weight: bold;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
 }
 
-.legend ul {
-    list-style: none;
-    padding: 0;
+.legend-item span {
+    display: block;
+    line-height: 1.2;
 }
 
-.legend li {
-    margin-bottom: 5px;
+.legend-item.not-completed {
+    background-color: #ff9999; /* Обновлено: насыщенный розовый */
 }
 
-.legend-color {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-    vertical-align: middle;
+.legend-item.overdue {
+    background-color: #ff3333; /* Обновлено: яркий красный */
 }
 
+.legend-item.warning {
+    background-color: #ffff66; /* Обновлено: насыщенный жёлтый */
+}
+
+.legend-item.completed {
+    background-color: #99ff99; /* Обновлено: насыщенный светло-зелёный */
+}
+
+/* Улучшение читаемости текста на красном фоне */
+.legend-item.overdue {
+    color: white;
+}
+
+/* Стили для ячеек таблицы */
 .not-completed {
-    background-color: #ffcccc;
+    background-color: #ff9999; /* Обновлено: насыщенный розовый */
 }
 
 .overdue {
-    background-color: #ffebcc;
+    background-color: #ff3333; /* Обновлено: яркий красный */
 }
 
 .warning {
-    background-color: #cce5ff;
+    background-color: #ffff66; /* Обновлено: насыщенный жёлтый */
 }
 
 .normal {
-    background-color: #ffffff;
-}
-
-.legend-color.not-completed {
-    background-color: #ff0000;
-}
-
-.legend-color.overdue {
-    background-color: #ff9900;
-}
-
-.legend-color.warning {
-    background-color: #0000ff;
-}
-
-.legend-color.normal {
-    background-color: #ffffff;
-    border: 1px solid #000;
+    background-color: #99ff99; /* Обновлено: насыщенный светло-зелёный */
 }

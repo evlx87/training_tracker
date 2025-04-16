@@ -6,7 +6,7 @@
 
 {% block content %}
 <h1>Обучение сотрудника {{ employee.last_name }} {{ employee.first_name }}</h1>
-<a href="{% url 'employees:training_record_create' employee_pk=employee.pk %}" class="action-button">Добавить запись об обучении</a>
+<a href="{% url 'employees:training_record_create' %}?employee_pk={{ employee.pk }}" class="action-button">Добавить запись об обучении</a>
 <a href="{% url 'employees:employee_list' %}" class="back-button">К списку сотрудников</a>
 {% if training_records %}
 <table>
@@ -17,11 +17,11 @@
     </tr>
     {% for record in training_records %}
     <tr>
-        <td>{{ record.training_program.name }}</td>
+        <td>{{ record.training_program }}</td>
         <td>{{ record.completion_date|date:"d.m.Y" }}</td>
         <td>
-            <a href="{% url 'employees:training_record_edit' record.pk %}" class="action-button">Редактировать</a>
-            <a href="{% url 'employees:training_record_delete' record.pk %}" class="delete-button">Удалить</a>
+            <a href="{% url 'employees:training_record_edit' pk=record.pk %}" class="action-button">Редактировать</a>
+            <a href="{% url 'employees:training_record_delete' pk=record.pk %}" class="delete-button">Удалить</a>
         </td>
     </tr>
     {% endfor %}
