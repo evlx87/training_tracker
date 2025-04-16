@@ -32,6 +32,7 @@ class Employee(models.Model):
     position = models.ForeignKey('employees.Position', on_delete=models.SET_NULL, null=True, verbose_name="Должность")
     department = models.ForeignKey('employees.Department', on_delete=models.SET_NULL, null=True,
                                    verbose_name="Подразделение")
+    hire_date = models.DateField(null=True, blank=True, verbose_name='Дата трудоустройства')
     is_dismissed = models.BooleanField(default=False, verbose_name="Уволен")
     dismissal_date = models.DateField(blank=True, null=True, verbose_name="Дата увольнения")
     is_on_maternity_leave = models.BooleanField(default=False, verbose_name="В декрете")

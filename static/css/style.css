@@ -110,3 +110,67 @@ th {
 .form-group {
     margin-bottom: 15px;
 }
+
+.form-text {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.legend {
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.legend h3 {
+    margin-bottom: 10px;
+}
+
+.legend ul {
+    list-style: none;
+    padding: 0;
+}
+
+.legend li {
+    margin-bottom: 5px;
+}
+
+.legend-color {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.not-completed {
+    background-color: #ffcccc;
+}
+
+.overdue {
+    background-color: #ffebcc;
+}
+
+.warning {
+    background-color: #cce5ff;
+}
+
+.normal {
+    background-color: #ffffff;
+}
+
+.legend-color.not-completed {
+    background-color: #ff0000;
+}
+
+.legend-color.overdue {
+    background-color: #ff9900;
+}
+
+.legend-color.warning {
+    background-color: #0000ff;
+}
+
+.legend-color.normal {
+    background-color: #ffffff;
+    border: 1px solid #000;
+}

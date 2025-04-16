@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 app_name = 'employees'
+
 urlpatterns = [
     path('', views.index, name='index'),
     path('employees/', views.employee_list, name='employee_list'),
@@ -9,9 +10,9 @@ urlpatterns = [
     path('employees/<int:pk>/edit/', views.employee_edit, name='employee_edit'),
     path('employees/<int:pk>/delete/', views.employee_delete, name='employee_delete'),
     path('employees/<int:pk>/trainings/', views.employee_trainings, name='employee_trainings'),
-    path('employees/<int:employee_pk>/trainings/create/', views.training_record_create, name='training_record_create'),
-    path('trainings/records/<int:pk>/edit/', views.training_record_edit, name='training_record_edit'),
-    path('trainings/records/<int:pk>/delete/', views.training_record_delete, name='training_record_delete'),
+    path('trainings/create/', views.training_record_create, name='training_record_create'),
+    path('trainings/<int:pk>/edit/', views.training_record_edit, name='training_record_edit'),
+    path('trainings/<int:pk>/delete/', views.training_record_delete, name='training_record_delete'),
     path('departments/', views.department_list, name='department_list'),
     path('departments/create/', views.department_create, name='department_create'),
     path('departments/<int:pk>/edit/', views.department_edit, name='department_edit'),

@@ -1,11 +1,78 @@
 {% extends 'base.html' %}
 
+{% load dict_get %}  <!-- Перемещаем сюда -->
+
 {% block title %}
-Отчеты
+Отчет по обучению
 {% endblock %}
 
 {% block content %}
-<h1>Отчеты</h1>
-<p>Страница в разработке.</p>
+<h1>Отчет по обучению сотрудников</h1>
 <a href="{% url 'employees:index' %}" class="back-button">На главную</a>
+
+<div style="margin: 10px 0;">
+    <form action="{% url 'employees:training_record_create' %}" method="get" style="display: inline;">
+    <select name="employee_pk" class="form-input" style="padding: 5px;">
+        <option value="">Выберите сотрудника</option>
+        {% for employee in employees %}
+        <option value="{{ employee.pk }}">{{ employee.last_name }} {{ employee.first_name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="action-button">Добавить запись об обучении</button>
+</form>
+    <a href="{% url 'employees:employee_list' %}" class="action-button">К списку сотрудников</a>
+</div>
+
+<div class="legend">
+    <h3>Легенда</h3>
+    <ul>
+        <li><span class="legend-color not-completed"></span> Обучение не пройдено</li>
+        <li><span class="legend-color overdue"></span> Периодичность обучения превышена</li>
+        <li><span class="legend-color warning"></span> До превышения периодичности менее 6 месяцев</li>
+        <li><span class="legend-color normal"></span> Обучение пройдено, периодичность в норме</li>
+    </ul>
+</div>
+
+{% if report_data %}
+<table>
+    <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Должность</th>
+            <th>Структурное подразделение</th>
+            <th colspan="{{ training_programs.count }}">Пройденное обучение</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            {% for program in training_programs %}
+            <th>{{ program.name }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in report_data %}
+        <tr>
+            <td>{{ data.employee.last_name }} {{ data.employee.first_name }} {{ data.employee.middle_name|default:"" }}</td>
+            <td>{{ data.employee.position|default:"—" }}</td>
+            <td>{{ data.employee.department|default:"—" }}</td>
+            {% for program in training_programs %}
+            <td class="{{ data.trainings|get_item:program.id|get_item:'class' }}">
+                {% with training_status=data.trainings|get_item:program.id %}
+                {% if training_status.date == "Обучение не пройдено" %}
+                    {{ training_status.date }}
+                {% else %}
+                    {{ training_status.date|date:"d.m.Y" }}
+                {% endif %}
+                {% endwith %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Данные для отчета отсутствуют.</p>
+{% endif %}
 {% endblock %}
