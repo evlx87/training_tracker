@@ -246,7 +246,7 @@ def reports(request):
     for employee in employees:
         employee_data = {
             'employee': employee,
-            'trainings': []  # Список
+            'trainings': {}  # Теперь словарь вместо списка
         }
         for program in training_programs:
             # Находим последнюю запись об обучении
@@ -273,7 +273,8 @@ def reports(request):
                     elif today >= warning_date:
                         status['class'] = 'warning'
 
-            employee_data['trainings'].append(status)
+            # Используем program.id как ключ в словаре trainings
+            employee_data['trainings'][program.id] = status
 
         report_data.append(employee_data)
 

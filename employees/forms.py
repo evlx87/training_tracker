@@ -1,18 +1,40 @@
 from django import forms
 from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
+from django.core.exceptions import ValidationError
 
 class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
-        fields = ['last_name', 'first_name', 'middle_name', 'position', 'department', 'hire_date']
+        fields = [
+            'last_name', 'first_name', 'middle_name', 'birth_date', 'position',
+            'department', 'hire_date', 'is_dismissed', 'dismissal_date',
+            'is_on_maternity_leave', 'is_external_part_time'
+        ]
         widgets = {
             'last_name': forms.TextInput(attrs={'class': 'form-input'}),
             'first_name': forms.TextInput(attrs={'class': 'form-input'}),
             'middle_name': forms.TextInput(attrs={'class': 'form-input'}),
+            'birth_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'position': forms.Select(attrs={'class': 'form-input'}),
             'department': forms.Select(attrs={'class': 'form-input'}),
             'hire_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'is_dismissed': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'dismissal_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'is_on_maternity_leave': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'is_external_part_time': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        is_dismissed = cleaned_data.get('is_dismissed')
+        dismissal_date = cleaned_data.get('dismissal_date')
+
+        if is_dismissed and not dismissal_date:
+            raise ValidationError('Укажите дату увольнения, если сотрудник уволен.')
+        if not is_dismissed and dismissal_date:
+            raise ValidationError('Дата увольнения должна быть пустой, если сотрудник не уволен.')
+
+        return cleaned_data
 
 class DepartmentForm(forms.ModelForm):
     class Meta:
@@ -34,10 +56,9 @@ class PositionForm(forms.ModelForm):
 class TrainingProgramForm(forms.ModelForm):
     class Meta:
         model = TrainingProgram
-        fields = ['name', 'description', 'recurrence_period']
+        fields = ['name', 'recurrence_period']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-input'}),
-            'description': forms.Textarea(attrs={'class': 'form-textarea'}),
             'recurrence_period': forms.NumberInput(attrs={'class': 'form-input'}),
         }
 

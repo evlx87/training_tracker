@@ -1,17 +1,15 @@
 {% extends 'base.html' %}
-
-{% load dict_get %}  <!-- Перемещаем сюда -->
+{% load dict_get %}
 
 {% block title %}
-Отчет по обучению
+Отчет по обучению сотрудников
 {% endblock %}
 
 {% block content %}
 <h1>Отчет по обучению сотрудников</h1>
-<a href="{% url 'employees:index' %}" class="back-button">На главную</a>
+<a href="{% url 'employees:index' %}" class="back-button">Назад на главную</a>
 
-<div style="margin: 10px 0;">
-    <form action="{% url 'employees:training_record_create' %}" method="get" style="display: inline;">
+<form action="{% url 'employees:training_record_create' %}" method="get" style="display: inline;">
     <select name="employee_pk" class="form-input" style="padding: 5px;">
         <option value="">Выберите сотрудника</option>
         {% for employee in employees %}
@@ -20,32 +18,13 @@
     </select>
     <button type="submit" class="action-button">Добавить запись об обучении</button>
 </form>
-    <a href="{% url 'employees:employee_list' %}" class="action-button">К списку сотрудников</a>
-</div>
 
-<div class="legend">
-    <h3>Легенда</h3>
-    <ul>
-        <li><span class="legend-color not-completed"></span> Обучение не пройдено</li>
-        <li><span class="legend-color overdue"></span> Периодичность обучения превышена</li>
-        <li><span class="legend-color warning"></span> До превышения периодичности менее 6 месяцев</li>
-        <li><span class="legend-color normal"></span> Обучение пройдено, периодичность в норме</li>
-    </ul>
-</div>
-
-{% if report_data %}
-<table>
+<table class="report-table">
     <thead>
         <tr>
-            <th>ФИО</th>
+            <th>Сотрудник</th>
             <th>Должность</th>
-            <th>Структурное подразделение</th>
-            <th colspan="{{ training_programs.count }}">Пройденное обучение</th>
-        </tr>
-        <tr>
-            <th></th>
-            <th></th>
-            <th></th>
+            <th>Подразделение</th>
             {% for program in training_programs %}
             <th>{{ program.name }}</th>
             {% endfor %}
@@ -72,7 +51,4 @@
         {% endfor %}
     </tbody>
 </table>
-{% else %}
-<p>Данные для отчета отсутствуют.</p>
-{% endif %}
 {% endblock %}
