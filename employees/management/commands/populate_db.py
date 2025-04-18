@@ -1,93 +1,17 @@
-from datetime import date
-
 from django.core.management.base import BaseCommand
-from employees.models import Department, Position, TrainingProgram, Employee, TrainingRecord
-from employees_output import employees_data_list
+
+from data_upload.departments_list import departments
+from data_upload.employees_list import employees_data_list
+from data_upload.positions_list import positions
+from data_upload.training_programs_list import training_programs
+from employees.models import Department, Position, TrainingProgram, Employee
+
 
 class Command(BaseCommand):
     help = 'Заполняет базу данных предопределенными подразделениями и должностями'
 
     def handle(self, *args, **kwargs):
-        # Список подразделений
-        departments = [
-            {"name": "Руководство", "description": "Руководство"},
-            {"name": "УМО", "description": "Учебно-методический отдел"},
-            {"name": "ООПиВР", "description": "Отдел общественно-политической и воспитательной работы"},
-            {"name": "ОДО", "description": "Отдел дополнительного образования"},
-            {"name": "ОСПР", "description": "Отдел социально-психологической работы"},
-            {"name": "ОК", "description": "Отдел кадров"},
-            {"name": "ФЭО", "description": "Финансово-экономический отдел"},
-            {"name": "ОМТО", "description": "Отдел материально-технического обеспечения"},
-            {"name": "ОДОб", "description": "Отдел документационного обеспечения"},
-            {"name": "МО", "description": "Медицинский отдел"},
-            {"name": "ООБ", "description": "Отдел обеспечения безопасности"},
-            {"name": "ОПО", "description": "Отделение правового обеспечения"},
-        ]
-
-        # Список должностей
-        positions = [
-            {"name": "Директор"},
-            {"name": "Первый заместитель директора"},
-            {"name": "Заместитель директора (по учебно-методической работе)"},
-            {"name": "Заместитель директора (по организационным вопросам и контролю)"},
-            {"name": "Заместитель директора - руководитель отдела общественно-политической и воспитательной работы"},
-            {"name": "Руководитель отдела"},
-            {"name": "Заместитель руководителя отдела"},
-            {"name": "Инспектор по инновационным технологиям"},
-            {"name": "Старший методист"},
-            {"name": "Методист"},
-            {"name": "Учитель"},
-            {"name": "Заместитель руководителя отдела (отделения Санкт-Петербургских кадетских классов и кадетских классов с морской направленностью)"},
-            {"name": "Заместитель руководителя отдела (отделение кадетских классов Пансиона воспитанниц)"},
-            {"name": "Старший воспитатель"},
-            {"name": "Воспитатель"},
-            {"name": "Педагог-организатор"},
-            {"name": "Педагог дополнительного образования"},
-            {"name": "Педагог дополнительного образования (заведующий музеем)"},
-            {"name": "Педагог-библиотекарь (заведующий библиотекой)"},
-            {"name": "Старший инспектор (психолог)"},
-            {"name": "Педагог-психолог"},
-            {"name": "Социальный педагог"},
-            {"name": "Старший инспектор"},
-            {"name": "Инспектор"},
-            {"name": "Руководитель отдела (главный бухгалтер)"},
-            {"name": "Инженер"},
-            {"name": "Техник"},
-            {"name": "Водитель автомобиля"},
-            {"name": "Начальник отдела (врач-педиатр)"},
-            {"name": "Врач-педиатр"},
-            {"name": "Медицинская сестра"},
-            {"name": "Инспектор (по охране труда)"},
-            {"name": "Руководитель отделения"},
-        ]
-
-        # Список программ обучения
-        training_programs = [
-            {"name": "Охрана труда", "recurrence_period": 3},
-            {"name": "Пожарная безопасность", "recurrence_period": 3},
-            {"name": "Оказание первой помощи", "recurrence_period": 3},
-        ]
-
-        # # Тестовые записи об обучении (используем реальных сотрудников из employees_data_list)
-        # training_records = [
-        #     {
-        #         "employee": {"last_name": "Акимов", "first_name": "Дмитрий"},
-        #         "training_program": "Охрана труда",
-        #         "completion_date": date(2023, 6, 1),
-        #     },
-        #     {
-        #         "employee": {"last_name": "Акимов", "first_name": "Дмитрий"},
-        #         "training_program": "Пожарная безопасность",
-        #         "completion_date": date(2024, 3, 15),
-        #     },
-        #     {
-        #         "employee": {"last_name": "Алейникова", "first_name": "Ирина"},
-        #         "training_program": "Оказание первой помощи",
-        #         "completion_date": date(2022, 9, 10),
-        #     },
-        # ]
-
-        # Заполнение подразделений
+    # Заполнение подразделений
         self.stdout.write("Заполнение подразделений...")
         for dept in departments:
             if not Department.objects.filter(name=dept["name"]).exists():
