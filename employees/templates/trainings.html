@@ -19,9 +19,13 @@
     <tr>
         <td>{{ training.name }}</td>
         <td>{{ training.recurrence_period|default:"—" }}</td>
-        <td>
-            <a href="{% url 'employees:training_edit' training.pk %}" class="action-button">Редактировать</a>
-            <a href="{% url 'employees:training_delete' training.pk %}" class="delete-button">Удалить</a>
+        <td class="actions">
+            <a href="{% url 'employees:training_edit' training.pk %}" class="action-icon" title="Редактировать" aria-label="Редактировать программу обучения">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'employees:training_delete' training.pk %}" class="delete-icon" title="Удалить" aria-label="Удалить программу обучения" onclick="return confirm('Вы уверены, что хотите удалить программу обучения?');">
+                <i class="fas fa-trash"></i>
+            </a>
         </td>
     </tr>
     {% endfor %}

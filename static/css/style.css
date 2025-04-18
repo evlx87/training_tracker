@@ -1,3 +1,4 @@
+/* Общие стили для страницы */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -15,6 +16,7 @@ h1 {
     margin-top: 30px;
 }
 
+/* Стили для контейнера кнопок на главной странице */
 .button-container {
     display: flex;
     justify-content: center;
@@ -45,6 +47,7 @@ h1 {
     background-color: #45a049;
 }
 
+/* Стили для таблиц */
 table {
     width: 90%;
     margin: 20px auto;
@@ -61,6 +64,7 @@ th {
     background-color: #f2f2f2;
 }
 
+/* Стили для текстовых кнопок */
 .back-button, .action-button, .submit-button, .delete-button {
     display: inline-block;
     padding: 10px 20px;
@@ -84,6 +88,7 @@ th {
     background-color: #d32f2f;
 }
 
+/* Стили для форм */
 .form-container {
     max-width: 600px;
     margin: 20px auto;
@@ -116,7 +121,7 @@ th {
     font-size: 0.9em;
 }
 
-/* Стили для легенды */
+/* Стили для легенды (для таблиц с цветовой индикацией) */
 .legend {
     display: flex;
     justify-content: center;
@@ -146,39 +151,71 @@ th {
 }
 
 .legend-item.not-completed {
-    background-color: #ff9999; /* Обновлено: насыщенный розовый */
+    background-color: #ff9999; /* Насыщенный розовый для незавершённых задач */
 }
 
 .legend-item.overdue {
-    background-color: #ff3333; /* Обновлено: яркий красный */
+    background-color: #ff3333; /* Яркий красный для просроченных задач */
+    color: white; /* Белый текст для лучшей читаемости */
 }
 
 .legend-item.warning {
-    background-color: #ffff66; /* Обновлено: насыщенный жёлтый */
+    background-color: #ffff66; /* Насыщенный жёлтый для предупреждений */
 }
 
 .legend-item.completed {
-    background-color: #99ff99; /* Обновлено: насыщенный светло-зелёный */
+    background-color: #99ff99; /* Светло-зелёный для завершённых задач */
 }
 
-/* Улучшение читаемости текста на красном фоне */
-.legend-item.overdue {
-    color: white;
-}
-
-/* Стили для ячеек таблицы */
+/* Стили для ячеек таблицы с цветовой индикацией */
 .not-completed {
-    background-color: #ff9999; /* Обновлено: насыщенный розовый */
+    background-color: #ff9999; /* Насыщенный розовый для незавершённых задач */
 }
 
 .overdue {
-    background-color: #ff3333; /* Обновлено: яркий красный */
+    background-color: #ff3333; /* Яркий красный для просроченных задач */
 }
 
 .warning {
-    background-color: #ffff66; /* Обновлено: насыщенный жёлтый */
+    background-color: #ffff66; /* Насыщенный жёлтый для предупреждений */
 }
 
 .normal {
-    background-color: #99ff99; /* Обновлено: насыщенный светло-зелёный */
+    background-color: #99ff99; /* Светло-зелёный для нормального состояния */
+}
+
+/* Стили для иконок в таблицах */
+.actions {
+    display: flex;
+    gap: 8px; /* Уменьшенный отступ между иконками для компактности */
+    justify-content: center;
+    align-items: center;
+    padding: 4px; /* Минимальный отступ внутри ячейки */
+}
+
+.view-icon, .action-icon, .delete-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; /* Размер иконок */
+    color: #4CAF50; /* Зелёный цвет для просмотра и редактирования */
+    text-decoration: none;
+    width: 24px; /* Фиксированная ширина для области клика */
+    height: 24px; /* Фиксированная высота для области клика */
+    border-radius: 4px; /* Скругление углов */
+    transition: color 0.2s, background-color 0.2s; /* Быстрый переход для эффекта наведения */
+}
+
+.delete-icon {
+    color: #f44336; /* Красный цвет для удаления */
+}
+
+.view-icon:hover, .action-icon:hover {
+    color: #fff; /* Белый цвет иконки при наведении */
+    background-color: #45a049; /* Зелёный фон при наведении */
+}
+
+.delete-icon:hover {
+    color: #fff; /* Белый цвет иконки при наведении */
+    background-color: #d32f2f; /* Красный фон при наведении */
 }

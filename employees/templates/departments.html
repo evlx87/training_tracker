@@ -19,9 +19,13 @@
     <tr>
         <td>{{ department.name }}</td>
         <td>{{ department.description|default:"—" }}</td>
-        <td>
-            <a href="{% url 'employees:department_edit' department.pk %}" class="action-button">Редактировать</a>
-            <a href="{% url 'employees:department_delete' department.pk %}" class="delete-button">Удалить</a>
+        <td class="actions">
+            <a href="{% url 'employees:department_edit' department.pk %}" class="action-icon" title="Редактировать" aria-label="Редактировать подразделение">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'employees:department_delete' department.pk %}" class="delete-icon" title="Удалить" aria-label="Удалить подразделение" onclick="return confirm('Вы уверены, что хотите удалить подразделение?');">
+                <i class="fas fa-trash"></i>
+            </a>
         </td>
     </tr>
     {% endfor %}

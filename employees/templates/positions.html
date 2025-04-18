@@ -17,9 +17,13 @@
     {% for position in positions %}
     <tr>
         <td>{{ position.name }}</td>
-        <td>
-            <a href="{% url 'employees:position_edit' position.pk %}" class="action-button">Редактировать</a>
-            <a href="{% url 'employees:position_delete' position.pk %}" class="delete-button">Удалить</a>
+        <td class="actions">
+            <a href="{% url 'employees:position_edit' position.pk %}" class="action-icon" title="Редактировать" aria-label="Редактировать должность">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'employees:position_delete' position.pk %}" class="delete-icon" title="Удалить" aria-label="Удалить должность" onclick="return confirm('Вы уверены, что хотите удалить должность?');">
+                <i class="fas fa-trash"></i>
+            </a>
         </td>
     </tr>
     {% endfor %}
