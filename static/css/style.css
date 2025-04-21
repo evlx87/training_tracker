@@ -58,10 +58,20 @@ th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
+    vertical-align: middle;
+    min-height: 40px;
+    box-sizing: border-box;
+    line-height: 1.5;
+    overflow: hidden;
 }
 
 th {
     background-color: #f2f2f2;
+}
+
+tr {
+    min-height: 40px;
+    max-height: 40px;
 }
 
 /* Стили для текстовых кнопок */
@@ -151,71 +161,78 @@ th {
 }
 
 .legend-item.not-completed {
-    background-color: #ff9999; /* Насыщенный розовый для незавершённых задач */
+    background-color: #ff9999;
 }
 
 .legend-item.overdue {
-    background-color: #ff3333; /* Яркий красный для просроченных задач */
-    color: white; /* Белый текст для лучшей читаемости */
+    background-color: #ff3333;
+    color: white;
 }
 
 .legend-item.warning {
-    background-color: #ffff66; /* Насыщенный жёлтый для предупреждений */
+    background-color: #ffff66;
 }
 
 .legend-item.completed {
-    background-color: #99ff99; /* Светло-зелёный для завершённых задач */
+    background-color: #99ff99;
 }
 
 /* Стили для ячеек таблицы с цветовой индикацией */
 .not-completed {
-    background-color: #ff9999; /* Насыщенный розовый для незавершённых задач */
+    background-color: #ff9999;
 }
 
 .overdue {
-    background-color: #ff3333; /* Яркий красный для просроченных задач */
+    background-color: #ff3333;
 }
 
 .warning {
-    background-color: #ffff66; /* Насыщенный жёлтый для предупреждений */
+    background-color: #ffff66;
 }
 
 .normal {
-    background-color: #99ff99; /* Светло-зелёный для нормального состояния */
+    background-color: #99ff99;
 }
 
 /* Стили для иконок в таблицах */
 .actions {
     display: flex;
-    gap: 8px; /* Уменьшенный отступ между иконками для компактности */
+    gap: 8px;
     justify-content: center;
     align-items: center;
-    padding: 4px; /* Минимальный отступ внутри ячейки */
+    padding: 8px;
+    height: 100%;
+    max-height: 40px;
+    box-sizing: border-box;
 }
 
 .view-icon, .action-icon, .delete-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px; /* Размер иконок */
-    color: #4CAF50; /* Зелёный цвет для просмотра и редактирования */
+    color: #4CAF50;
     text-decoration: none;
-    width: 24px; /* Фиксированная ширина для области клика */
-    height: 24px; /* Фиксированная высота для области клика */
-    border-radius: 4px; /* Скругление углов */
-    transition: color 0.2s, background-color 0.2s; /* Быстрый переход для эффекта наведения */
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.view-icon svg, .action-icon svg, .delete-icon svg {
+    width: 16px;
+    height: 16px;
 }
 
 .delete-icon {
-    color: #f44336; /* Красный цвет для удаления */
+    color: #f44336;
 }
 
 .view-icon:hover, .action-icon:hover {
-    color: #fff; /* Белый цвет иконки при наведении */
-    background-color: #45a049; /* Зелёный фон при наведении */
+    color: #fff;
+    background-color: #45a049;
 }
 
 .delete-icon:hover {
-    color: #fff; /* Белый цвет иконки при наведении */
-    background-color: #d32f2f; /* Красный фон при наведении */
+    color: #fff;
+    background-color: #d32f2f;
 }
