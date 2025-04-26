@@ -186,10 +186,8 @@ th {
 
 /* Стили для иконок в таблицах */
 .actions {
-    display: flex;
     gap: 8px; /* Уменьшенный отступ между иконками для компактности */
-    justify-content: center;
-    align-items: center;
+    text-align: center;
     padding: 4px; /* Минимальный отступ внутри ячейки */
 }
 
