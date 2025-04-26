@@ -49,15 +49,17 @@ h1 {
 
 /* Стили для таблиц */
 table {
-    width: 90%;
+    width: auto;
     margin: 20px auto;
     border-collapse: collapse;
+    table-layout: auto;
 }
 
 th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
+    /* white-space: nowrap; */
 }
 
 th {
