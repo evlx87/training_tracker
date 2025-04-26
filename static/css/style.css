@@ -58,11 +58,13 @@ th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
-    vertical-align: middle;
+    vertical-align: middle; /* Выравнивание содержимого по вертикали */
     min-height: 40px;
+    height: 40px; /* Фиксируем высоту ячейки */
     box-sizing: border-box;
     line-height: 1.5;
-    overflow: hidden;
+    overflow: hidden; /* Обрезка содержимого */
+    white-space: nowrap; /* Предотвращение переноса текста */
 }
 
 th {
@@ -72,6 +74,7 @@ th {
 tr {
     min-height: 40px;
     max-height: 40px;
+    overflow: hidden; /* Предотвращаем растяжение строки */
 }
 
 /* Стили для текстовых кнопок */
@@ -128,7 +131,7 @@ tr {
 
 .form-text {
     color: #666;
-    font-size: 0.9em;
+ font-size:0.9em;
 }
 
 /* Стили для легенды (для таблиц с цветовой индикацией) */
@@ -202,7 +205,6 @@ tr {
     align-items: center;
     padding: 8px;
     height: 100%;
-    max-height: 40px;
     box-sizing: border-box;
 }
 
@@ -216,11 +218,13 @@ tr {
     height: 24px;
     border-radius: 4px;
     transition: color 0.2s, background-color 0.2s;
+    overflow: hidden;
 }
 
 .view-icon svg, .action-icon svg, .delete-icon svg {
     width: 16px;
     height: 16px;
+    vertical-align: middle; /* Выравниваем SVG по центру */
 }
 
 .delete-icon {
@@ -235,4 +239,18 @@ tr {
 .delete-icon:hover {
     color: #fff;
     background-color: #d32f2f;
+}
+
+/* Дополнительные стили для выравнивания высоты ячеек */
+td.actions {
+    height: 40px; /* Фиксируем высоту для ячеек с кнопками */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+td.actions a {
+    display: inline-block;
+    height: 24px; /* Фиксируем высоту для кнопок */
+    line-height: 24px; /* Выравниваем текст по центру */
 }
