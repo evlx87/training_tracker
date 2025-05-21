@@ -64,15 +64,15 @@ class TrainingProgram(models.Model):
 
 
 class TrainingRecord(models.Model):
-    employee = models.ForeignKey('employees.Employee', on_delete=models.CASCADE, verbose_name="Сотрудник")
-    training_program = models.ForeignKey('employees.TrainingProgram', on_delete=models.CASCADE,
-                                         verbose_name="Программа обучения")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name="Сотрудник")
+    training_program = models.ForeignKey(TrainingProgram, on_delete=models.CASCADE, verbose_name="Программа обучения")
     completion_date = models.DateField(verbose_name="Дата прохождения")
-
-    def __str__(self):
-        return f"{self.employee} - {self.training_program} ({self.completion_date})"
+    details = models.TextField(blank=True, verbose_name="Детали")  # Поле для групп и пометок
 
     class Meta:
         verbose_name = "Запись об обучении"
         verbose_name_plural = "Записи об обучении"
         unique_together = ['employee', 'training_program', 'completion_date']
+
+    def __str__(self):
+        return f"{self.employee} - {self.training_program} - {self.completion_date}"
