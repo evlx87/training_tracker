@@ -49,32 +49,24 @@ h1 {
 
 /* Стили для таблиц */
 table {
-    width: 90%;
+    width: auto;
     margin: 20px auto;
     border-collapse: collapse;
+    table-layout: auto;
 }
 
 th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
-    vertical-align: middle; /* Выравнивание содержимого по вертикали */
-    min-height: 40px;
-    height: 40px; /* Фиксируем высоту ячейки */
-    box-sizing: border-box;
-    line-height: 1.5;
-    overflow: hidden; /* Обрезка содержимого */
-    white-space: nowrap; /* Предотвращение переноса текста */
+    /* white-space: nowrap; */
 }
 
 th {
     background-color: #f2f2f2;
-}
-
-tr {
-    min-height: 40px;
-    max-height: 40px;
-    overflow: hidden; /* Предотвращаем растяжение строки */
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center; /* Центрирование текста в шапке таблицы */
 }
 
 /* Стили для текстовых кнопок */
@@ -131,7 +123,7 @@ tr {
 
 .form-text {
     color: #666;
- font-size:0.9em;
+    font-size: 0.9em;
 }
 
 /* Стили для легенды (для таблиц с цветовой индикацией) */
@@ -164,93 +156,69 @@ tr {
 }
 
 .legend-item.not-completed {
-    background-color: #ff9999;
+    background-color: #ff9999; /* Насыщенный розовый для незавершённых задач */
 }
 
 .legend-item.overdue {
-    background-color: #ff3333;
-    color: white;
+    background-color: #ff3333; /* Яркий красный для просроченных задач */
+    color: white; /* Белый текст для лучшей читаемости */
 }
 
 .legend-item.warning {
-    background-color: #ffff66;
+    background-color: #ffff66; /* Насыщенный жёлтый для предупреждений */
 }
 
 .legend-item.completed {
-    background-color: #99ff99;
+    background-color: #99ff99; /* Светло-зелёный для завершённых задач */
 }
 
 /* Стили для ячеек таблицы с цветовой индикацией */
 .not-completed {
-    background-color: #ff9999;
+    background-color: #ff9999; /* Насыщенный розовый для незавершённых задач */
 }
 
 .overdue {
-    background-color: #ff3333;
+    background-color: #ff3333; /* Яркий красный для просроченных задач */
 }
 
 .warning {
-    background-color: #ffff66;
+    background-color: #ffff66; /* Насыщенный жёлтый для предупреждений */
 }
 
 .normal {
-    background-color: #99ff99;
+    background-color: #99ff99; /* Светло-зелёный для нормального состояния */
 }
 
 /* Стили для иконок в таблицах */
 .actions {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    align-items: center;
-    padding: 8px;
-    height: 100%;
-    box-sizing: border-box;
+    gap: 8px; /* Уменьшенный отступ между иконками для компактности */
+    text-align: center;
+    padding: 4px; /* Минимальный отступ внутри ячейки */
 }
 
 .view-icon, .action-icon, .delete-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #4CAF50;
+    font-size: 16px; /* Размер иконок */
+    color: #4CAF50; /* Зелёный цвет для просмотра и редактирования */
     text-decoration: none;
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    transition: color 0.2s, background-color 0.2s;
-    overflow: hidden;
-}
-
-.view-icon svg, .action-icon svg, .delete-icon svg {
-    width: 16px;
-    height: 16px;
-    vertical-align: middle; /* Выравниваем SVG по центру */
+    width: 24px; /* Фиксированная ширина для области клика */
+    height: 24px; /* Фиксированная высота для области клика */
+    border-radius: 4px; /* Скругление углов */
+    transition: color 0.2s, background-color 0.2s; /* Быстрый переход для эффекта наведения */
 }
 
 .delete-icon {
-    color: #f44336;
+    color: #f44336; /* Красный цвет для удаления */
 }
 
 .view-icon:hover, .action-icon:hover {
-    color: #fff;
-    background-color: #45a049;
+    color: #fff; /* Белый цвет иконки при наведении */
+    background-color: #45a049; /* Зелёный фон при наведении */
 }
 
 .delete-icon:hover {
-    color: #fff;
-    background-color: #d32f2f;
-}
-
-/* Дополнительные стили для выравнивания высоты ячеек */
-td.actions {
-    height: 40px; /* Фиксируем высоту для ячеек с кнопками */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-td.actions a {
-    display: inline-block;
-    height: 24px; /* Фиксируем высоту для кнопок */
-    line-height: 24px; /* Выравниваем текст по центру */
+    color: #fff; /* Белый цвет иконки при наведении */
+    background-color: #d32f2f; /* Красный фон при наведении */
 }
