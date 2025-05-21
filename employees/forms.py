@@ -1,6 +1,8 @@
 from django import forms
-from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
 from django.core.exceptions import ValidationError
+
+from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
+
 
 class EmployeeForm(forms.ModelForm):
     class Meta:
