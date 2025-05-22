@@ -1,73 +1,58 @@
 {% extends 'base.html' %}
 {% load dict_get %}
-
 {% block title %}
-Отчет по обучению сотрудников
+Отчет по обучению
 {% endblock %}
-
 {% block content %}
-<h1>Отчет по обучению сотрудников</h1>
-<a href="{% url 'employees:index' %}" class="back-button">Назад на главную</a>
-
+<h1>Отчет по обучению</h1>
+<a href="{% url 'employees:index' %}" class="back-button">На главную</a>
 <form action="{% url 'employees:training_record_create' %}" method="get" style="display: inline;">
-    <select name="employee_pk" class="form-input" style="padding: 5px;">
+    <select name="employee_pk" class="form-input">
         <option value="">Выберите сотрудника</option>
         {% for employee in employees %}
         <option value="{{ employee.pk }}">{{ employee.last_name }} {{ employee.first_name }}</option>
         {% endfor %}
     </select>
-    <button type="submit" class="action-button">Добавить запись об обучении</button>
+    <button type="submit" class="action-button">Добавить запись</button>
 </form>
-
 <div class="legend">
-    <div class="legend-item not-completed">
-        <span>Обучение</span>
-        <span>не пройдено</span>
-    </div>
-    <div class="legend-item overdue">
-        <span>Обучение</span>
-        <span>просрочено</span>
-    </div>
-    <div class="legend-item warning">
-        <span>Обучение скоро</span>
-        <span>станет просроченным</span>
-    </div>
-    <div class="legend-item completed">
-        <span>Обучение</span>
-        <span>пройдено</span>
-    </div>
+    <div class="legend-item not-completed">Не пройдено</div>
+    <div class="legend-item overdue">Просрочено</div>
+    <div class="legend-item warning">Скоро истекает</div>
+    <div class="legend-item completed">Пройдено</div>
 </div>
-
-<table class="report-table">
-    <thead>
-        <tr>
-            <th>Сотрудник</th>
-            <th>Должность</th>
-            <th>Подразделение</th>
-            {% for program in training_programs %}
-            <th>{{ program.name }}</th>
+<div class="table-container">
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Сотрудник</th>
+                <th>Должность</th>
+                <th>Подразделение</th>
+                {% for program in training_programs %}
+                <th title="{{ program.name }}">{{ program.name|truncatechars:10 }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in report_data %}
+            <tr>
+                <td>{{ data.employee.last_name }} {{ data.employee.first_name|first }}. {% if data.employee.middle_name %}{{ data.employee.middle_name|first }}.{% endif %}</td>
+                <td>{{ data.employee.position|default:"—" }}</td>
+                <td>{{ data.employee.department|default:"—" }}</td>
+                {% for program in training_programs %}
+                <td class="{{ data.trainings|get_item:program.id|get_item:'class' }}">
+                    {% with training_status=data.trainings|get_item:program.id %}
+                    {% if training_status.date == "Обучение не пройдено" %}
+                        —
+                    {% else %}
+                        {{ training_status.date|date:"d.m.y" }}
+                    {% endif %}
+                    {% endwith %}
+                </td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for data in report_data %}
-        <tr>
-            <td>{{ data.employee.last_name }} {{ data.employee.first_name }} {{ data.employee.middle_name|default:"" }}</td>
-            <td>{{ data.employee.position|default:"—" }}</td>
-            <td>{{ data.employee.department|default:"—" }}</td>
-            {% for program in training_programs %}
-            <td class="{{ data.trainings|get_item:program.id|get_item:'class' }}">
-                {% with training_status=data.trainings|get_item:program.id %}
-                {% if training_status.date == "Обучение не пройдено" %}
-                    {{ training_status.date }}
-                {% else %}
-                    {{ training_status.date|date:"d.m.Y" }}
-                {% endif %}
-                {% endwith %}
-            </td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 {% endblock %}
