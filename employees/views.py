@@ -1,10 +1,12 @@
+from datetime import timedelta
+
+from django.contrib import messages  # Добавляем messages
 from django.forms import ModelForm, TextInput, Textarea
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages  # Добавляем messages
-from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
-from .forms import EmployeeForm, DepartmentForm, PositionForm, TrainingProgramForm, TrainingRecordForm
 from django.utils import timezone
-from datetime import timedelta
+
+from .forms import EmployeeForm, DepartmentForm, PositionForm, TrainingProgramForm, TrainingRecordForm
+from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
 
 
 # Формы
@@ -45,7 +47,9 @@ def employee_create(request):
             return redirect('employees:employee_list')
     else:
         form = EmployeeForm()
-    return render(request, 'employee_form.html', {'form': form, 'action': 'Добавить'})
+    return render(
+        request, 'employee_form.html', {
+            'form': form, 'action': 'Добавить'})
 
 
 def employee_edit(request, pk):
@@ -57,7 +61,9 @@ def employee_edit(request, pk):
             return redirect('employees:employee_list')
     else:
         form = EmployeeForm(instance=employee)
-    return render(request, 'employee_form.html', {'form': form, 'action': 'Редактировать'})
+    return render(
+        request, 'employee_form.html', {
+            'form': form, 'action': 'Редактировать'})
 
 
 def employee_delete(request, pk):
@@ -65,7 +71,9 @@ def employee_delete(request, pk):
     if request.method == 'POST':
         employee.delete()
         return redirect('employees:employee_list')
-    return render(request, 'employee_confirm_delete.html', {'employee': employee})
+    return render(
+        request, 'employee_confirm_delete.html', {
+            'employee': employee})
 
 
 def employee_trainings(request, pk):
@@ -80,7 +88,8 @@ def employee_trainings(request, pk):
 def training_record_create(request):
     employee_pk = request.GET.get('employee_pk')
     if not employee_pk:
-        messages.error(request, 'Пожалуйста, выберите сотрудника.')  # Добавляем сообщение об ошибке
+        # Добавляем сообщение об ошибке
+        messages.error(request, 'Пожалуйста, выберите сотрудника.')
         return redirect('employees:employee_list')
     employee = get_object_or_404(Employee, pk=employee_pk)
     if request.method == 'POST':
@@ -141,7 +150,8 @@ def department_create(request):
             return redirect('employees:department_list')
     else:
         form = DepartmentForm()
-    return render(request, 'department_form.html', {'form': form, 'action': 'Добавить'})
+    return render(request, 'department_form.html', {
+                  'form': form, 'action': 'Добавить'})
 
 
 def department_edit(request, pk):
@@ -153,7 +163,9 @@ def department_edit(request, pk):
             return redirect('employees:department_list')
     else:
         form = DepartmentForm(instance=department)
-    return render(request, 'department_form.html', {'form': form, 'action': 'Редактировать'})
+    return render(
+        request, 'department_form.html', {
+            'form': form, 'action': 'Редактировать'})
 
 
 def department_delete(request, pk):
@@ -161,7 +173,9 @@ def department_delete(request, pk):
     if request.method == 'POST':
         department.delete()
         return redirect('employees:department_list')
-    return render(request, 'department_confirm_delete.html', {'department': department})
+    return render(
+        request, 'department_confirm_delete.html', {
+            'department': department})
 
 
 def position_list(request):
@@ -177,7 +191,9 @@ def position_create(request):
             return redirect('employees:position_list')
     else:
         form = PositionForm()
-    return render(request, 'position_form.html', {'form': form, 'action': 'Добавить'})
+    return render(
+        request, 'position_form.html', {
+            'form': form, 'action': 'Добавить'})
 
 
 def position_edit(request, pk):
@@ -189,7 +205,9 @@ def position_edit(request, pk):
             return redirect('employees:position_list')
     else:
         form = PositionForm(instance=position)
-    return render(request, 'position_form.html', {'form': form, 'action': 'Редактировать'})
+    return render(
+        request, 'position_form.html', {
+            'form': form, 'action': 'Редактировать'})
 
 
 def position_delete(request, pk):
@@ -197,7 +215,9 @@ def position_delete(request, pk):
     if request.method == 'POST':
         position.delete()
         return redirect('employees:position_list')
-    return render(request, 'position_confirm_delete.html', {'position': position})
+    return render(
+        request, 'position_confirm_delete.html', {
+            'position': position})
 
 
 def training_list(request):
@@ -213,7 +233,9 @@ def training_create(request):
             return redirect('employees:training_list')
     else:
         form = TrainingProgramForm()
-    return render(request, 'training_form.html', {'form': form, 'action': 'Добавить'})
+    return render(
+        request, 'training_form.html', {
+            'form': form, 'action': 'Добавить'})
 
 
 def training_edit(request, pk):
@@ -225,7 +247,9 @@ def training_edit(request, pk):
             return redirect('employees:training_list')
     else:
         form = TrainingProgramForm(instance=training)
-    return render(request, 'training_form.html', {'form': form, 'action': 'Редактировать'})
+    return render(
+        request, 'training_form.html', {
+            'form': form, 'action': 'Редактировать'})
 
 
 def training_delete(request, pk):
@@ -233,7 +257,9 @@ def training_delete(request, pk):
     if request.method == 'POST':
         training.delete()
         return redirect('employees:training_list')
-    return render(request, 'training_confirm_delete.html', {'training': training})
+    return render(
+        request, 'training_confirm_delete.html', {
+            'training': training})
 
 
 def reports(request):
@@ -266,7 +292,8 @@ def reports(request):
             else:
                 status['date'] = latest_record.completion_date
                 if program.recurrence_period:
-                    due_date = latest_record.completion_date + timedelta(days=program.recurrence_period * 365)
+                    due_date = latest_record.completion_date + \
+                        timedelta(days=program.recurrence_period * 365)
                     warning_date = due_date - six_months
                     if today > due_date:
                         status['class'] = 'overdue'
