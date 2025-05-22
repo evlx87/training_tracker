@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 from datetime import datetime
 import os
@@ -5,29 +6,26 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from employees.models import Employee, Department, Position, TrainingProgram, TrainingRecord
 
+# Настройка логгера
+logger = logging.getLogger('employees')
 
 class Command(BaseCommand):
     help = 'Импортирует данные из Excel файла в базу данных'
 
     def handle(self, *args, **kwargs):
-        # Путь к файлу в корне проекта
         file_path = os.path.join(settings.BASE_DIR, 'data_upload', 'обучение.xlsx')
-
         if not os.path.exists(file_path):
-            self.stdout.write(self.style.ERROR(f"Файл не найден: {file_path}"))
+            logger.error(f"Файл не найден: {file_path}")
             return
 
-        # Чтение Excel файла
         try:
             df = pd.read_excel(file_path, header=[0, 1, 2], engine='openpyxl')
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f"Ошибка чтения файла: {e}"))
+            logger.error(f"Ошибка чтения файла: {e}")
             return
 
-        # Вывод заголовков для диагностики
-        self.stdout.write(self.style.WARNING(f"Заголовки столбцов: {df.columns.tolist()}"))
+        logger.info(f"Заголовки столбцов: {df.columns.tolist()}")
 
-        # Список программ обучения с периодичностью
         programs = {
             'Охрана труда': 3,
             'Пожарная безопасность': 3,
@@ -36,8 +34,6 @@ class Command(BaseCommand):
             'Ответственный за БДД': None,
             'Антитеррор': None
         }
-
-        # Создание программ обучения
         program_objects = {}
         for name, recurrence in programs.items():
             program, _ = TrainingProgram.objects.get_or_create(
@@ -45,12 +41,10 @@ class Command(BaseCommand):
                 defaults={'recurrence_period': recurrence}
             )
             program_objects[name] = program
+            logger.debug(f"Создана/получена программа обучения: {name}")
 
-        # Обработка строк таблицы
         for index, row in df.iterrows():
-            self.stdout.write(self.style.WARNING(f"Обрабатывается строка {index}"))
-
-            # Попытка доступа к данным сотрудника
+            logger.debug(f"Обрабатывается строка {index}")
             try:
                 last_name = row.get(('Фамилия', 'Unnamed: 1_level_1', 'Unnamed: 1_level_2'), None)
                 first_name = row.get(('Имя', 'Unnamed: 2_level_1', 'Unnamed: 2_level_2'), None)
@@ -64,18 +58,14 @@ class Command(BaseCommand):
                 note = row.get(('Примечание', 'Unnamed: 4_level_1', 'Unnamed: 4_level_2'), '') if pd.notna(
                     row.get(('Примечание', 'Unnamed: 4_level_1', 'Unnamed: 4_level_2'), None)) else ''
             except KeyError as e:
-                self.stdout.write(self.style.WARNING(f"Ошибка доступа к столбцу в строке {index}: {e}"))
+                logger.warning(f"Ошибка доступа к столбцу в строке {index}: {e}")
                 continue
 
-            # Пропуск строк без ФИО
             if pd.isna(last_name) or pd.isna(first_name):
-                self.stdout.write(self.style.WARNING(
-                    f"Пропущена строка {index}: отсутствует Фамилия или Имя ({last_name}, {first_name})"))
+                logger.warning(f"Пропущена строка {index}: отсутствует Фамилия или Имя ({last_name}, {first_name})")
                 continue
 
-            self.stdout.write(self.style.WARNING(f"Обработка сотрудника: {last_name} {first_name}"))
-
-            # Обработка статуса сотрудника
+            logger.info(f"Обработка сотрудника: {last_name} {first_name}")
             is_dismissed = 'уволена' in note.lower()
             is_on_maternity_leave = 'декрет' in note.lower()
             dismissal_date = None
@@ -83,22 +73,21 @@ class Command(BaseCommand):
                 try:
                     dismissal_date_str = note.lower().split('с ')[1].strip()
                     dismissal_date = datetime.strptime(dismissal_date_str, '%d.%m.%Y').date()
+                    logger.debug(f"Обработана дата увольнения: {dismissal_date}")
                 except (ValueError, IndexError):
-                    self.stdout.write(
-                        self.style.WARNING(f"Не удалось разобрать дату увольнения для {last_name}: {note}"))
+                    logger.warning(f"Не удалось разобрать дату увольнения для {last_name}: {note}")
 
-            # Создание или получение подразделения
             department, _ = Department.objects.get_or_create(
                 name=department_name,
                 defaults={'description': ''}
             )
+            logger.debug(f"Создана/получена должность: {department_name}")
 
-            # Создание или получение должности
             position, _ = Position.objects.get_or_create(
                 name=position_name
             )
+            logger.debug(f"Создана/получена должность: {position_name}")
 
-            # Создание или получение сотрудника
             employee, _ = Employee.objects.get_or_create(
                 last_name=last_name,
                 first_name=first_name,
@@ -111,21 +100,16 @@ class Command(BaseCommand):
                     'dismissal_date': dismissal_date
                 }
             )
+            logger.info(f"Сотрудник добавлен/обновлен: {employee}")
 
-            # Обработка программ обучения
             for program_name in programs.keys():
                 program_obj = program_objects[program_name]
-
-                # Проверка всех возможных столбцов для программы
                 for column in df.columns:
                     if column[0] == program_name and column[1] == 'Дата прохождения обучения':
                         cell_value = row.get(column, None)
                         if pd.notna(cell_value):
-                            self.stdout.write(
-                                self.style.WARNING(f"Найдена дата для {program_name} в столбце {column}: {cell_value}"))
-                            # Обработка строки
+                            logger.debug(f"Найдена дата для {program_name} в столбце {column}: {cell_value}")
                             cell_value = str(cell_value).strip()
-                            # Разделяем множественные даты или группы
                             entries = cell_value.split('\n')
                             for entry in entries:
                                 entry = entry.strip()
@@ -134,52 +118,37 @@ class Command(BaseCommand):
                                 details = ''
                                 date_str = entry
                                 has_question_mark = '?' in entry
-
-                                # Для электробезопасности извлекаем группу
                                 if program_name == 'Электробезопасность' and ', ' in entry:
                                     try:
                                         details, date_str = entry.split(', ', 1)
                                         date_str = date_str.strip()
                                     except ValueError:
-                                        self.stdout.write(self.style.WARNING(
-                                            f"Ошибка обработки группы для {employee} ({program_name}): {entry}"))
+                                        logger.warning(
+                                            f"Ошибка обработки группы для {employee} ({program_name}): {entry}")
                                         continue
-                                # Убираем символ '?' из даты
                                 date_str = date_str.replace('?', '').strip()
-
-                                # Обработка даты
                                 try:
-                                    # Формат YYYY-MM-DD HH:MM:SS
                                     if len(date_str) >= 10 and date_str[4] == '-' and date_str[7] == '-':
                                         training_date = datetime.strptime(date_str[:10], '%Y-%m-%d').date()
-                                        self.stdout.write(
-                                            self.style.WARNING(f"Обработана дата YYYY-MM-DD: {training_date}"))
-                                    # Формат DD.MM.YYYY
+                                        logger.debug(f"Обработана дата YYYY-MM-DD: {training_date}")
                                     elif len(date_str) >= 8 and date_str[2] == '.' and date_str[5] == '.':
                                         training_date = datetime.strptime(date_str, '%d.%m.%Y').date()
-                                        self.stdout.write(
-                                            self.style.WARNING(f"Обработана дата DD.MM.YYYY: {training_date}"))
+                                        logger.debug(f"Обработана дата DD.MM.YYYY: {training_date}")
                                     else:
-                                        self.stdout.write(
-                                            self.style.WARNING(f"Неподдерживаемый формат даты: {date_str}"))
+                                        logger.warning(f"Неподдерживаемый формат даты: {date_str}")
                                         continue
-
-                                    # Добавляем пометку об отсутствии скана, если есть '?'
                                     if has_question_mark:
                                         details = f"{details} Отсутствует скан документа".strip()
-
-                                    # Создание записи
                                     TrainingRecord.objects.get_or_create(
                                         employee=employee,
                                         training_program=program_obj,
                                         completion_date=training_date,
                                         defaults={'details': details}
                                     )
-                                    self.stdout.write(self.style.WARNING(
-                                        f"Создана запись для {program_name}: {training_date} (Детали: {details})"))
+                                    logger.info(
+                                        f"Создана запись для {program_name}: {training_date} (Детали: {details})")
                                 except (ValueError, TypeError) as e:
-                                    self.stdout.write(self.style.WARNING(
-                                        f"Ошибка обработки даты для {employee} ({program_name}): {entry} ({e})"))
+                                    logger.warning(
+                                        f"Ошибка обработки даты для {employee} ({program_name}): {entry} ({e})")
                                     continue
-
-        self.stdout.write(self.style.SUCCESS('Импорт данных успешно завершён!'))
+        logger.info('Импорт данных успешно завершён!')
