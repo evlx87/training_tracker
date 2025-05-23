@@ -1,8 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-
 from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
-
 
 class EmployeeForm(forms.ModelForm):
     class Meta:
@@ -30,12 +28,10 @@ class EmployeeForm(forms.ModelForm):
         cleaned_data = super().clean()
         is_dismissed = cleaned_data.get('is_dismissed')
         dismissal_date = cleaned_data.get('dismissal_date')
-
         if is_dismissed and not dismissal_date:
             raise ValidationError('Укажите дату увольнения, если сотрудник уволен.')
         if not is_dismissed and dismissal_date:
             raise ValidationError('Дата увольнения должна быть пустой, если сотрудник не уволен.')
-
         return cleaned_data
 
 class DepartmentForm(forms.ModelForm):
