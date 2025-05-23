@@ -176,3 +176,6 @@ LOGGING = {
         },
     },
 }
+
+# Перенаправление после выхода
+LOGOUT_REDIRECT_URL = 'employees:index'

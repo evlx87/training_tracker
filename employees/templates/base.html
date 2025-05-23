@@ -1,14 +1,37 @@
 <!DOCTYPE html>
 {% load static %}
-<html>
+<html lang="ru">
 <head>
-    <title>{% block title %}Система учета сотрудников{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Training Tracker{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <div class="container">
+    <header>
+        <h1>Training Tracker</h1>
+        <div class="user-info">
+            {% if user.is_authenticated %}
+                <span>Пользователь: {{ user.username }}</span>
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="action-button">Выход</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="action-button">Войти</a>
+            {% endif %}
+        </div>
+    </header>
+    <main>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p class="{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
         {% block content %}
         {% endblock %}
-    </div>
+    </main>
 </body>
 </html>
