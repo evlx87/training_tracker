@@ -10,7 +10,7 @@
     <select name="employee_pk" class="form-input">
         <option value="">Выберите сотрудника</option>
         {% for employee in employees %}
-        <option value="{{ employee.pk }}">{{ employee.last_name }} {{ employee.first_name }}</option>
+        <option value="{{ employee.pk }}">{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name }}</option>
         {% endfor %}
     </select>
     <button type="submit" class="action-button">Добавить запись</button>
