@@ -198,19 +198,24 @@ class EmployeeTrainingsView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class TrainingRecordCreateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        CreateView):
+class TrainingRecordCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = TrainingRecord
     form_class = TrainingRecordForm
     template_name = 'training_record_form.html'
     permission_required = 'employees.add_trainingrecord'
 
+    def get_employee(self):
+        """Получает сотрудника из URL или POST-запроса."""
+        employee_pk = self.kwargs.get('employee_pk') or self.request.POST.get('employee_pk')
+        if employee_pk:
+            return get_object_or_404(Employee, pk=employee_pk)
+        return None
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['employee'] = get_object_or_404(
-            Employee, pk=self.kwargs['employee_pk'])
+        employee = self.get_employee()
+        if employee:
+            context['employee'] = employee
         context['action'] = 'Добавить'
         return context
 
@@ -219,22 +224,30 @@ class TrainingRecordCreateView(
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        form.instance.employee = get_object_or_404(
-            Employee, pk=self.kwargs['employee_pk'])
+        employee = self.get_employee()
+        if not employee:
+            logger.error(
+                'Не указан сотрудник для создания записи об обучении пользователем: %s',
+                self.request.user.username
+            )
+            form.add_error(None, 'Сотрудник не выбран.')
+            return self.form_invalid(form)
+
+        form.instance.employee = employee
         training_record = form.save()
         logger.info(
             'Создана запись об обучении для %s пользователем: %s',
             form.instance.employee,
-            self.request.user.username)
-        return redirect(
-            'employees:employee_trainings',
-            pk=form.instance.employee.pk)
+            self.request.user.username
+        )
+        return redirect('employees:employee_trainings', pk=form.instance.employee.pk)
 
     def form_invalid(self, form):
         logger.warning(
             'Ошибка валидации формы создания записи об обучении: %s пользователем: %s',
             form.errors,
-            self.request.user.username)
+            self.request.user.username
+        )
         return super().form_invalid(form)
 
 

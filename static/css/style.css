@@ -324,7 +324,8 @@ main {
 }
 
 .form-input,
-.form-textarea {
+.form-textarea,
+.form-input select {
     width: 100%;
     padding: 8px;
     margin: 10px 0;
@@ -332,6 +333,18 @@ main {
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 12px;
+    background-color: #fff;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.form-input select {
+    cursor: pointer;
+    padding-right: 24px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23333" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center;
 }
 
 .form-textarea {
@@ -391,9 +404,20 @@ main {
     }
 
     .form-input,
-    .form-textarea {
+    .form-textarea,
+    .form-input select {
         padding: 6px;
         font-size: 11px;
+    }
+
+    .legend {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .legend-item {
+        width: 80px;
+        font-size: 10px;
     }
 }
 
@@ -416,6 +440,12 @@ main {
 
     .pagination .page-link {
         padding: 5px 8px;
+        font-size: 10px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-input select {
         font-size: 10px;
     }
 }

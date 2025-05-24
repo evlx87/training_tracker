@@ -1,6 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
+
 from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
+
 
 class EmployeeForm(forms.ModelForm):
     class Meta:
@@ -65,6 +67,5 @@ class TrainingRecordForm(forms.ModelForm):
         model = TrainingRecord
         fields = ['training_program', 'completion_date']
         widgets = {
-            'training_program': forms.Select(attrs={'class': 'form-input'}),
-            'completion_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'completion_date': forms.DateInput(attrs={'type': 'date'}),
         }
