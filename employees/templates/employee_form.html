@@ -6,70 +6,73 @@
 
 {% block content %}
 <h1>{{ action }} сотрудника</h1>
-<a href="{% url 'employees:employee_list' %}" class="back-button">Назад к списку сотрудников</a>
-
-<form method="post">
-    {% csrf_token %}
-    {% if form.non_field_errors %}
-        <div class="form-errors">
+<div class="form-container">
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="messages error">
             {{ form.non_field_errors }}
         </div>
-    {% endif %}
-    <div class="form-group">
-        <label for="{{ form.last_name.id_for_label }}">Фамилия:</label>
-        {{ form.last_name }}
-        {{ form.last_name.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.first_name.id_for_label }}">Имя:</label>
-        {{ form.first_name }}
-        {{ form.first_name.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.middle_name.id_for_label }}">Отчество:</label>
-        {{ form.middle_name }}
-        {{ form.middle_name.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.birth_date.id_for_label }}">Дата рождения:</label>
-        {{ form.birth_date }}
-        {{ form.birth_date.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.position.id_for_label }}">Должность:</label>
-        {{ form.position }}
-        {{ form.position.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.department.id_for_label }}">Подразделение:</label>
-        {{ form.department }}
-        {{ form.department.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.hire_date.id_for_label }}">Дата трудоустройства:</label>
-        {{ form.hire_date }}
-        {{ form.hire_date.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.is_dismissed.id_for_label }}">Уволен:</label>
-        {{ form.is_dismissed }}
-        {{ form.is_dismissed.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.dismissal_date.id_for_label }}">Дата увольнения:</label>
-        {{ form.dismissal_date }}
-        {{ form.dismissal_date.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.is_on_maternity_leave.id_for_label }}">В декрете:</label>
-        {{ form.is_on_maternity_leave }}
-        {{ form.is_on_maternity_leave.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.is_external_part_time.id_for_label }}">Внешний совместитель:</label>
-        {{ form.is_external_part_time }}
-        {{ form.is_external_part_time.errors }}
-    </div>
-    <button type="submit" class="action-button">{{ action }}</button>
-</form>
+        {% endif %}
+        <div class="form-group">
+            <label for="{{ form.last_name.id_for_label }}">Фамилия:</label>
+            {{ form.last_name }}
+            {{ form.last_name.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.first_name.id_for_label }}">Имя:</label>
+            {{ form.first_name }}
+            {{ form.first_name.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.middle_name.id_for_label }}">Отчество:</label>
+            {{ form.middle_name }}
+            {{ form.middle_name.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.birth_date.id_for_label }}">Дата рождения:</label>
+            {{ form.birth_date }}
+            {{ form.birth_date.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.position.id_for_label }}">Должность:</label>
+            {{ form.position }}
+            {{ form.position.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.department.id_for_label }}">Подразделение:</label>
+            {{ form.department }}
+            {{ form.department.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.hire_date.id_for_label }}">Дата трудоустройства:</label>
+            {{ form.hire_date }}
+            {{ form.hire_date.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.is_dismissed.id_for_label }}">Уволен:</label>
+            {{ form.is_dismissed }}
+            {{ form.is_dismissed.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.dismissal_date.id_for_label }}">Дата увольнения:</label>
+            {{ form.dismissal_date }}
+            {{ form.dismissal_date.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.is_on_maternity_leave.id_for_label }}">В декрете:</label>
+            {{ form.is_on_maternity_leave }}
+            {{ form.is_on_maternity_leave.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.is_external_part_time.id_for_label }}">Внешний совместитель:</label>
+            {{ form.is_external_part_time }}
+            {{ form.is_external_part_time.errors }}
+        </div>
+        <div class="form-group">
+            <button type="submit" class="button button--primary">{{ action }}</button>
+            <a href="{% url 'employees:employee_list' %}" class="button button--danger">Отмена</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

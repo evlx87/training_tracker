@@ -179,3 +179,12 @@ LOGGING = {
 
 # Перенаправление после выхода
 LOGOUT_REDIRECT_URL = 'employees:index'
+
+MTO_GROUP_NAME = 'MTO'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'training-tracker-cache',
+    }
+}

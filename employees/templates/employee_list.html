@@ -1,62 +1,75 @@
 {% extends 'base.html' %}
 
-{% block title %}
-Список сотрудников
-{% endblock %}
-
 {% block content %}
-<h1>Сотрудники</h1>
-<a href="{% url 'employees:employee_create' %}" class="action-button">Добавить сотрудника</a>
-<a href="{% url 'employees:index' %}" class="back-button">На главную</a>
-{% if employees %}
-<table>
-    <tr>
-        <th>Фамилия</th>
-        <th>Имя</th>
-        <th>Отчество</th>
-        <th>Дата рождения</th>
-        <th>Должность</th>
-        <th>Подразделение</th>
-        <th>Уволен</th>
-        <th>В декрете</th>
-        <th>Внешний совместитель</th>
-        <th>Действия</th>
-    </tr>
-    {% for employee in employees %}
-    <tr>
-        <td>{{ employee.last_name }}</td>
-        <td>{{ employee.first_name }}</td>
-        <td>{{ employee.middle_name }}</td>
-        <td>{{ employee.birth_date|date:"d.m.Y" }}</td>
-        <td>{{ employee.position }}</td>
-        <td>{{ employee.department }}</td>
-        <td>{{ employee.is_dismissed|yesno:"Да,Нет" }}</td>
-        <td>{{ employee.is_on_maternity_leave|yesno:"Да,Нет" }}</td>
-        <td>{{ employee.is_external_part_time|yesno:"Да,Нет" }}</td>
-        <td class="actions">
-            <a href="{% url 'employees:employee_trainings' employee.pk %}" class="view-icon" title="Просмотреть обучение" aria-label="Просмотреть обучение сотрудника">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                </svg>
-            </a>
-            <a href="{% url 'employees:employee_edit' employee.pk %}" class="action-icon" title="Редактировать" aria-label="Редактировать сотрудника">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-            </a>
-            <a href="{% url 'employees:employee_delete' employee.pk %}" class="delete-icon" title="Удалить" aria-label="Удалить сотрудника" onclick="return confirm('Вы уверены, что хотите удалить сотрудника?');">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                </svg>
-            </a>
-        </td>
-    </tr>
+<h1>Список сотрудников</h1>
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ФИО</th>
+                <th>Должность</th>
+                <th>Подразделение</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+            <tr>
+                <td>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</td>
+                <td>{{ employee.position.name|default:"—" }}</td>
+                <td>{{ employee.department.name|default:"—" }}</td>
+                <td class="actions">
+                    <a href="{% url 'employees:employee_trainings' employee.pk %}" class="button button--info">Обучение</a>
+                    <a href="{% url 'employees:employee_update' employee.pk %}" class="button button--primary">Редактировать</a>
+                    <a href="{% url 'employees:employee_delete' employee.pk %}" class="button button--danger">Удалить</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Сотрудники не найдены.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <span class="page-link">Предыдущая</span>
+    </li>
+    {% endif %}
+
+    {% for num in paginator.page_range %}
+    {% if page_obj.number == num %}
+    <li class="page-item active" aria-current="page">
+        <span class="page-link">{{ num }}</span>
+    </li>
+    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+    </li>
+    {% endif %}
     {% endfor %}
-</table>
-{% else %}
-<p>Сотрудники отсутствуют.</p>
+
+    {% if page_obj.has_next %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <span class="page-link">Следующая</span>
+    </li>
+    {% endif %}
+</ul>
 {% endif %}
+
+<div class="form-group">
+    <a href="{% url 'employees:employee_create' %}" class="button button--success">Добавить сотрудника</a>
+</div>
 {% endblock %}

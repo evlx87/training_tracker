@@ -7,10 +7,10 @@
 {% block content %}
 <h1>Добро пожаловать в систему учета сотрудников и обучения</h1>
 <div class="button-container">
-    <a href="{% url 'employees:employee_list' %}" class="button">Список<br>сотрудников</a>
-    <a href="{% url 'employees:department_list' %}" class="button">Структурные<br>подразделения</a>
-    <a href="{% url 'employees:training_list' %}" class="button">Программы<br>обучения</a>
-    <a href="{% url 'employees:position_list' %}" class="button">Должности</a>
-    <a href="{% url 'employees:reports' %}" class="button">Отчеты<br>по обучению</a>
+    <a href="{% url 'employees:employee_list' %}" class="button button--primary button--large">Список<br>сотрудников</a>
+    <a href="{% url 'employees:department_list' %}" class="button button--primary button--large">Структурные<br>подразделения</a>
+    <a href="{% url 'employees:training_list' %}" class="button button--primary button--large">Программы<br>обучения</a>
+    <a href="{% url 'employees:position_list' %}" class="button button--primary button--large">Должности</a>
+    <a href="{% url 'employees:reports' %}" class="button button--primary button--large">Отчеты<br>по обучению</a>
 </div>
 {% endblock %}
