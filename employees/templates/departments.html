@@ -15,7 +15,7 @@
             <tr>
                 <td>{{ department.name }}</td>
                 <td class="actions">
-                    <a href="{% url 'employees:department_update' department.pk %}" class="button button--primary">Редактировать</a>
+                    <a href="{% url 'employees:department_edit' department.pk %}" class="button button--primary">Редактировать</a>
                     <a href="{% url 'employees:department_delete' department.pk %}" class="button button--danger">Удалить</a>
                 </td>
             </tr>

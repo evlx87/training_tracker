@@ -79,9 +79,12 @@ class EmployeeListView(LoginRequiredMixin, ListView):
     context_object_name = 'employees'
     paginate_by = 20
 
-    @log_view_action('Запрошен список', 'сотрудников')
     def get_queryset(self):
         return Employee.objects.select_related('position', 'department')
+
+    @log_view_action('Запрошен список', 'сотрудников')
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class EmployeeCreateView(
