@@ -79,9 +79,12 @@ class EmployeeListView(LoginRequiredMixin, ListView):
     context_object_name = 'employees'
     paginate_by = 20
 
-    @log_view_action('Запрошен список', 'сотрудников')
     def get_queryset(self):
         return Employee.objects.select_related('position', 'department')
+
+    @log_view_action('Запрошен список', 'сотрудников')
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class EmployeeCreateView(
@@ -679,11 +682,14 @@ class TrainingDeleteConfirmView(MTOConfirmedDeleteView):
 class ReportsView(LoginRequiredMixin, TemplateView):
     template_name = 'reports.html'
 
-    @cache_page(60 * 15)  # Кэшировать на 15 минут
-    @log_view_action('Запрошен', 'отчет по обучению')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         report_data, training_programs = ReportService.generate_training_report()
         context['report_data'] = report_data
         context['training_programs'] = training_programs
         return context
+
+    @cache_page(60 * 15)  # Кэшировать на 15 минут
+    @log_view_action('Запрошен', 'отчет по обучению')
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
