@@ -177,7 +177,7 @@ LOGGING = {
     },
 }
 
-# Перенаправление после выхода
+LOGIN_REDIRECT_URL = 'employees:index'
 LOGOUT_REDIRECT_URL = 'employees:index'
 
 MTO_GROUP_NAME = 'MTO'

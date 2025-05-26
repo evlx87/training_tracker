@@ -6,6 +6,12 @@
 
 {% block content %}
 <h1>Добро пожаловать в систему учета сотрудников и обучения</h1>
+{% if not user.is_authenticated %}
+<div class="messages">
+    <p class="error">Для дальнейшей работы с сайтом необходимо авторизоваться.</p>
+    <a href="{% url 'login' %}" class="button button--primary">Войти</a>
+</div>
+{% else %}
 <div class="button-container">
     <a href="{% url 'employees:employee_list' %}" class="button button--primary button--large">Список<br>сотрудников</a>
     <a href="{% url 'employees:department_list' %}" class="button button--primary button--large">Структурные<br>подразделения</a>
@@ -13,4 +19,5 @@
     <a href="{% url 'employees:position_list' %}" class="button button--primary button--large">Должности</a>
     <a href="{% url 'employees:reports' %}" class="button button--primary button--large">Отчеты<br>по обучению</a>
 </div>
+{% endif %}
 {% endblock %}
