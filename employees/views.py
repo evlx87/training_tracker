@@ -689,7 +689,6 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         context['training_programs'] = training_programs
         return context
 
-    @cache_page(60 * 15)  # Кэшировать на 15 минут
     @log_view_action('Запрошен', 'отчет по обучению')
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
