@@ -1,17 +1,26 @@
+/* Общие стили */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    line-height: 1.6;
 }
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    box-sizing: border-box;
 }
+
+/* Заголовки */
 h1 {
     text-align: center;
-    margin-top: 30px;
+    margin: 30px 0;
+    font-size: 24px;
 }
+
+/* Шапка */
 header {
     display: flex;
     justify-content: space-between;
@@ -37,24 +46,12 @@ header h1 {
     color: #333;
 }
 
-.action-button {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.action-button:hover {
-    background-color: #45a049;
-}
-
+/* Основной контент */
 main {
     padding: 20px;
 }
 
+/* Сообщения */
 .messages {
     margin-bottom: 20px;
 }
@@ -68,6 +65,53 @@ main {
     background-color: #f8d7da;
     color: #721c24;
 }
+
+/* Кнопки */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+    box-sizing: border-box;
+}
+
+.button--primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.button--danger {
+    background-color: #f44336;
+    color: white;
+}
+
+.button--info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.button--success {
+    background-color: #28a745;
+    color: white;
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+
+.button--large {
+    width: 200px;
+    height: 80px;
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 10px;
+}
+
 .button-container {
     display: flex;
     justify-content: center;
@@ -75,38 +119,78 @@ main {
     flex-wrap: wrap;
     margin-top: 30px;
 }
-.button {
-    display: inline-block;
-    width: 200px;
-    height: 80px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 16px;
-    text-align: center;
-    line-height: 1.5;
-    display: flex;
+
+/* Иконки действий */
+.view-icon, .action-icon, .delete-icon {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    box-sizing: border-box;
+    font-size: 16px;
+    color: #4CAF50;
+    text-decoration: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
 }
-.button:hover {
+
+.delete-icon {
+    color: #f44336;
+}
+
+.view-icon:hover, .action-icon:hover {
+    color: #fff;
     background-color: #45a049;
 }
+
+.delete-icon:hover {
+    color: #fff;
+    background-color: #d32f2f;
+}
+
+/* Таблицы общего назначения (для списков) */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.table th,
+.table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table tr:hover {
+    background-color: #f1f1f1;
+}
+
 .table-container {
     max-width: 100%;
     overflow-x: auto;
     margin: 10px 0;
 }
+
+/* Таблица отчетов */
 .report-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 10px; /* Уменьшенный шрифт */
+    font-size: 10px;
     table-layout: fixed;
 }
-.report-table th, .report-table td {
+
+.report-table th,
+.report-table td {
     border: 1px solid #ddd;
     padding: 4px;
     text-align: center;
@@ -114,26 +198,35 @@ main {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .report-table td.not-completed {
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.report-table th:not(:nth-child(-n+3)), .report-table td:not(:nth-child(-n+3)) {
+
+.report-table th:not(:nth-child(-n+3)),
+.report-table td:not(:nth-child(-n+3)) {
     width: 80px;
 }
+
 .report-table th:nth-child(1) {
     width: 150px;
 }
-.report-table th:nth-child(2), .report-table th:nth-child(3) {
+
+.report-table th:nth-child(2),
+.report-table th:nth-child(3) {
     width: 100px;
 }
+
+/* Легенда для отчетов */
 .legend {
     display: flex;
     justify-content: center;
     gap: 5px;
     margin: 10px 0;
 }
+
 .legend-item {
     width: 100px;
     height: 30px;
@@ -148,112 +241,211 @@ main {
     border-radius: 3px;
     padding: 2px;
 }
+
 .legend-item.not-completed {
     background-color: #ff9999;
 }
+
 .legend-item.overdue {
     background-color: #ff3333;
     color: white;
 }
+
 .legend-item.warning {
     background-color: #ffff66;
 }
+
 .legend-item.completed {
     background-color: #99ff99;
 }
+
+/* Статусы для таблиц */
 .not-completed {
     background-color: #ff9999;
 }
+
 .overdue {
     background-color: #ff3333;
     color: white;
 }
+
 .warning {
     background-color: #ffff66;
 }
+
 .normal {
     background-color: #99ff99;
 }
-.form-input, .action-button {
-    font-size: 12px;
-    padding: 4px;
-    margin: 5px;
+
+/* Пагинация */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    list-style: none;
+    padding: 0;
 }
-.action-button {
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 3px;
+
+.pagination .page-item {
+    margin: 0 5px;
 }
-.back-button, .submit-button, .delete-button {
+
+.pagination .page-link {
     display: inline-block;
-    padding: 10px 20px;
-    margin: 10px 5px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #4CAF50;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.pagination .page-link:hover {
+    background-color: #f4f4f4;
+}
+
+.pagination .page-item.active .page-link {
     background-color: #4CAF50;
     color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    text-align: center;
+    border-color: #4CAF50;
 }
-.back-button:hover, .action-button:hover, .submit-button:hover {
-    background-color: #45a049;
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    border-color: #ddd;
+    cursor: not-allowed;
 }
-.delete-button {
-    background-color: #f44336;
-}
-.delete-button:hover {
-    background-color: #d32f2f;
-}
+
+/* Формы */
 .form-container {
     max-width: 600px;
     margin: 20px auto;
 }
-.form-input, .form-textarea {
+
+.form-input,
+.form-textarea,
+.form-input select {
     width: 100%;
     padding: 8px;
     margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
+    font-size: 12px;
+    background-color: #fff;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
+
+.form-input select {
+    cursor: pointer;
+    padding-right: 24px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23333" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+}
+
 .form-textarea {
     height: 100px;
     resize: vertical;
 }
+
 .form-checkbox {
     margin: 10px 0;
 }
+
 .form-group {
     margin-bottom: 15px;
 }
+
 .form-text {
     color: #666;
     font-size: 0.9em;
 }
-.actions {
-    gap: 8px;
-    text-align: center;
-    padding: 4px;
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .table th,
+    .table td {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    .report-table th,
+    .report-table td {
+        padding: 3px;
+        font-size: 9px;
+    }
+
+    .button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .button--large {
+        width: 150px;
+        height: 60px;
+        font-size: 14px;
+    }
+
+    .pagination .page-link {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-input select {
+        padding: 6px;
+        font-size: 11px;
+    }
+
+    .legend {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .legend-item {
+        width: 80px;
+        font-size: 10px;
+    }
 }
-.view-icon, .action-icon, .delete-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    color: #4CAF50;
-    text-decoration: none;
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    transition: color 0.2s, background-color 0.2s;
-}
-.delete-icon {
-    color: #f44336;
-}
-.view-icon:hover, .action-icon:hover {
-    color: #fff;
-    background-color: #45a049;
-}
-.delete-icon:hover {
-    color: #fff;
-    background-color: #d32f2f;
+
+@media (max-width: 480px) {
+    .table th,
+    .table td {
+        font-size: 10px;
+    }
+
+    .button-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button--large {
+        width: 120px;
+        height: 50px;
+        font-size: 12px;
+    }
+
+    .pagination .page-link {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-input select {
+        font-size: 10px;
+    }
 }

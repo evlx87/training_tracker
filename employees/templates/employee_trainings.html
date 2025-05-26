@@ -6,36 +6,44 @@
 
 {% block content %}
 <h1>Обучение сотрудника {{ employee.last_name }} {{ employee.first_name }}</h1>
-<a href="{% url 'employees:training_record_create' %}?employee_pk={{ employee.pk }}" class="action-button">Добавить запись об обучении</a>
-<a href="{% url 'employees:employee_list' %}" class="back-button">К списку сотрудников</a>
+<div class="form-group">
+    <a href="{% url 'employees:training_record_create' employee_pk=employee.pk %}" class="button button--success">Добавить запись об обучении</a>
+    <a href="{% url 'employees:employee_list' %}" class="button button--danger">К списку сотрудников</a>
+</div>
 {% if training_records %}
-<table>
-    <tr>
-        <th>Программа обучения</th>
-        <th>Дата прохождения</th>
-        <th>Действия</th>
-    </tr>
-    {% for record in training_records %}
-    <tr>
-        <td>{{ record.training_program }}</td>
-        <td>{{ record.completion_date|date:"d.m.Y" }}</td>
-        <td class="actions">
-            <a href="{% url 'employees:training_record_edit' pk=record.pk %}" class="action-icon" title="Редактировать" aria-label="Редактировать запись об обучении">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-            </a>
-            <a href="{% url 'employees:training_record_delete' pk=record.pk %}" class="delete-icon" title="Удалить" aria-label="Удалить запись об обучении" onclick="return confirm('Вы уверены, что хотите удалить запись об обучении?');">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                </svg>
-            </a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Программа обучения</th>
+                <th>Дата прохождения</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in training_records %}
+            <tr>
+                <td>{{ record.training_program }}</td>
+                <td>{{ record.completion_date|date:"d.m.Y" }}</td>
+                <td class="actions">
+                    <a href="{% url 'employees:training_record_edit' pk=record.pk %}" class="action-icon" title="Редактировать" aria-label="Редактировать запись об обучении">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                    </a>
+                    <a href="{% url 'employees:training_record_delete' pk=record.pk %}" class="delete-icon" title="Удалить" aria-label="Удалить запись об обучении" onclick="return confirm('Вы уверены, что хотите удалить запись об обучении?');">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
 <p>Записи об обучении отсутствуют.</p>
 {% endif %}

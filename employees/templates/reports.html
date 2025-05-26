@@ -1,20 +1,31 @@
 {% extends 'base.html' %}
 {% load dict_get %}
+
 {% block title %}
 Отчет по обучению
 {% endblock %}
+
 {% block content %}
 <h1>Отчет по обучению</h1>
-<a href="{% url 'employees:index' %}" class="back-button">На главную</a>
-<form action="{% url 'employees:training_record_create' %}" method="get" style="display: inline;">
-    <select name="employee_pk" class="form-input">
-        <option value="">Выберите сотрудника</option>
-        {% for employee in employees %}
-        <option value="{{ employee.pk }}">{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit" class="action-button">Добавить запись</button>
-</form>
+<div class="form-group">
+    <a href="{% url 'employees:index' %}" class="button button--danger">На главную</a>
+    <form action="{% url 'employees:training_record_create' %}" method="post" class="form-container">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="employee_pk">Сотрудник:</label>
+            <select name="employee_pk" id="employee_pk" class="form-input" required>
+                <option value="">Выберите сотрудника</option>
+                {% for employee in employees %}
+                <option value="{{ employee.pk }}">{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name }}</option>
+                {% endfor %}
+            </select>
+            {% if form.errors.employee_pk %}
+            <div class="messages error">{{ form.errors.employee_pk }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="button button--success">Добавить запись</button>
+    </form>
+</div>
 <div class="legend">
     <div class="legend-item not-completed">Не пройдено</div>
     <div class="legend-item overdue">Просрочено</div>
