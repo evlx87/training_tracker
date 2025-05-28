@@ -193,10 +193,8 @@ class EmployeeTrainingsView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         employee = get_object_or_404(Employee, pk=self.kwargs['pk'])
-        training_records = TrainingRecord.objects.filter(
-            employee=employee).select_related('training_program')
         context['employee'] = employee
-        context['training_records'] = training_records
+        context['trainings'] = employee.training_set.all()  # Получение тренировок сотрудника
         return context
 
 
@@ -689,7 +687,6 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         context['training_programs'] = training_programs
         return context
 
-    @cache_page(60 * 15)  # Кэшировать на 15 минут
     @log_view_action('Запрошен', 'отчет по обучению')
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
