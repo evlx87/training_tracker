@@ -189,13 +189,16 @@ class EmployeeDeleteConfirmView(MTOConfirmedDeleteView):
 class EmployeeTrainingsView(LoginRequiredMixin, TemplateView):
     template_name = 'employee_trainings.html'
 
-    @log_view_action('Запрошены записи об обучении для', 'сотрудника')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         employee = get_object_or_404(Employee, pk=self.kwargs['pk'])
         context['employee'] = employee
         context['trainings'] = employee.training_set.all()  # Получение тренировок сотрудника
         return context
+
+    @log_view_action('Запрошены записи об обучении для', 'сотрудника')
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class TrainingRecordCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
