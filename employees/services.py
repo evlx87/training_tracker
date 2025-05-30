@@ -32,8 +32,8 @@ class ReportService:
                     # Проверяем, есть ли запись об обучении для сотрудника по программе
                     record = employee.trainingrecord_set.filter(training_program=program).first()
                     employee_data['trainings'][program.id] = {
-                        'completed': record.completion_date if record else None,
-                        'status': 'Пройдено' if record else 'Не пройдено'
+                        'date': record.completion_date if record else "Обучение не пройдено",
+                        'class': 'completed' if record else 'not-completed'
                     }
                 report_data.append(employee_data)
 

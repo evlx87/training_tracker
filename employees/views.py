@@ -194,9 +194,9 @@ class EmployeeTrainingsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         employee = get_object_or_404(Employee, pk=self.kwargs['pk'])
         context['employee'] = employee
-        trainings = employee.trainingrecord_set.all()  # Исправлено
+        trainings = employee.trainingrecord_set.all()
+        context['training_records'] = trainings
         logger.debug("Найдено %d записей об обучении для сотрудника %s", trainings.count(), employee)
-        context['trainings'] = trainings
         return context
 
     @log_view_action('Запрошены записи об обучении для', 'сотрудника')
