@@ -703,6 +703,10 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         report_data, training_programs = ReportService.generate_training_report()
 
+        # Отладочная печать
+        logger.debug("Training programs: %s", [program.name for program in training_programs])
+        logger.debug("Report data sample: %s", report_data[:1] if report_data else "No data")
+
         # Фильтрация
         department_id = self.request.GET.get('department')
         search_query = self.request.GET.get('search')
@@ -711,10 +715,13 @@ class ReportsView(LoginRequiredMixin, TemplateView):
                 data for data in report_data if data['employee'].department_id == int(department_id)]
         if search_query:
             report_data = [
-                data for data in report_data if search_query.lower() in f"{
-                    data['employee'].last_name} {
-                    data['employee'].first_name} {
-                    data['employee'].middle_name}".lower()]
+                data for data in report_data
+                if search_query.lower() in (
+                    f"{data['employee'].last_name} "
+                    f"{data['employee'].first_name} "
+                    f"{data['employee'].middle_name or ''}"
+                ).lower().strip()
+            ]
 
         # Сортировка
         sort_by = self.request.GET.get('sort_by')
@@ -724,7 +731,7 @@ class ReportsView(LoginRequiredMixin, TemplateView):
                 key=lambda x: x['trainings'].get(
                     int(sort_by), {}).get(
                     'date', 'Обучение не пройдено'), reverse=(
-                    sort_order == 'desc'))
+                        sort_order == 'desc'))
 
         # Добавить подразделения для фильтра
         context['departments'] = Department.objects.all()
@@ -741,9 +748,9 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         )
         total_possible_trainings = len(report_data) * len(training_programs)
         completed_percentage = (
-            completed_trainings /
-            total_possible_trainings *
-            100) if total_possible_trainings else 0
+                completed_trainings /
+                total_possible_trainings *
+                100) if total_possible_trainings else 0
         context['completed_trainings'] = completed_trainings
         context['completed_percentage'] = round(completed_percentage, 2)
 
@@ -765,7 +772,8 @@ class ExportReportView(LoginRequiredMixin, View):
         ws.title = "Отчет по обучению"
 
         # Формируем заголовки
-        headers = ["Сотрудник", "Должность", "Подразделение"] + [program.name for program in training_programs]
+        headers = ["Сотрудник", "Должность", "Подразделение"] + \
+            [program.name for program in training_programs]
         ws.append(headers)
         for cell in ws[1]:
             cell.font = Font(bold=True)
@@ -776,7 +784,8 @@ class ExportReportView(LoginRequiredMixin, View):
             # Формируем ФИО: Фамилия И. О. (если отчество есть)
             first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
             middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
-            employee_name = f"{data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
+            employee_name = f"{data['employee'].last_name} {first_initial}. {middle_initial}.".strip(
+            )
 
             row = [
                 employee_name,
@@ -786,7 +795,8 @@ class ExportReportView(LoginRequiredMixin, View):
             for program in training_programs:
                 training = data['trainings'].get(program.id, {})
                 date = training.get('date', "Обучение не пройдено")
-                row.append(date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
+                row.append(
+                    date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
             ws.append(row)
 
         # Применяем стили для статусов
@@ -801,20 +811,23 @@ class ExportReportView(LoginRequiredMixin, View):
                     'warning': 'FFFF66',        # Желтый
                     'completed': '99FF99'       # Зеленый
                 }
-                cell.fill = PatternFill(start_color=fill_colors.get(status_class, 'FFFFFF'),
-                                        end_color=fill_colors.get(status_class, 'FFFFFF'),
-                                        fill_type="solid")
+                cell.fill = PatternFill(
+                    start_color=fill_colors.get(
+                        status_class, 'FFFFFF'), end_color=fill_colors.get(
+                        status_class, 'FFFFFF'), fill_type="solid")
 
         # Настраиваем ширину столбцов
         for col in ws.columns:
-            max_length = max(len(str(cell.value)) for cell in col if cell.value)
+            max_length = max(len(str(cell.value))
+                             for cell in col if cell.value)
             ws.column_dimensions[col[0].column_letter].width = max_length + 2
 
         # Формируем HTTP-ответ
         response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename="training_report.xlsx"'
         wb.save(response)
-        logger.info('Экспортирован отчет по обучению пользователем: %s', request.user.username)
+        logger.info(
+            'Экспортирован отчет по обучению пользователем: %s',
+            request.user.username)
         return response
