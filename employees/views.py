@@ -756,64 +756,65 @@ class ReportsView(LoginRequiredMixin, TemplateView):
 
 class ExportReportView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        # Получаем данные отчета
         report_data, training_programs = ReportService.generate_training_report()
+
+        # Создаем новый Excel-файл
         wb = Workbook()
         ws = wb.active
         ws.title = "Отчет по обучению"
 
-        # Заголовки
-        headers = ["Сотрудник", "Должность", "Подразделение"] + \
-            [program.name for program in training_programs]
+        # Формируем заголовки
+        headers = ["Сотрудник", "Должность", "Подразделение"] + [program.name for program in training_programs]
         ws.append(headers)
         for cell in ws[1]:
             cell.font = Font(bold=True)
             cell.alignment = Alignment(horizontal="center")
 
-        # Данные
+        # Заполняем данные
         for data in report_data:
+            # Формируем ФИО: Фамилия И. О. (если отчество есть)
+            first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
+            middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
+            employee_name = f"{data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
+
             row = [
-                f"{
-                    data['employee'].last_name} {
-                    data['employee'].first_name | 0 | 1}. {
-                    data['employee'].middle_name | 0 | 1}.", str(
-                    data['employee'].position or "—"), str(
-                        data['employee'].department or "—")]
+                employee_name,
+                str(data['employee'].position or "—"),
+                str(data['employee'].department or "—")
+            ]
             for program in training_programs:
                 training = data['trainings'].get(program.id, {})
                 date = training.get('date', "Обучение не пройдено")
-                row.append(
-                    date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
+                row.append(date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
             ws.append(row)
 
-        # Стили для статусов
+        # Применяем стили для статусов
         for row_idx, data in enumerate(report_data, start=2):
             for col_idx, program in enumerate(training_programs, start=4):
                 cell = ws.cell(row=row_idx, column=col_idx)
                 training = data['trainings'].get(program.id, {})
                 status_class = training.get('class', 'not-completed')
                 fill_colors = {
-                    'not-completed': 'FF9999',
-                    'overdue': 'FF3333',
-                    'warning': 'FFFF66',
-                    'completed': '99FF99'
+                    'not-completed': 'FF9999',  # Светло-красный
+                    'overdue': 'FF3333',        # Красный
+                    'warning': 'FFFF66',        # Желтый
+                    'completed': '99FF99'       # Зеленый
                 }
-                cell.fill = PatternFill(
-                    start_color=fill_colors.get(
-                        status_class, 'FFFFFF'), end_color=fill_colors.get(
-                        status_class, 'FFFFFF'), fill_type="solid")
+                cell.fill = PatternFill(start_color=fill_colors.get(status_class, 'FFFFFF'),
+                                        end_color=fill_colors.get(status_class, 'FFFFFF'),
+                                        fill_type="solid")
 
-        # Настройка ширины столбцов
+        # Настраиваем ширину столбцов
         for col in ws.columns:
-            max_length = max(len(str(cell.value))
-                             for cell in col if cell.value)
+            max_length = max(len(str(cell.value)) for cell in col if cell.value)
             ws.column_dimensions[col[0].column_letter].width = max_length + 2
 
-        # Формирование ответа
+        # Формируем HTTP-ответ
         response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
         response['Content-Disposition'] = 'attachment; filename="training_report.xlsx"'
         wb.save(response)
-        logger.info(
-            'Экспортирован отчет по обучению пользователем: %s',
-            request.user.username)
+        logger.info('Экспортирован отчет по обучению пользователем: %s', request.user.username)
         return response

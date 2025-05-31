@@ -35,31 +35,10 @@
         <div class="form-group">
             <button type="submit" class="button button--primary">Применить</button>
             <a href="{% url 'employees:reports' %}" class="button button--danger">Сбросить</a>
+            <!-- Кнопка экспорта -->
+            <a href="{% url 'employees:export_report' %}" class="button button--success">Экспорт в Excel</a>
         </div>
     </form>
-    <!-- Кнопка экспорта -->
-    <a href="{% url 'employees:export_report' %}" class="button button--success">Экспорт в Excel</a>
-</div>
-
-<!-- Форма для добавления записи об обучении -->
-<div class="form-group">
-    <form action="{% url 'employees:training_record_create' %}" method="post" class="form-container">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="employee_pk">Сотрудник:</label>
-            <select name="employee_pk" id="employee_pk" class="form-input" required>
-                <option value="">Выберите сотрудника</option>
-                {% for employee in employees %}
-                <option value="{{ employee.pk }}">{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name }}</option>
-                {% endfor %}
-            </select>
-            {% if form.errors.employee_pk %}
-            <div class="messages error">{{ form.errors.employee_pk }}</div>
-            {% endif %}
-        </div>
-        <button type="submit" class="button button--success">Добавить запись</button>
-    </form>
-    <a href="{% url 'employees:index' %}" class="button button--danger">На главную</a>
 </div>
 
 <!-- Легенда -->
