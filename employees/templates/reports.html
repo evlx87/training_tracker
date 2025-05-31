@@ -43,10 +43,10 @@
 
 <!-- Легенда -->
 <div class="legend">
-    <div class="legend-item not-completed">Не пройдено</div>
-    <div class="legend-item overdue">Просрочено</div>
-    <div class="legend-item warning">Скоро истекает</div>
-    <div class="legend-item completed">Пройдено</div>
+    <div class="legend-item not-completed">Не пройдено <span class="icon">✖</span></div>
+    <div class="legend-item overdue">Просрочено <span class="icon">⏰</span></div>
+    <div class="legend-item warning">Скоро истекает <span class="icon">⚠</span></div>
+    <div class="legend-item completed">Пройдено <span class="icon">✔</span></div>
 </div>
 
 <!-- Таблица отчета -->
@@ -59,7 +59,7 @@
                 <th>Подразделение</th>
                 {% for program in training_programs %}
                 <th title="{{ program.name }}" class="sortable" data-program-id="{{ program.id }}">
-                    {{ program.name|truncatechars:10 }}
+                    {{ program.name|truncatechars:15 }}
                     <span class="sort-icon"></span>
                 </th>
                 {% endfor %}
@@ -75,9 +75,12 @@
                 <td class="{{ data.trainings|get_item:program.id|get_item:'class' }}" title="{{ data.trainings|get_item:program.id|get_item:'details' }}">
                     {% with training_status=data.trainings|get_item:program.id %}
                     {% if training_status.date == "Обучение не пройдено" %}
-                        —
+                        {% if training_status.class == "not-completed" %}<span class="icon">✖</span>{% endif %}
                     {% else %}
                         {{ training_status.date|date:"d.m.y" }}
+                        {% if training_status.class == "overdue" %}<span class="icon">⏰</span>{% endif %}
+                        {% if training_status.class == "warning" %}<span class="icon">⚠</span>{% endif %}
+                        {% if training_status.class == "completed" %}<span class="icon">✔</span>{% endif %}
                     {% endif %}
                     {% endwith %}
                 </td>
