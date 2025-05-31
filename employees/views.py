@@ -4,10 +4,13 @@ from functools import wraps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.decorators.cache import cache_page
+from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill, Font, Alignment
 
 from .forms import EmployeeForm, DepartmentForm, PositionForm, TrainingProgramForm, TrainingRecordForm
 from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
@@ -68,6 +71,7 @@ class MTOConfirmedDeleteView(
 
 class IndexView(TemplateView):
     template_name = 'index.html'
+
     @log_view_action('Открыта', 'главная страница')
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -190,13 +194,18 @@ class EmployeeTrainingsView(LoginRequiredMixin, TemplateView):
     template_name = 'employee_trainings.html'
 
     def get_context_data(self, **kwargs):
-        logger.debug("Вызван get_context_data в EmployeeTrainingsView для pk=%s", self.kwargs['pk'])
+        logger.debug(
+            "Вызван get_context_data в EmployeeTrainingsView для pk=%s",
+            self.kwargs['pk'])
         context = super().get_context_data(**kwargs)
         employee = get_object_or_404(Employee, pk=self.kwargs['pk'])
         context['employee'] = employee
         trainings = employee.trainingrecord_set.all()
         context['training_records'] = trainings
-        logger.debug("Найдено %d записей об обучении для сотрудника %s", trainings.count(), employee)
+        logger.debug(
+            "Найдено %d записей об обучении для сотрудника %s",
+            trainings.count(),
+            employee)
         return context
 
     @log_view_action('Запрошены записи об обучении для', 'сотрудника')
@@ -204,7 +213,10 @@ class EmployeeTrainingsView(LoginRequiredMixin, TemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class TrainingRecordCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class TrainingRecordCreateView(
+        LoginRequiredMixin,
+        PermissionRequiredMixin,
+        CreateView):
     model = TrainingRecord
     form_class = TrainingRecordForm
     template_name = 'training_record_form.html'
@@ -212,7 +224,8 @@ class TrainingRecordCreateView(LoginRequiredMixin, PermissionRequiredMixin, Crea
 
     def get_employee(self):
         """Получает сотрудника из URL или POST-запроса."""
-        employee_pk = self.kwargs.get('employee_pk') or self.request.POST.get('employee_pk')
+        employee_pk = self.kwargs.get(
+            'employee_pk') or self.request.POST.get('employee_pk')
         if employee_pk:
             return get_object_or_404(Employee, pk=employee_pk)
         return None
@@ -234,8 +247,7 @@ class TrainingRecordCreateView(LoginRequiredMixin, PermissionRequiredMixin, Crea
         if not employee:
             logger.error(
                 'Не указан сотрудник для создания записи об обучении пользователем: %s',
-                self.request.user.username
-            )
+                self.request.user.username)
             form.add_error(None, 'Сотрудник не выбран.')
             return self.form_invalid(form)
 
@@ -246,14 +258,15 @@ class TrainingRecordCreateView(LoginRequiredMixin, PermissionRequiredMixin, Crea
             form.instance.employee,
             self.request.user.username
         )
-        return redirect('employees:employee_trainings', pk=form.instance.employee.pk)
+        return redirect(
+            'employees:employee_trainings',
+            pk=form.instance.employee.pk)
 
     def form_invalid(self, form):
         logger.warning(
             'Ошибка валидации формы создания записи об обучении: %s пользователем: %s',
             form.errors,
-            self.request.user.username
-        )
+            self.request.user.username)
         return super().form_invalid(form)
 
 
@@ -689,10 +702,118 @@ class ReportsView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         report_data, training_programs = ReportService.generate_training_report()
+
+        # Фильтрация
+        department_id = self.request.GET.get('department')
+        search_query = self.request.GET.get('search')
+        if department_id:
+            report_data = [
+                data for data in report_data if data['employee'].department_id == int(department_id)]
+        if search_query:
+            report_data = [
+                data for data in report_data if search_query.lower() in f"{
+                    data['employee'].last_name} {
+                    data['employee'].first_name} {
+                    data['employee'].middle_name}".lower()]
+
+        # Сортировка
+        sort_by = self.request.GET.get('sort_by')
+        sort_order = self.request.GET.get('sort_order', 'asc')
+        if sort_by:
+            report_data.sort(
+                key=lambda x: x['trainings'].get(
+                    int(sort_by), {}).get(
+                    'date', 'Обучение не пройдено'), reverse=(
+                    sort_order == 'desc'))
+
+        # Добавить подразделения для фильтра
+        context['departments'] = Department.objects.all()
         context['report_data'] = report_data
         context['training_programs'] = training_programs
+        # Для формы добавления записи
+        context['employees'] = Employee.objects.all()
+
+        # Сводка
+        total_employees = len(report_data)
+        completed_trainings = sum(
+            1 for data in report_data for program in training_programs
+            if data['trainings'].get(program.id, {}).get('date') != "Обучение не пройдено"
+        )
+        total_possible_trainings = len(report_data) * len(training_programs)
+        completed_percentage = (
+            completed_trainings /
+            total_possible_trainings *
+            100) if total_possible_trainings else 0
+        context['completed_trainings'] = completed_trainings
+        context['completed_percentage'] = round(completed_percentage, 2)
+
         return context
 
     @log_view_action('Запрошен', 'отчет по обучению')
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+
+
+class ExportReportView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        report_data, training_programs = ReportService.generate_training_report()
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Отчет по обучению"
+
+        # Заголовки
+        headers = ["Сотрудник", "Должность", "Подразделение"] + \
+            [program.name for program in training_programs]
+        ws.append(headers)
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal="center")
+
+        # Данные
+        for data in report_data:
+            row = [
+                f"{
+                    data['employee'].last_name} {
+                    data['employee'].first_name | 0 | 1}. {
+                    data['employee'].middle_name | 0 | 1}.", str(
+                    data['employee'].position or "—"), str(
+                        data['employee'].department or "—")]
+            for program in training_programs:
+                training = data['trainings'].get(program.id, {})
+                date = training.get('date', "Обучение не пройдено")
+                row.append(
+                    date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
+            ws.append(row)
+
+        # Стили для статусов
+        for row_idx, data in enumerate(report_data, start=2):
+            for col_idx, program in enumerate(training_programs, start=4):
+                cell = ws.cell(row=row_idx, column=col_idx)
+                training = data['trainings'].get(program.id, {})
+                status_class = training.get('class', 'not-completed')
+                fill_colors = {
+                    'not-completed': 'FF9999',
+                    'overdue': 'FF3333',
+                    'warning': 'FFFF66',
+                    'completed': '99FF99'
+                }
+                cell.fill = PatternFill(
+                    start_color=fill_colors.get(
+                        status_class, 'FFFFFF'), end_color=fill_colors.get(
+                        status_class, 'FFFFFF'), fill_type="solid")
+
+        # Настройка ширины столбцов
+        for col in ws.columns:
+            max_length = max(len(str(cell.value))
+                             for cell in col if cell.value)
+            ws.column_dimensions[col[0].column_letter].width = max_length + 2
+
+        # Формирование ответа
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="training_report.xlsx"'
+        wb.save(response)
+        logger.info(
+            'Экспортирован отчет по обучению пользователем: %s',
+            request.user.username)
+        return response
