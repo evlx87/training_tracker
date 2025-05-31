@@ -10,8 +10,15 @@
 <body>
     <header>
         <h1>Training Tracker</h1>
-        <div class="user-info">
             {% if user.is_authenticated %}
+        <div class="button-container">
+            <a href="{% url 'employees:employee_list' %}" class="button button--primary button--small">Список сотрудников</a>
+            <a href="{% url 'employees:department_list' %}" class="button button--primary button--small">Структурные подразделения</a>
+            <a href="{% url 'employees:training_list' %}" class="button button--primary button--small">Программы обучения</a>
+            <a href="{% url 'employees:position_list' %}" class="button button--primary button--small">Должности</a>
+            <a href="{% url 'employees:reports' %}" class="button button--primary button--small">Отчеты по обучению</a>
+        </div>
+        <div class="user-info">
                 <span>Пользователь: {{ user.username }}</span>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
