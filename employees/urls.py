@@ -33,6 +33,6 @@ urlpatterns = [
     path('trainings/<int:pk>/edit/', views.TrainingUpdateView.as_view(), name='training_edit'),
     path('trainings/<int:pk>/delete/', views.TrainingDeleteView.as_view(), name='training_delete'),
     path('trainings/<int:pk>/delete/confirm/', views.TrainingDeleteConfirmView.as_view(), name='training_delete_confirm'),
-    path('reports/', cache_page(60 * 15)(views.ReportsView.as_view()), name='reports'),
+    path('reports/', views.ReportsView.as_view(), name='reports'),
     path('reports/export/', views.ExportReportView.as_view(), name='export_report'),
 ]
