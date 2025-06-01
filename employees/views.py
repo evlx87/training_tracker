@@ -705,20 +705,31 @@ class ReportsView(TemplateView):
         selected_employees = self.request.GET.getlist('employees')
         selected_program = self.request.GET.get('program')
 
+        # Удаляем пустые строки из selected_employees
+        selected_employees = [emp for emp in selected_employees if emp]
+        logger.debug("Selected employees after filtering: %s", selected_employees)
+
         # Генерация отчета
-        report_data, training_programs = ReportService.generate_training_report(selected_employees, selected_program)
+        report_data, training_programs = ReportService.generate_training_report(
+            selected_employees, selected_program)
 
-        # Фильтрация по сотрудникам
-        if selected_employees and selected_employees[0]:  # Пропускаем случай "Все сотрудники"
-            report_data = [data for data in report_data if str(data['employee'].pk) in selected_employees]
+        # Фильтрация по сотрудникам только если есть конкретные ID
+        if selected_employees:
+            report_data = [
+                data for data in report_data if str(data['employee'].pk) in selected_employees
+            ]
 
-        # Сортировка (оставляем как есть)
+        logger.debug("Report data length after filtering: %s", len(report_data))
+
+        # Сортировка
         sort_by = self.request.GET.get('sort_by')
         sort_order = self.request.GET.get('sort_order', 'asc')
         if sort_by and sort_by.isdigit():
             report_data.sort(
-                key=lambda x: x['trainings'].get(int(sort_by), {}).get('date', 'Обучение не пройдено'),
-                reverse=(sort_order == 'desc'))
+                key=lambda x: x['trainings'].get(
+                    int(sort_by), {}).get('date', 'Обучение не пройдено'),
+                reverse=(sort_order == 'desc')
+            )
 
         # Подготовка контекста
         context['report_data'] = report_data
@@ -738,7 +749,10 @@ class ReportsView(TemplateView):
         # Подсчет обученных по программам
         trained_counts = {}
         for program in training_programs:
-            trained_count = sum(1 for data in report_data if data['trainings'].get(program.id, {}).get('date') != "Обучение не пройдено")
+            trained_count = sum(
+                1 for data in report_data if data['trainings'].get(
+                    program.id, {}).get('date') != "Обучение не пройдено"
+            )
             trained_counts[program.name] = trained_count
         context['trained_counts'] = trained_counts
 
@@ -768,8 +782,8 @@ class ExportReportView(LoginRequiredMixin, View):
             # Формируем ФИО: Фамилия И. О. (если отчество есть)
             first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
             middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
-            employee_name = f"{data['employee'].last_name} {first_initial}. {middle_initial}.".strip(
-            )
+            employee_name = f"{
+                data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
 
             row = [
                 employee_name,

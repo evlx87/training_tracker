@@ -82,7 +82,6 @@
         </thead>
         <tbody>
             {% for data in report_data %}
-            {% if not selected_employees or data.employee.pk|stringformat:"s" in selected_employees %}
             <tr class="employee-row">
                 <td>{{ data.employee.last_name }} {{ data.employee.first_name.0 }}. {% if data.employee.middle_name %}{{ data.employee.middle_name.0 }}.{% endif %}</td>
                 <td>{{ data.employee.position|default:"—" }}</td>
@@ -101,7 +100,6 @@
                     {% endwith %}
                 {% endif %}
             </tr>
-            {% endif %}
             {% empty %}
             <tr>
                 <td colspan="4">Данные не найдены.</td>
@@ -110,4 +108,18 @@
         </tbody>
     </table>
 </div>
+
+<script>
+document.getElementById('employees').addEventListener('change', function() {
+    const options = this.options;
+    const allEmployeesOption = options[0];
+    if (allEmployeesOption.selected) {
+        for (let i = 1; i < options.length; i++) {
+            options[i].selected = false;
+        }
+    } else if (this.selectedOptions.length > 0) {
+        allEmployeesOption.selected = false;
+    }
+});
+</script>
 {% endblock %}
