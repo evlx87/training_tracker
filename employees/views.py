@@ -696,69 +696,53 @@ class TrainingDeleteConfirmView(MTOConfirmedDeleteView):
         return self.render_to_response(self.get_context_data())
 
 
-class ReportsView(LoginRequiredMixin, TemplateView):
+class ReportsView(TemplateView):
     template_name = 'reports.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        report_data, training_programs = ReportService.generate_training_report()
+        # Получение параметров из запроса
+        selected_employees = self.request.GET.getlist('employees')
+        selected_program = self.request.GET.get('program')
 
-        # Отладочная печать
-        logger.debug("Training programs: %s", [program.name for program in training_programs])
-        logger.debug("Report data sample: %s", report_data[:1] if report_data else "No data")
+        # Генерация отчета
+        report_data, training_programs = ReportService.generate_training_report(selected_employees, selected_program)
 
-        # Фильтрация
-        department_id = self.request.GET.get('department')
-        search_query = self.request.GET.get('search')
-        if department_id:
-            report_data = [
-                data for data in report_data if data['employee'].department_id == int(department_id)]
-        if search_query:
-            report_data = [
-                data for data in report_data
-                if search_query.lower() in (
-                    f"{data['employee'].last_name} "
-                    f"{data['employee'].first_name} "
-                    f"{data['employee'].middle_name or ''}"
-                ).lower().strip()
-            ]
+        # Фильтрация по сотрудникам
+        if selected_employees and selected_employees[0]:  # Пропускаем случай "Все сотрудники"
+            report_data = [data for data in report_data if str(data['employee'].pk) in selected_employees]
 
-        # Сортировка
+        # Сортировка (оставляем как есть)
         sort_by = self.request.GET.get('sort_by')
         sort_order = self.request.GET.get('sort_order', 'asc')
-        if sort_by:
+        if sort_by and sort_by.isdigit():
             report_data.sort(
-                key=lambda x: x['trainings'].get(
-                    int(sort_by), {}).get(
-                    'date', 'Обучение не пройдено'), reverse=(
-                        sort_order == 'desc'))
+                key=lambda x: x['trainings'].get(int(sort_by), {}).get('date', 'Обучение не пройдено'),
+                reverse=(sort_order == 'desc'))
 
-        # Добавить подразделения для фильтра
-        context['departments'] = Department.objects.all()
+        # Подготовка контекста
         context['report_data'] = report_data
         context['training_programs'] = training_programs
-        # Для формы добавления записи
         context['employees'] = Employee.objects.all()
+        context['departments'] = Department.objects.all()
+        context['selected_employees'] = selected_employees
+        context['selected_program'] = selected_program
+        if selected_program and selected_program.isdigit():
+            program = TrainingProgram.objects.filter(id=int(selected_program)).first()
+            context['selected_program_name'] = program.name if program else "Неизвестная программа"
 
         # Сводка
         total_employees = len(report_data)
-        completed_trainings = sum(
-            1 for data in report_data for program in training_programs
-            if data['trainings'].get(program.id, {}).get('date') != "Обучение не пройдено"
-        )
-        total_possible_trainings = len(report_data) * len(training_programs)
-        completed_percentage = (
-                completed_trainings /
-                total_possible_trainings *
-                100) if total_possible_trainings else 0
-        context['completed_trainings'] = completed_trainings
-        context['completed_percentage'] = round(completed_percentage, 2)
+        context['total_employees'] = total_employees
+
+        # Подсчет обученных по программам
+        trained_counts = {}
+        for program in training_programs:
+            trained_count = sum(1 for data in report_data if data['trainings'].get(program.id, {}).get('date') != "Обучение не пройдено")
+            trained_counts[program.name] = trained_count
+        context['trained_counts'] = trained_counts
 
         return context
-
-    @log_view_action('Запрошен', 'отчет по обучению')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
 
 
 class ExportReportView(LoginRequiredMixin, View):

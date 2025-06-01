@@ -10,32 +10,50 @@
 
 <!-- Сводка статистики -->
 <div class="report-summary">
-    <p>Всего сотрудников: {{ employees|length }}</p>
-    <p>Завершено обучений: {{ completed_trainings }} ({{ completed_percentage }}%)</p>
+    <p>Всего сотрудников: {{ total_employees }}</p>
+    <!-- Столбчатая диаграмма -->
+    <div class="chart-container">
+        <table class="bar-chart">
+            <tr>
+                {% for program, trained_count in trained_counts.items %}
+                <td>
+                    <div class="bar" style="height: {{ trained_count|add:10 }}px;" title="{{ program }}: {{ trained_count }}"></div>
+                    <span>{{ program }}</span>
+                </td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
 </div>
 
 <!-- Фильтры и поиск -->
 <div class="filters-container">
     <form method="get" class="filter-form">
         <div class="form-group">
-            <label for="department">Подразделение:</label>
-            <select name="department" id="department" class="form-input">
-                <option value="">Все подразделения</option>
-                {% for dept in departments %}
-                <option value="{{ dept.pk }}" {% if dept.pk|stringformat:"s" == request.GET.department %}selected{% endif %}>
-                    {{ dept.name }}
+            <label for="employees">Сотрудники:</label>
+            <select name="employees" id="employees" class="form-input" multiple>
+                <option value="" {% if not selected_employees %}selected{% endif %}>Все сотрудники</option>
+                {% for employee in employees %}
+                <option value="{{ employee.pk }}" {% if employee.pk|stringformat:"s" in selected_employees %}selected{% endif %}>
+                    {{ employee.last_name }} {{ employee.first_name.0 }}.{% if employee.middle_name %}{{ employee.middle_name.0 }}.{% endif %}
                 </option>
                 {% endfor %}
             </select>
         </div>
         <div class="form-group">
-            <label for="search">Поиск по имени:</label>
-            <input type="text" name="search" id="search" class="form-input" value="{{ request.GET.search|default:"" }}" placeholder="Введите ФИО">
+            <label for="program">Программа обучения:</label>
+            <select name="program" id="program" class="form-input">
+                <option value="" {% if not selected_program %}selected{% endif %}>Все программы</option>
+                {% for program in training_programs %}
+                <option value="{{ program.id }}" {% if program.id|stringformat:"s" == selected_program %}selected{% endif %}>
+                    {{ program.name }}
+                </option>
+                {% endfor %}
+            </select>
         </div>
         <div class="form-group">
             <button type="submit" class="button button--primary">Применить</button>
             <a href="{% url 'employees:reports' %}" class="button button--danger">Сбросить</a>
-            <!-- Кнопка экспорта -->
             <a href="{% url 'employees:export_report' %}" class="button button--success">Экспорт в Excel</a>
         </div>
     </form>
@@ -57,65 +75,39 @@
                 <th>Сотрудник</th>
                 <th>Должность</th>
                 <th>Подразделение</th>
-                {% for program in training_programs %}
-                <th title="{{ program.name }}" class="sortable" data-program-id="{{ program.id }}">
-                    {{ program.name|truncatechars:15 }}
-                    <span class="sort-icon"></span>
-                </th>
-                {% endfor %}
+                {% if selected_program %}
+                <th>{{ selected_program_name }}</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for data in report_data %}
-            <tr class="employee-row" data-employee-id="{{ data.employee.pk }}">
-                <td>{{ data.employee.last_name }} {{ data.employee.first_name|first }}. {% if data.employee.middle_name %}{{ data.employee.middle_name|first }}.{% endif %}</td>
+            {% if not selected_employees or data.employee.pk|stringformat:"s" in selected_employees %}
+            <tr class="employee-row">
+                <td>{{ data.employee.last_name }} {{ data.employee.first_name.0 }}. {% if data.employee.middle_name %}{{ data.employee.middle_name.0 }}.{% endif %}</td>
                 <td>{{ data.employee.position|default:"—" }}</td>
                 <td>{{ data.employee.department|default:"—" }}</td>
-                {% for program in training_programs %}
-                <td class="{{ data.trainings|get_item:program.id|get_item:'class' }}" title="{{ data.trainings|get_item:program.id|get_item:'details' }}">
-                    {% with training_status=data.trainings|get_item:program.id %}
-                    {% if training_status.date == "Обучение не пройдено" %}
-                        {% if training_status.class == "not-completed" %}<span class="icon">✖</span>{% endif %}
-                    {% else %}
-                        {{ training_status.date|date:"d.m.y" }}
-                        {% if training_status.class == "overdue" %}<span class="icon">⏰</span>{% endif %}
-                        {% if training_status.class == "warning" %}<span class="icon">⚠</span>{% endif %}
-                        {% if training_status.class == "completed" %}<span class="icon">✔</span>{% endif %}
-                    {% endif %}
+                {% if selected_program %}
+                    {% with training_status=data.trainings|int_key:selected_program %}
+                    <td class="{{ training_status|dict_get:'class'|default:'not-completed' }}"
+                        title="{{ training_status|dict_get:'details'|default:'' }}">
+                        {% if training_status and training_status.date != "Обучение не пройдено" %}
+                            {{ training_status.date|date:"d.m.y" }}
+                            <span class="icon">{{ training_status.class|get_status_icon }}</span>
+                        {% else %}
+                            <span class="icon">✖</span>
+                        {% endif %}
+                    </td>
                     {% endwith %}
-                </td>
-                {% endfor %}
+                {% endif %}
             </tr>
+            {% endif %}
             {% empty %}
             <tr>
-                <td colspan="{{ training_programs|length|add:3 }}">Нет данных для отображения.</td>
+                <td colspan="4">Данные не найдены.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
-
-<!-- JavaScript для интерактивности -->
-<script>
-    // Сортировка таблицы
-    document.querySelectorAll('.sortable').forEach(header => {
-        header.addEventListener('click', function() {
-            const programId = this.getAttribute('data-program-id');
-            const url = new URL(window.location);
-            url.searchParams.set('sort_by', programId);
-            url.searchParams.set('sort_order', url.searchParams.get('sort_order') === 'asc' ? 'desc' : 'asc');
-            window.location = url;
-        });
-    });
-
-    // Сворачивание/разворачивание строк
-    document.querySelectorAll('.employee-row').forEach(row => {
-        row.addEventListener('click', function(e) {
-            if (e.target.tagName !== 'A' && !e.target.closest('.sortable')) {
-                this.classList.toggle('collapsed');
-            }
-        });
-    });
-</script>
-
 {% endblock %}
