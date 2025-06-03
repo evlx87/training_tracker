@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
-
 {% block title %}
 Главная страница
 {% endblock %}
-
 {% block content %}
 <h1>Добро пожаловать в систему учета сотрудников и обучения</h1>
 {% if not user.is_authenticated %}
@@ -12,12 +10,18 @@
     <a href="{% url 'login' %}" class="button button--primary">Войти</a>
 </div>
 {% else %}
-<div class="button-container">
-    <a href="{% url 'employees:employee_list' %}" class="button button--primary button--large">Список<br>сотрудников</a>
-    <a href="{% url 'employees:department_list' %}" class="button button--primary button--large">Структурные<br>подразделения</a>
-    <a href="{% url 'employees:training_list' %}" class="button button--primary button--large">Программы<br>обучения</a>
-    <a href="{% url 'employees:position_list' %}" class="button button--primary button--large">Должности</a>
-    <a href="{% url 'employees:reports' %}" class="button button--primary button--large">Отчеты<br>по обучению</a>
+<div class="instructions">
+    <h2><span class="icon">ℹ️</span> Инструкция по работе с порталом</h2>
+    <p>Система "<strong>Training Tracker</strong>" предназначена для управления данными сотрудников, их обучением, подразделениями и должностями. Вот краткое руководство для начала работы:</p>
+    <ol>
+        <li><strong>Список сотрудников</strong>: Просматривайте, добавляйте, редактируйте или удаляйте данные сотрудников и их записи об обучении.</li>
+        <li><strong>Структурные подразделения</strong>: Управляйте подразделениями, создавайте новые или редактируйте существующие.</li>
+        <li><strong>Программы обучения</strong>: Создавайте программы, указывайте периодичность и отслеживайте прогресс.</li>
+        <li><strong>Должности</strong>: Управляйте списком должностей в организации.</li>
+        <li><strong>Отчеты по обучению</strong>: Формируйте отчеты с фильтрацией и экспортом в Excel.</li>
+        <li><strong>Удаление данных</strong>: Для удаления записей требуется подтверждение от пользователей группы MTO.</li>
+    </ol>
+    <p>Используйте кнопки в верхней части страницы для навигации по разделам.</p>
 </div>
 {% endif %}
 {% endblock %}
