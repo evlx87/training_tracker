@@ -578,3 +578,21 @@ main {
     font-size: 12px;
     margin-top: 5px;
 }
+.instructions {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 4px;
+    text-align: left;
+}
+.instructions h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+.instructions ol {
+    padding-left: 20px;
+}
+.instructions li {
+    margin-bottom: 10px;
+}

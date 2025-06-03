@@ -1,17 +1,14 @@
 {% extends 'base.html' %}
 {% load dict_get %}
-
 {% block title %}
 Отчет по обучению
 {% endblock %}
-
 {% block content %}
 <h1>Отчет по обучению</h1>
 
-<!-- Сводка статистики -->
+<!-- Диаграмма с количеством сотрудников, прошедших обучение -->
 <div class="report-summary">
     <p>Всего сотрудников: {{ total_employees }}</p>
-    <!-- Столбчатая диаграмма -->
     <div class="chart-container">
         <table class="bar-chart">
             <tr>
@@ -26,7 +23,7 @@
     </div>
 </div>
 
-<!-- Фильтры и поиск -->
+<!-- Фильтры -->
 <div class="filters-container">
     <form method="get" class="filter-form">
         <div class="form-group">
@@ -67,47 +64,62 @@
     <div class="legend-item completed">Пройдено <span class="icon">✔</span></div>
 </div>
 
-<!-- Таблица отчета -->
-<div class="table-container">
-    <table class="report-table">
-        <thead>
-            <tr>
-                <th>Сотрудник</th>
-                <th>Должность</th>
-                <th>Подразделение</th>
-                {% if selected_program %}
-                <th>{{ selected_program_name }}</th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in report_data %}
-            <tr class="employee-row">
-                <td>{{ data.employee.last_name }} {{ data.employee.first_name.0 }}. {% if data.employee.middle_name %}{{ data.employee.middle_name.0 }}.{% endif %}</td>
-                <td>{{ data.employee.position|default:"—" }}</td>
-                <td>{{ data.employee.department|default:"—" }}</td>
-                {% if selected_program %}
-                    {% with training_status=data.trainings|int_key:selected_program %}
-                    <td class="{{ training_status|dict_get:'class'|default:'not-completed' }}"
-                        title="{{ training_status|dict_get:'details'|default:'' }}">
-                        {% if training_status and training_status.date != "Обучение не пройдено" %}
-                            {{ training_status.date|date:"d.m.y" }}
-                            <span class="icon">{{ training_status.class|get_status_icon }}</span>
-                        {% else %}
-                            <span class="icon">✖</span>
-                        {% endif %}
-                    </td>
-                    {% endwith %}
-                {% endif %}
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4">Данные не найдены.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<!-- Инструкция или таблица в зависимости от фильтров -->
+{% if selected_employees or selected_program %}
+    <div class="table-container">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Сотрудник</th>
+                    <th>Должность</th>
+                    <th>Подразделение</th>
+                    {% if selected_program %}
+                    <th>{{ selected_program_name }}</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in report_data %}
+                <tr class="employee-row">
+                    <td>{{ data.employee.last_name }} {{ data.employee.first_name.0 }}. {% if data.employee.middle_name %}{{ data.employee.middle_name.0 }}.{% endif %}</td>
+                    <td>{{ data.employee.position|default:"—" }}</td>
+                    <td>{{ data.employee.department|default:"—" }}</td>
+                    {% if selected_program %}
+                        {% with training_status=data.trainings|int_key:selected_program %}
+                        <td class="{{ training_status|dict_get:'class'|default:'not-completed' }}"
+                            title="{{ training_status|dict_get:'details'|default:'' }}">
+                            {% if training_status and training_status.date != "Обучение не пройдено" %}
+                                {{ training_status.date|date:"d.m.y" }}
+                                <span class="icon">{{ training_status.class|get_status_icon }}</span>
+                            {% else %}
+                                <span class="icon">✖</span>
+                            {% endif %}
+                        </td>
+                        {% endwith %}
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Данные не найдены.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="instructions">
+        <h2>Инструкция по работе с отчетом</h2>
+        <p>На этой странице вы можете сформировать отчет по обучению сотрудников. Для этого выполните следующие шаги:</p>
+        <ol>
+            <li>В разделе "Сотрудники" выберите одного или нескольких сотрудников, которых хотите включить в отчет. Для выбора всех сотрудников оставьте поле пустым.</li>
+            <li>В разделе "Программа обучения" выберите конкретную программу, чтобы отобразить данные только по ней. Если выбрать "Все программы", отчет будет содержать общую информацию.</li>
+            <li>Нажмите кнопку "Применить", чтобы сформировать таблицу с данными.</li>
+            <li>Используйте кнопку "Экспорт в Excel" для сохранения отчета в формате Excel.</li>
+            <li>Легенда внизу показывает статусы обучения: "Не пройдено", "Просрочено", "Скоро истекает" или "Пройдено".</li>
+        </ol>
+        <p>Диаграмма вверху показывает общее количество сотрудников, прошедших обучение по каждой программе.</p>
+    </div>
+{% endif %}
 
 <script>
 document.getElementById('employees').addEventListener('change', function() {
