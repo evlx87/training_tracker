@@ -6,23 +6,6 @@
 {% block content %}
 <h1>Отчет по обучению</h1>
 
-<!-- Диаграмма с количеством сотрудников, прошедших обучение -->
-<div class="report-summary">
-    <p>Всего сотрудников: {{ total_employees }}</p>
-    <div class="chart-container">
-        <table class="bar-chart">
-            <tr>
-                {% for program, trained_count in trained_counts.items %}
-                <td>
-                    <div class="bar" style="height: {{ trained_count|add:10 }}px;" title="{{ program }}: {{ trained_count }}"></div>
-                    <span>{{ program }}</span>
-                </td>
-                {% endfor %}
-            </tr>
-        </table>
-    </div>
-</div>
-
 <!-- Фильтры -->
 <div class="filters-container">
     <form method="get" class="filter-form">
@@ -117,7 +100,6 @@
             <li>Используйте кнопку "Экспорт в Excel" для сохранения отчета в формате Excel.</li>
             <li>Легенда внизу показывает статусы обучения: "Не пройдено", "Просрочено", "Скоро истекает" или "Пройдено".</li>
         </ol>
-        <p>Диаграмма вверху показывает общее количество сотрудников, прошедших обучение по каждой программе.</p>
     </div>
 {% endif %}
 
