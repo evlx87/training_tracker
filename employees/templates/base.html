@@ -10,7 +10,7 @@
 <body>
     <header>
         <h1>Training Tracker</h1>
-            {% if user.is_authenticated %}
+        {% if user.is_authenticated %}
         <div class="button-container">
             <a href="{% url 'employees:employee_list' %}" class="button button--primary button--small">Список сотрудников</a>
             <a href="{% url 'employees:department_list' %}" class="button button--primary button--small">Структурные подразделения</a>
@@ -19,15 +19,17 @@
             <a href="{% url 'employees:reports' %}" class="button button--primary button--small">Отчеты по обучению</a>
         </div>
         <div class="user-info">
-                <span>Пользователь: {{ user.username }}</span>
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="button button--danger">Выход</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" class="button button--primary">Войти</a>
-            {% endif %}
+            <span>Пользователь: {{ user.username }}</span>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="button button--danger">Выход</button>
+            </form>
         </div>
+        {% else %}
+        <div class="user-info">
+            <a href="{% url 'login' %}" class="button button--primary">Войти</a>
+        </div>
+        {% endif %}
     </header>
     <div class="container">
         {% if messages %}
