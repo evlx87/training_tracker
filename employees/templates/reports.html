@@ -31,20 +31,34 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="form-group">
-            <button type="submit" class="button button--primary">Применить</button>
-            <a href="{% url 'employees:reports' %}" class="button button--danger">Сбросить</a>
-            <a href="{% url 'employees:export_report' %}" class="button button--success">Экспорт в Excel</a>
+        <div class="form-group buttons-group">
+            <button type="submit" class="button button--primary">
+                <span class="icon">✔</span> Применить
+            </button>
+            <a href="{% url 'employees:reports' %}" class="button button--danger">
+                <span class="icon">✖</span> Сбросить
+            </a>
+            <a href="{% url 'employees:export_report' %}" class="button button--success">
+                <span class="icon">📊</span> Экспорт в Excel
+            </a>
         </div>
     </form>
 </div>
 
 <!-- Легенда -->
 <div class="legend">
-    <div class="legend-item not-completed">Не пройдено <span class="icon">✖</span></div>
-    <div class="legend-item overdue">Просрочено <span class="icon">⏰</span></div>
-    <div class="legend-item warning">Скоро истекает <span class="icon">⚠</span></div>
-    <div class="legend-item completed">Пройдено <span class="icon">✔</span></div>
+    <div class="legend-item not-completed">
+        <span class="icon">✖</span> Не пройдено
+    </div>
+    <div class="legend-item overdue">
+        <span class="icon">⏰</span> Просрочено
+    </div>
+    <div class="legend-item warning">
+        <span class="icon">⚠</span> Скоро истекает
+    </div>
+    <div class="legend-item completed">
+        <span class="icon">✔</span> Пройдено
+    </div>
 </div>
 
 <!-- Инструкция или таблица в зависимости от фильтров -->
@@ -91,7 +105,7 @@
     </div>
 {% else %}
     <div class="instructions">
-        <h2>Инструкция по работе с отчетом</h2>
+        <h2><span class="icon">📋</span> Инструкция по работе с отчетом</h2>
         <p>На этой странице вы можете сформировать отчет по обучению сотрудников. Для этого выполните следующие шаги:</p>
         <ol>
             <li>В разделе "Сотрудники" выберите одного или нескольких сотрудников, которых хотите включить в отчет. Для выбора всех сотрудников оставьте поле пустым.</li>
