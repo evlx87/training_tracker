@@ -336,8 +336,8 @@ main {
 }
 
 .legend-item.not-completed {
-    background-color: #ffe6e6;
-    color: #e74c3c;
+    background-color: #e6f3fa;
+    color: #2c5282;
 }
 
 .legend-item.overdue {
@@ -357,8 +357,8 @@ main {
 
 /* Статусы для таблиц */
 .not-completed {
-    background-color: #ffe6e6;
-    color: #e74c3c;
+    background-color: #e6f3fa;
+    color: #2c5282;
 }
 
 .overdue {
