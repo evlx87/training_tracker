@@ -5,16 +5,18 @@
 {% endblock %}
 
 {% block content %}
-<h1>Удалить запись об обучении</h1>
-<p>Вы уверены, что хотите удалить запись "{{ training_record.training_program.name }}" от {{ training_record.completion_date|date:"d.m.Y" }} для сотрудника {{ employee.last_name }} {{ employee.first_name }}?</p>
-{% if confirm_mode %}
-<p>Подтверждение удаления доступно только пользователям группы MTO. Текущий пользователь: {{ request.user.username }}</p>
-{% endif %}
-<form method="post">
-    {% csrf_token %}
-    <div class="form-group">
-        <button type="submit" class="button button--danger">Удалить</button>
-        <a href="{% url 'employees:employee_trainings' employee.pk %}" class="button button--primary">Отмена</a>
-    </div>
-</form>
+<div class="confirm-container">
+    <h1>Удалить запись об обучении</h1>
+    <p><span class="icon">⚠️</span> Вы уверены, что хотите удалить запись <span class="highlight">"{{ training_record.training_program.name }}"</span> от {{ training_record.completion_date|date:"d.m.Y" }} для сотрудника <span class="highlight">{{ employee.last_name }} {{ employee.first_name }}</span>?</p>
+    {% if confirm_mode %}
+    <p class="confirm-warning">Подтверждение удаления доступно только пользователям группы MTO. Текущий пользователь: {{ request.user.username }}</p>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="button-group">
+            <button type="submit" class="button button--danger"><span class="icon">🗑️</span> Удалить</button>
+            <a href="{% url 'employees:employee_trainings' employee.pk %}" class="button button--primary"><span class="icon">↩️</span> Отмена</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

@@ -126,7 +126,7 @@ main {
 }
 
 .button--small {
-    display: flex; /* Для выравнивания иконки и текста */
+    display: flex;
     flex-direction: row;
     width: 200px;
     height: 40px;
@@ -136,7 +136,7 @@ main {
 }
 
 .button--small:hover {
-    background-color: #45a049; /* Более темный оттенок при наведении */
+    background-color: #45a049;
 }
 
 /* Иконки для кнопок в base.html */
@@ -225,6 +225,47 @@ main {
     gap: 8px;
 }
 
+/* Контейнер подтверждения удаления */
+.confirm-container {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-left: 4px solid #f44336;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.confirm-container p {
+    font-size: 15px;
+    color: #34495e;
+    margin: 10px 0;
+}
+
+.confirm-container .highlight {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.confirm-warning {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+/* Группа кнопок */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
 /* Таблицы общего назначения (для списков) */
 .table {
     width: 100%;
@@ -248,7 +289,7 @@ main {
     background-color: #34495e;
     font-weight: 600;
     color: #fff;
-    text-align: center; /* Центрируем текст в заголовках */
+    text-align: center;
 }
 
 .table tr:nth-child(even) {
@@ -652,6 +693,24 @@ main {
         margin: 2px;
     }
 
+    .confirm-container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    .confirm-container p {
+        font-size: 14px;
+    }
+
+    .confirm-warning {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .button-group {
+        gap: 10px;
+    }
+
     .pagination .page-link {
         padding: 6px 10px;
         font-size: 13px;
@@ -743,6 +802,29 @@ main {
         gap: 4px;
     }
 
+    .confirm-container {
+        margin: 15px auto;
+        padding: 10px;
+    }
+
+    .confirm-container p {
+        font-size: 13px;
+    }
+
+    .confirm-warning {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .button-group .button {
+        width: 100%;
+    }
+
     .pagination .page-link {
         padding: 4px 8px;
         font-size: 12px;
@@ -769,7 +851,6 @@ main {
         gap: 8px;
     }
 
-    /* Горизонтальная прокрутка для кнопок в header */
     header .button-container {
         flex-direction: row;
         justify-content: flex-start;
