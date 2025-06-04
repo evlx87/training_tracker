@@ -6,5 +6,5 @@ class EmployeesConfig(AppConfig):
     name = 'employees'
 
     def ready(self):
-        import employees.services  # Подключаем сигналы
+        import employees.signals  # Подключаем сигналы
 
