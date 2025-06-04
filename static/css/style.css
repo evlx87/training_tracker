@@ -140,7 +140,9 @@ main {
 }
 
 /* Иконки для кнопок в base.html */
-.button--primary[data-icon]::before {
+.button--primary[data-icon]::before,
+.button--success[data-icon]::before,
+.button--danger[data-icon]::before {
     content: '';
     display: inline-block;
     width: 16px;
@@ -170,6 +172,14 @@ main {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1></svg>');
 }
 
+.button[data-icon="add"]::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>');
+}
+
+.button[data-icon="back"]::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>');
+}
+
 .button-container {
     display: flex;
     justify-content: center;
@@ -188,7 +198,7 @@ main {
     height: 24px;
     border-radius: 4px;
     margin: 0 4px;
-    transition: color 0.2s, background-color 0.2s;
+    transition: color 0.2s, background-color 0.2s, transform 0.2s;
 }
 
 .training-icon {
@@ -206,16 +216,19 @@ main {
 .training-icon:hover {
     color: #fff;
     background-color: #138496;
+    transform: scale(1.1);
 }
 
 .view-icon:hover, .action-icon:hover {
     color: #fff;
     background-color: #45a049;
+    transform: scale(1.1);
 }
 
 .delete-icon:hover {
     color: #fff;
     background-color: #d32f2f;
+    transform: scale(1.1);
 }
 
 /* Контейнер для иконок действий */
@@ -282,14 +295,19 @@ main {
 .table td {
     padding: 12px;
     border: 1px solid #e0e0e0;
-    text-align: left;
+    text-align: center;
 }
 
 .table th {
     background-color: #34495e;
     font-weight: 600;
     color: #fff;
-    text-align: center;
+    position: relative;
+}
+
+.table th .icon {
+    margin-right: 6px;
+    vertical-align: middle;
 }
 
 .table tr:nth-child(even) {
@@ -298,6 +316,15 @@ main {
 
 .table tr:hover {
     background-color: #f1f1f1;
+}
+
+.table tr.overdue {
+    background-color: #ffcccc;
+    color: #c0392b;
+}
+
+.table tr.overdue:hover {
+    background-color: #ffb3b3;
 }
 
 .table-container {
@@ -650,6 +677,28 @@ main {
     to { opacity: 1; }
 }
 
+/* Сообщение об отсутствии данных */
+.no-data {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-left: 4px solid #17a2b8;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 15px;
+    color: #34495e;
+}
+
+.no-data p {
+    margin: 0 0 15px;
+}
+
+.no-data .button {
+    margin-top: 10px;
+}
+
 /* Фильтры */
 .filters-container {
     display: flex;
@@ -821,6 +870,12 @@ main {
         font-size: 12px;
     }
 
+    .no-data {
+        margin: 20px auto;
+        padding: 15px;
+        font-size: 14px;
+    }
+
     .filters-container {
         flex-direction: column;
         align-items: stretch;
@@ -947,6 +1002,12 @@ main {
     .form-group .optional,
     .form-group .field-errors {
         font-size: 11px;
+    }
+
+    .no-data {
+        margin: 15px auto;
+        padding: 10px;
+        font-size: 13px;
     }
 
     .legend-item {
