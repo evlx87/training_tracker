@@ -22,8 +22,8 @@
                 <td>{{ training.name }}</td>
                 <td>{{ training.recurrence_period|default:"—" }}</td>
                 <td class="actions">
-                    <a href="{% url 'employees:training_edit' training.pk %}" class="button button--primary"><span class="icon">✎</span> Редактировать</a>
-                    <a href="{% url 'employees:training_delete' training.pk %}" class="button button--danger"><span class="icon">✖</span> Удалить</a>
+                    <a href="{% url 'employees:training_edit' training.pk %}" class="action-icon" title="Редактировать">✎</a>
+                    <a href="{% url 'employees:training_delete' training.pk %}" class="delete-icon" title="Удалить">✖</a>
                 </td>
             </tr>
             {% empty %}

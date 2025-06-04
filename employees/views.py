@@ -589,6 +589,7 @@ class TrainingDeleteView(MTOConfirmedDeleteView):
     success_url = reverse_lazy('employees:training_list')
     confirm_url_name = 'employees:training_delete_confirm'
     permission_required = 'employees.delete_trainingprogram'
+    context_object_name = 'training'
 
 class TrainingDeleteConfirmView(MTOConfirmedDeleteView):
     model = TrainingProgram
@@ -596,6 +597,7 @@ class TrainingDeleteConfirmView(MTOConfirmedDeleteView):
     success_url = reverse_lazy('employees:training_list')
     confirm_url_name = 'employees:training_delete_confirm'
     permission_required = 'employees.delete_trainingprogram'
+    context_object_name = 'training'
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()

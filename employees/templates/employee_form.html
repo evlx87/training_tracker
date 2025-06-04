@@ -14,64 +14,90 @@
             {{ form.non_field_errors }}
         </div>
         {% endif %}
-        <div class="form-group">
-            <label for="{{ form.last_name.id_for_label }}">Фамилия:</label>
+        <div class="form-group{% if form.last_name.errors %} has-error{% endif %}">
+            <label for="{{ form.last_name.id_for_label }}"><span class="icon">👤</span> Фамилия:</label>
             {{ form.last_name }}
-            {{ form.last_name.errors }}
+            {% if form.last_name.errors %}
+            <span class="field-errors">{{ form.last_name.errors }}</span>
+            {% endif %}
         </div>
-        <div class="form-group">
-            <label for="{{ form.first_name.id_for_label }}">Имя:</label>
+        <div class="form-group{% if form.first_name.errors %} has-error{% endif %}">
+            <label for="{{ form.first_name.id_for_label }}"><span class="icon">👤</span> Имя:</label>
             {{ form.first_name }}
-            {{ form.first_name.errors }}
+            {% if form.first_name.errors %}
+            <span class="field-errors">{{ form.first_name.errors }}</span>
+            {% endif %}
         </div>
-        <div class="form-group">
-            <label for="{{ form.middle_name.id_for_label }}">Отчество:</label>
+        <div class="form-group{% if form.middle_name.errors %} has-error{% endif %} form-tooltip">
+            <label for="{{ form.middle_name.id_for_label }}"><span class="icon">👤</span> Отчество:<span class="optional">(необязательно)</span></label>
             {{ form.middle_name }}
-            {{ form.middle_name.errors }}
+            {% if form.middle_name.errors %}
+            <span class="field-errors">{{ form.middle_name.errors }}</span>
+            {% endif %}
+            <span class="tooltip-text">Укажите отчество, если есть.</span>
         </div>
-        <div class="form-group">
-            <label for="{{ form.birth_date.id_for_label }}">Дата рождения:</label>
+        <div class="form-group{% if form.birth_date.errors %} has-error{% endif %} form-tooltip">
+            <label for="{{ form.birth_date.id_for_label }}"><span class="icon">🎂</span> Дата рождения:<span class="optional">(необязательно)</span></label>
             {{ form.birth_date }}
-            {{ form.birth_date.errors }}
+            {% if form.birth_date.errors %}
+            <span class="field-errors">{{ form.birth_date.errors }}</span>
+            {% endif %}
+            <span class="tooltip-text">Формат: ДД.ММ.ГГГГ</span>
         </div>
-        <div class="form-group">
-            <label for="{{ form.position.id_for_label }}">Должность:</label>
+        <div class="form-group{% if form.position.errors %} has-error{% endif %}">
+            <label for="{{ form.position.id_for_label }}"><span class="icon">💼</span> Должность:</label>
             {{ form.position }}
-            {{ form.position.errors }}
+            {% if form.position.errors %}
+            <span class="field-errors">{{ form.position.errors }}</span>
+            {% endif %}
         </div>
-        <div class="form-group">
-            <label for="{{ form.department.id_for_label }}">Подразделение:</label>
+        <div class="form-group{% if form.department.errors %} has-error{% endif %}">
+            <label for="{{ form.department.id_for_label }}"><span class="icon">🏢</span> Подразделение:</label>
             {{ form.department }}
-            {{ form.department.errors }}
+            {% if form.department.errors %}
+            <span class="field-errors">{{ form.department.errors }}</span>
+            {% endif %}
         </div>
-        <div class="form-group">
-            <label for="{{ form.hire_date.id_for_label }}">Дата трудоустройства:</label>
+        <div class="form-group{% if form.hire_date.errors %} has-error{% endif %} form-tooltip">
+            <label for="{{ form.hire_date.id_for_label }}"><span class="icon">📅</span> Дата трудоустройства:<span class="optional">(необязательно)</span></label>
             {{ form.hire_date }}
-            {{ form.hire_date.errors }}
+            {% if form.hire_date.errors %}
+            <span class="field-errors">{{ form.hire_date.errors }}</span>
+            {% endif %}
+            <span class="tooltip-text">Формат: ДД.ММ.ГГГГ</span>
         </div>
-        <div class="form-group">
-            <label for="{{ form.is_dismissed.id_for_label }}">Уволен:</label>
+        <div class="form-group form-checkbox{% if form.is_dismissed.errors %} has-error{% endif %}">
+            <label for="{{ form.is_dismissed.id_for_label }}"><span class="icon">🚪</span> Уволен:</label>
             {{ form.is_dismissed }}
-            {{ form.is_dismissed.errors }}
+            {% if form.is_dismissed.errors %}
+            <span class="field-errors">{{ form.is_dismissed.errors }}</span>
+            {% endif %}
         </div>
-        <div class="form-group">
-            <label for="{{ form.dismissal_date.id_for_label }}">Дата увольнения:</label>
+        <div class="form-group{% if form.dismissal_date.errors %} has-error{% endif %} form-tooltip">
+            <label for="{{ form.dismissal_date.id_for_label }}"><span class="icon">📅</span> Дата увольнения:<span class="optional">(необязательно)</span></label>
             {{ form.dismissal_date }}
-            {{ form.dismissal_date.errors }}
+            {% if form.dismissal_date.errors %}
+            <span class="field-errors">{{ form.dismissal_date.errors }}</span>
+            {% endif %}
+            <span class="tooltip-text">Укажите, если сотрудник уволен.</span>
         </div>
-        <div class="form-group">
-            <label for="{{ form.is_on_maternity_leave.id_for_label }}">В декрете:</label>
+        <div class="form-group form-checkbox{% if form.is_on_maternity_leave.errors %} has-error{% endif %}">
+            <label for="{{ form.is_on_maternity_leave.id_for_label }}"><span class="icon">👶</span> В декрете:</label>
             {{ form.is_on_maternity_leave }}
-            {{ form.is_on_maternity_leave.errors }}
+            {% if form.is_on_maternity_leave.errors %}
+            <span class="field-errors">{{ form.is_on_maternity_leave.errors }}</span>
+            {% endif %}
         </div>
-        <div class="form-group">
-            <label for="{{ form.is_external_part_time.id_for_label }}">Внешний совместитель:</label>
+        <div class="form-group form-checkbox{% if form.is_external_part_time.errors %} has-error{% endif %}">
+            <label for="{{ form.is_external_part_time.id_for_label }}"><span class="icon">⏰</span> Внешний совместитель:</label>
             {{ form.is_external_part_time }}
-            {{ form.is_external_part_time.errors }}
+            {% if form.is_external_part_time.errors %}
+            <span class="field-errors">{{ form.is_external_part_time.errors }}</span>
+            {% endif %}
         </div>
-        <div class="form-group">
-            <button type="submit" class="button button--primary">{{ action }}</button>
-            <a href="{% url 'employees:employee_list' %}" class="button button--danger">Отмена</a>
+        <div class="button-group">
+            <button type="submit" class="button button--primary"><span class="icon">💾</span> {{ action }}</button>
+            <a href="{% url 'employees:employee_list' %}" class="button button--danger"><span class="icon">✖️</span> Отмена</a>
         </div>
     </form>
 </div>

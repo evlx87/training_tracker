@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-<h1>{{ action }} запись об обучении для {{ employee.last_name }} {{ employee.first_name }}</h1>
+<h1>{{ action }} запись для {{ employee }}</h1>
 <div class="form-container">
     <form method="post">
         {% csrf_token %}
@@ -14,19 +14,24 @@
             {{ form.non_field_errors }}
         </div>
         {% endif %}
-        <div class="form-group">
-            <label for="{{ form.training_program.id_for_label }}">Программа обучения:</label>
+        <div class="form-group{% if form.training_program.errors %} has-error{% endif %}">
+            <label for="{{ form.training_program.id_for_label }}"><span class="icon">📚</span> Программа обучения:</label>
             {{ form.training_program }}
-            {{ form.training_program.errors }}
+            {% if form.training_program.errors %}
+            <span class="field-errors">{{ form.training_program.errors }}</span>
+            {% endif %}
         </div>
-        <div class="form-group">
-            <label for="{{ form.completion_date.id_for_label }}">Дата прохождения:</label>
+        <div class="form-group{% if form.completion_date.errors %} has-error{% endif %} form-tooltip">
+            <label for="{{ form.completion_date.id_for_label }}"><span class="icon">📅</span> Дата прохождения:</label>
             {{ form.completion_date }}
-            {{ form.completion_date.errors }}
+            {% if form.completion_date.errors %}
+            <span class="field-errors">{{ form.completion_date.errors }}</span>
+            {% endif %}
+            <span class="tooltip-text">Формат: ДД.ММ.ГГГГ</span>
         </div>
-        <div class="form-group">
-            <button type="submit" class="button button--primary">Сохранить</button>
-            <a href="{% url 'employees:employee_trainings' employee.pk %}" class="button button--danger">Отмена</a>
+        <div class="button-group">
+            <button type="submit" class="button button--primary"><span class="icon">💾</span> Сохранить</button>
+            <a href="{% url 'employees:employee_trainings' employee.pk %}" class="button button--danger"><span class="icon">✖️</span> Отмена</a>
         </div>
     </form>
 </div>

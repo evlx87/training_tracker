@@ -14,14 +14,16 @@
             {{ form.non_field_errors }}
         </div>
         {% endif %}
-        <div class="form-group">
-            <label for="{{ form.name.id_for_label }}">Название:</label>
+        <div class="form-group{% if form.name.errors %} has-error{% endif %}">
+            <label for="{{ form.name.id_for_label }}"><span class="icon">💼</span> Название:</label>
             {{ form.name }}
-            {{ form.name.errors }}
+            {% if form.name.errors %}
+            <span class="field-errors">{{ form.name.errors }}</span>
+            {% endif %}
         </div>
-        <div class="form-group">
-            <button type="submit" class="button button--primary">Сохранить</button>
-            <a href="{% url 'employees:position_list' %}" class="button button--danger">Отмена</a>
+        <div class="button-group">
+            <button type="submit" class="button button--primary"><span class="icon">💾</span> Сохранить</button>
+            <a href="{% url 'employees:position_list' %}" class="button button--danger"><span class="icon">✖️</span> Отмена</a>
         </div>
     </form>
 </div>

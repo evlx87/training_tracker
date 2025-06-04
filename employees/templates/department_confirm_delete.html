@@ -5,13 +5,15 @@
 {% endblock %}
 
 {% block content %}
-<h1>Удалить подразделение</h1>
-<p>Вы уверены, что хотите удалить подразделение "{{ department.name }}"?</p>
-<form method="post">
-    {% csrf_token %}
-    <div class="form-group">
-        <button type="submit" class="button button--danger">Удалить</button>
-        <a href="{% url 'employees:department_list' %}" class="button button--primary">Отмена</a>
-    </div>
-</form>
+<div class="confirm-container">
+    <h1>Удалить подразделение</h1>
+    <p><span class="icon">⚠️</span> Вы уверены, что хотите удалить подразделение <span class="highlight">"{{ department.name }}"</span>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="button-group">
+            <button type="submit" class="button button--danger"><span class="icon">🗑️</span> Удалить</button>
+            <a href="{% url 'employees:department_list' %}" class="button button--primary"><span class="icon">↩️</span> Отмена</a>
+        </div>
+    </form>
+</div>
 {% endblock %}
