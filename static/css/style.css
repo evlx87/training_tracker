@@ -178,21 +178,34 @@ main {
 }
 
 /* Иконки действий */
-.view-icon, .action-icon, .delete-icon {
+.training-icon, .view-icon, .action-icon, .delete-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    color: #4CAF50;
     text-decoration: none;
     width: 24px;
     height: 24px;
     border-radius: 4px;
+    margin: 0 4px;
     transition: color 0.2s, background-color 0.2s;
+}
+
+.training-icon {
+    color: #17a2b8;
+}
+
+.action-icon {
+    color: #4CAF50;
 }
 
 .delete-icon {
     color: #f44336;
+}
+
+.training-icon:hover {
+    color: #fff;
+    background-color: #138496;
 }
 
 .view-icon:hover, .action-icon:hover {
@@ -203,6 +216,13 @@ main {
 .delete-icon:hover {
     color: #fff;
     background-color: #d32f2f;
+}
+
+/* Контейнер для иконок действий */
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
 }
 
 /* Таблицы общего назначения (для списков) */
@@ -610,7 +630,7 @@ main {
 
     .button {
         padding: 8px 16px;
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .button--large {
@@ -620,10 +640,16 @@ main {
     }
 
     .button--small {
-        width: 150px;
+        width: 140px;
         height: 36px;
-        font-size: 13px;
-        padding: 2px;
+        font-size: 12px;
+    }
+
+    .training-icon, .view-icon, .action-icon, .delete-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
+        margin: 2px;
     }
 
     .pagination .page-link {
@@ -635,13 +661,13 @@ main {
     .form-textarea,
     .form-input select {
         padding: 8px;
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .filters-container {
         flex-direction: column;
         align-items: stretch;
-        padding: 15px;
+        padding: 8px;
     }
 
     .legend {
@@ -676,7 +702,7 @@ main {
     .table th,
     .table td {
         padding: 6px;
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .report-table {
@@ -689,28 +715,44 @@ main {
         min-width: 80px;
     }
 
+    .button {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
     .button--large {
         width: 120px;
-        height: 50px;
+        height: 40px;
         font-size: 12px;
     }
 
     .button--small {
         width: 120px;
         height: 32px;
+        font-size: 11px;
+    }
+
+    .training-icon, .view-icon, .action-icon, .delete-icon {
+        width: 18px;
+        height: 18px;
         font-size: 12px;
-        padding: 2px;
+        margin: 2px;
+    }
+
+    .actions {
+        gap: 4px;
     }
 
     .pagination .page-link {
-        padding: 5px 8px;
+        padding: 4px 8px;
         font-size: 12px;
     }
 
     .form-input,
     .form-textarea,
     .form-input select {
-        font-size: 12px;
+        padding: 6px;
+        font-size: 11px;
     }
 
     .legend-item {
@@ -719,7 +761,7 @@ main {
     }
 
     .filters-container {
-        padding: 10px;
+        padding: 8px;
     }
 
     .buttons-group {
@@ -727,16 +769,11 @@ main {
         gap: 8px;
     }
 
-    .button {
-        width: 100%;
-        justify-content: center;
-    }
-
     /* Горизонтальная прокрутка для кнопок в header */
     header .button-container {
         flex-direction: row;
         justify-content: flex-start;
-        gap: 10px;
+        gap: 8px;
         overflow-x: auto;
         padding-bottom: 10px;
         white-space: nowrap;

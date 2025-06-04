@@ -21,12 +21,12 @@
             {% for employee in employees %}
             <tr>
                 <td>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</td>
-                <td>{{ employee.position.name|default:"—" }}</td>
-                <td>{{ employee.department.name|default:"—" }}</td>
+                <td>{{ employee.position|default:"—" }}</td>
+                <td>{{ employee.department|default:"—" }}</td>
                 <td class="actions">
-                    <a href="{% url 'employees:employee_trainings' employee.pk %}" class="button button--info">Обучение</a>
-                    <a href="{% url 'employees:employee_edit' employee.pk %}" class="button button--primary"><span class="icon">✎</span> Редактировать</a>
-                    <a href="{% url 'employees:employee_delete' employee.pk %}" class="button button--danger"><span class="icon">✖</span> Удалить</a>
+                    <a href="{% url 'employees:employee_trainings' employee.id %}" class="training-icon" title="Обучение">📚</a>
+                    <a href="{% url 'employees:employee_edit' employee.id %}" class="action-icon" title="Редактировать">✎</a>
+                    <a href="{% url 'employees:employee_delete' employee.id %}" class="delete-icon" title="Удалить">✖</a>
                 </td>
             </tr>
             {% empty %}
