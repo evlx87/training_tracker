@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'employees',
+    'employees.apps.EmployeesConfig',
 ]
 
 MIDDLEWARE = [
@@ -174,9 +174,15 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        'employees.auth': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
     },
 }
 
+LOGIN_URL = 'employees:login'
 LOGIN_REDIRECT_URL = 'employees:index'
 LOGOUT_REDIRECT_URL = 'employees:index'
 
