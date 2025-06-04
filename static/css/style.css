@@ -508,13 +508,18 @@ main {
 .form-container {
     max-width: 600px;
     margin: 20px auto;
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #4CAF50;
 }
 
 .form-input,
 .form-textarea,
 .form-input select {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin: 8px 0;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
@@ -522,7 +527,7 @@ main {
     font-size: 14px;
     background-color: #fff;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
 }
 
 .form-input select {
@@ -533,11 +538,12 @@ main {
     background-position: right 10px center;
 }
 
-.form-input select:focus,
 .form-input:focus,
-.form-textarea:focus {
+.form-textarea:focus,
+.form-input select:focus {
     border-color: #4CAF50;
-    outline: none;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    transform: translateY(-1px);
 }
 
 .form-textarea {
@@ -547,23 +553,101 @@ main {
 
 .form-checkbox {
     margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-checkbox input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    position: relative;
 }
 
 .form-group label {
-    font-size: 14px;
-    color: #34495e;
-    font-weight: 500;
-    margin-bottom: 5px;
+    font-size: 15px;
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.form-group label .icon {
+    font-size: 16px;
+    color: #4CAF50;
+}
+
+.form-group .field-errors {
+    color: #f44336;
+    font-size: 12px;
+    margin-top: 5px;
     display: block;
+    animation: fadeIn 0.3s ease-in;
 }
 
 .form-text {
     color: #7f8c8d;
+    font-size: 13px;
+    margin-top: 5px;
+    display: block;
+}
+
+.form-group .optional {
+    color: #7f8c8d;
     font-size: 12px;
+    margin-left: 5px;
+    font-weight: normal;
+}
+
+.form-group.has-error .form-input,
+.form-group.has-error .form-textarea,
+.form-group.has-error select {
+    border-color: #f44336;
+    box-shadow: 0 0 8px rgba(244, 67, 54, 0.3);
+}
+
+.form-group.has-error label {
+    color: #f44336;
+}
+
+/* Подсказки */
+.form-tooltip {
+    position: relative;
+}
+
+.form-tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #34495e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.form-tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* Фильтры */
@@ -716,10 +800,24 @@ main {
         font-size: 13px;
     }
 
+    .form-container {
+        padding: 20px;
+    }
+
     .form-input,
     .form-textarea,
     .form-input select {
-        padding: 8px;
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-text,
+    .form-group .optional,
+    .form-group .field-errors {
         font-size: 12px;
     }
 
@@ -830,10 +928,24 @@ main {
         font-size: 12px;
     }
 
+    .form-container {
+        padding: 15px;
+    }
+
     .form-input,
     .form-textarea,
     .form-input select {
-        padding: 6px;
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+    }
+
+    .form-text,
+    .form-group .optional,
+    .form-group .field-errors {
         font-size: 11px;
     }
 
@@ -858,5 +970,11 @@ main {
         overflow-x: auto;
         padding-bottom: 10px;
         white-space: nowrap;
+    }
+
+    .form-tooltip .tooltip-text {
+        width: 150px;
+        font-size: 11px;
+        bottom: 110%;
     }
 }
