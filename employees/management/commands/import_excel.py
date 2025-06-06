@@ -1,19 +1,25 @@
 import logging
-import pandas as pd
-from datetime import datetime
 import os
-from django.core.management.base import BaseCommand
+from datetime import datetime
+
+import pandas as pd
 from django.conf import settings
+from django.core.management.base import BaseCommand
+
 from employees.models import Employee, Department, Position, TrainingProgram, TrainingRecord
 
 # Настройка логгера
 logger = logging.getLogger('employees')
 
+
 class Command(BaseCommand):
     help = 'Импортирует данные из Excel файла в базу данных'
 
     def handle(self, *args, **kwargs):
-        file_path = os.path.join(settings.BASE_DIR, 'data_upload', 'обучение.xlsx')
+        file_path = os.path.join(
+            settings.BASE_DIR,
+            'data_upload',
+            'обучение.xlsx')
         if not os.path.exists(file_path):
             logger.error(f"Файл не найден: {file_path}")
             return
@@ -46,23 +52,46 @@ class Command(BaseCommand):
         for index, row in df.iterrows():
             logger.debug(f"Обрабатывается строка {index}")
             try:
-                last_name = row.get(('Фамилия', 'Unnamed: 1_level_1', 'Unnamed: 1_level_2'), None)
-                first_name = row.get(('Имя', 'Unnamed: 2_level_1', 'Unnamed: 2_level_2'), None)
-                middle_name = row.get(('Отчество', 'Unnamed: 3_level_1', 'Unnamed: 3_level_2'), '') if pd.notna(
-                    row.get(('Отчество', 'Unnamed: 3_level_1', 'Unnamed: 3_level_2'), None)) else ''
-                position_name = row.get(('ДОЛЖНОСТЬ', 'Unnamed: 5_level_1', 'Unnamed: 5_level_2'), '') if pd.notna(
-                    row.get(('ДОЛЖНОСТЬ', 'Unnamed: 5_level_1', 'Unnamed: 5_level_2'), None)) else ''
-                department_name = row.get(('СТРУКТУРНОЕ ПОДРАЗДЕЛЕНИЕ', 'Unnamed: 6_level_1', 'Unnamed: 6_level_2'),
-                                          '') if pd.notna(
-                    row.get(('СТРУКТУРНОЕ ПОДРАЗДЕЛЕНИЕ', 'Unnamed: 6_level_1', 'Unnamed: 6_level_2'), None)) else ''
-                note = row.get(('Примечание', 'Unnamed: 4_level_1', 'Unnamed: 4_level_2'), '') if pd.notna(
-                    row.get(('Примечание', 'Unnamed: 4_level_1', 'Unnamed: 4_level_2'), None)) else ''
+                last_name = row.get(
+                    ('Фамилия', 'Unnamed: 1_level_1', 'Unnamed: 1_level_2'), None)
+                first_name = row.get(
+                    ('Имя', 'Unnamed: 2_level_1', 'Unnamed: 2_level_2'), None)
+                middle_name = row.get(
+                    ('Отчество', 'Unnamed: 3_level_1', 'Unnamed: 3_level_2'), '') if pd.notna(
+                    row.get(
+                        ('Отчество', 'Unnamed: 3_level_1', 'Unnamed: 3_level_2'), None)) else ''
+                position_name = row.get(
+                    ('ДОЛЖНОСТЬ', 'Unnamed: 5_level_1', 'Unnamed: 5_level_2'), '') if pd.notna(
+                    row.get(
+                        ('ДОЛЖНОСТЬ', 'Unnamed: 5_level_1', 'Unnamed: 5_level_2'), None)) else ''
+                department_name = row.get(
+                    ('СТРУКТУРНОЕ ПОДРАЗДЕЛЕНИЕ',
+                     'Unnamed: 6_level_1',
+                     'Unnamed: 6_level_2'),
+                    '') if pd.notna(
+                    row.get(
+                        ('СТРУКТУРНОЕ ПОДРАЗДЕЛЕНИЕ',
+                         'Unnamed: 6_level_1',
+                         'Unnamed: 6_level_2'),
+                        None)) else ''
+                note = row.get(
+                    ('Примечание',
+                     'Unnamed: 4_level_1',
+                     'Unnamed: 4_level_2'),
+                    '') if pd.notna(
+                    row.get(
+                        ('Примечание',
+                         'Unnamed: 4_level_1',
+                         'Unnamed: 4_level_2'),
+                        None)) else ''
             except KeyError as e:
-                logger.warning(f"Ошибка доступа к столбцу в строке {index}: {e}")
+                logger.warning(
+                    f"Ошибка доступа к столбцу в строке {index}: {e}")
                 continue
 
             if pd.isna(last_name) or pd.isna(first_name):
-                logger.warning(f"Пропущена строка {index}: отсутствует Фамилия или Имя ({last_name}, {first_name})")
+                logger.warning(
+                    f"Пропущена строка {index}: отсутствует Фамилия или Имя ({last_name}, {first_name})")
                 continue
 
             logger.info(f"Обработка сотрудника: {last_name} {first_name}")
@@ -72,10 +101,13 @@ class Command(BaseCommand):
             if is_dismissed and 'с ' in note.lower():
                 try:
                     dismissal_date_str = note.lower().split('с ')[1].strip()
-                    dismissal_date = datetime.strptime(dismissal_date_str, '%d.%m.%Y').date()
-                    logger.debug(f"Обработана дата увольнения: {dismissal_date}")
+                    dismissal_date = datetime.strptime(
+                        dismissal_date_str, '%d.%m.%Y').date()
+                    logger.debug(
+                        f"Обработана дата увольнения: {dismissal_date}")
                 except (ValueError, IndexError):
-                    logger.warning(f"Не удалось разобрать дату увольнения для {last_name}: {note}")
+                    logger.warning(
+                        f"Не удалось разобрать дату увольнения для {last_name}: {note}")
 
             department, _ = Department.objects.get_or_create(
                 name=department_name,
@@ -108,7 +140,8 @@ class Command(BaseCommand):
                     if column[0] == program_name and column[1] == 'Дата прохождения обучения':
                         cell_value = row.get(column, None)
                         if pd.notna(cell_value):
-                            logger.debug(f"Найдена дата для {program_name} в столбце {column}: {cell_value}")
+                            logger.debug(
+                                f"Найдена дата для {program_name} в столбце {column}: {cell_value}")
                             cell_value = str(cell_value).strip()
                             entries = cell_value.split('\n')
                             for entry in entries:
@@ -120,7 +153,8 @@ class Command(BaseCommand):
                                 has_question_mark = '?' in entry
                                 if program_name == 'Электробезопасность' and ', ' in entry:
                                     try:
-                                        details, date_str = entry.split(', ', 1)
+                                        details, date_str = entry.split(
+                                            ', ', 1)
                                         date_str = date_str.strip()
                                     except ValueError:
                                         logger.warning(
@@ -128,17 +162,24 @@ class Command(BaseCommand):
                                         continue
                                 date_str = date_str.replace('?', '').strip()
                                 try:
-                                    if len(date_str) >= 10 and date_str[4] == '-' and date_str[7] == '-':
-                                        training_date = datetime.strptime(date_str[:10], '%Y-%m-%d').date()
-                                        logger.debug(f"Обработана дата YYYY-MM-DD: {training_date}")
+                                    if len(
+                                            date_str) >= 10 and date_str[4] == '-' and date_str[7] == '-':
+                                        training_date = datetime.strptime(
+                                            date_str[:10], '%Y-%m-%d').date()
+                                        logger.debug(
+                                            f"Обработана дата YYYY-MM-DD: {training_date}")
                                     elif len(date_str) >= 8 and date_str[2] == '.' and date_str[5] == '.':
-                                        training_date = datetime.strptime(date_str, '%d.%m.%Y').date()
-                                        logger.debug(f"Обработана дата DD.MM.YYYY: {training_date}")
+                                        training_date = datetime.strptime(
+                                            date_str, '%d.%m.%Y').date()
+                                        logger.debug(
+                                            f"Обработана дата DD.MM.YYYY: {training_date}")
                                     else:
-                                        logger.warning(f"Неподдерживаемый формат даты: {date_str}")
+                                        logger.warning(
+                                            f"Неподдерживаемый формат даты: {date_str}")
                                         continue
                                     if has_question_mark:
-                                        details = f"{details} Отсутствует скан документа".strip()
+                                        details = f"{details} Отсутствует скан документа".strip(
+                                        )
                                     TrainingRecord.objects.get_or_create(
                                         employee=employee,
                                         training_program=program_obj,

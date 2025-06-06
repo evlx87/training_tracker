@@ -31,10 +31,13 @@ class EmployeeForm(forms.ModelForm):
         is_dismissed = cleaned_data.get('is_dismissed')
         dismissal_date = cleaned_data.get('dismissal_date')
         if is_dismissed and not dismissal_date:
-            raise ValidationError('Укажите дату увольнения, если сотрудник уволен.')
+            raise ValidationError(
+                'Укажите дату увольнения, если сотрудник уволен.')
         if not is_dismissed and dismissal_date:
-            raise ValidationError('Дата увольнения должна быть пустой, если сотрудник не уволен.')
+            raise ValidationError(
+                'Дата увольнения должна быть пустой, если сотрудник не уволен.')
         return cleaned_data
+
 
 class DepartmentForm(forms.ModelForm):
     class Meta:
@@ -45,6 +48,7 @@ class DepartmentForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-textarea'}),
         }
 
+
 class PositionForm(forms.ModelForm):
     class Meta:
         model = Position
@@ -53,14 +57,20 @@ class PositionForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-input'}),
         }
 
+
 class TrainingProgramForm(forms.ModelForm):
     class Meta:
         model = TrainingProgram
         fields = ['name', 'recurrence_period']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-input'}),
-            'recurrence_period': forms.NumberInput(attrs={'class': 'form-input'}),
+            'name': forms.TextInput(
+                attrs={
+                    'class': 'form-input'}),
+            'recurrence_period': forms.NumberInput(
+                attrs={
+                    'class': 'form-input'}),
         }
+
 
 class TrainingRecordForm(forms.ModelForm):
     class Meta:

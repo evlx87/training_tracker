@@ -1,6 +1,7 @@
-from django.db import models
 from datetime import date
+
 from dateutil.relativedelta import relativedelta
+from django.db import models
 
 
 class Department(models.Model):
