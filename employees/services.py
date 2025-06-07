@@ -79,14 +79,7 @@ class ReportService:
                     'details': details
                 }
             report_data.append(employee_data)
-            logger.debug(
-                "Employee %s trainings: %s",
-                employee.last_name,
-                employee_data['trainings'])
+
         logger.debug("Training report generated successfully")
-        logger.debug("Generated report_data: %s",
-                     [data['employee'].last_name for data in report_data])
-        logger.debug(
-            "Report data content: %s", [
-                (data['employee'].last_name, data['trainings']) for data in report_data])
+
         return report_data, training_programs

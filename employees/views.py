@@ -831,8 +831,8 @@ class ExportReportView(LoginRequiredMixin, View):
         for data in report_data:
             first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
             middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
-            employee_name = f"{data['employee'].last_name} {first_initial}. {middle_initial}.".strip(
-            )
+            employee_name = f"{
+                data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
             row = [
                 employee_name,
                 str(data['employee'].position or "—"),
