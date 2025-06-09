@@ -180,6 +180,10 @@ main {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>');
 }
 
+.button[data-icon="password-change"]::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7v3H4v8h16v-8h-1V9a7 7 0 0 0-7-7zm0 4a3 3 0 0 0-3 3v3h6V9a3 3 0 0 0-3-3z"/></svg>');
+}
+
 .button-container {
     display: flex;
     justify-content: center;

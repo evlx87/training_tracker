@@ -4,6 +4,7 @@ from functools import wraps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -874,5 +875,32 @@ class ExportReportView(LoginRequiredMixin, View):
         return response
 
     @log_view_action('Экспортирован', 'отчет по обучению')
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+
+class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
+    template_name = 'password_change_form.html'
+    success_url = reverse_lazy('employees:password_change_done')
+
+    @log_view_action('Открыта форма смены пароля', 'пользователя')
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        user = self.request.user.username
+        logger.info('Пароль успешно изменен для пользователя: %s', user)
+        messages.success(self.request, 'Ваш пароль успешно изменен.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        user = self.request.user.username
+        logger.warning('Ошибка валидации формы смены пароля для пользователя: %s, ошибки: %s', user, form.errors)
+        return super().form_invalid(form)
+
+class PasswordChangeDoneCustomView(LoginRequiredMixin, PasswordChangeDoneView):
+    template_name = 'password_change_done.html'
+
+    @log_view_action('Открыта страница подтверждения смены пароля', 'пользователя')
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)

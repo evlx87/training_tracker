@@ -34,4 +34,6 @@ urlpatterns = [
     path('trainings/<int:pk>/delete/confirm/', views.TrainingDeleteConfirmView.as_view(), name='training_delete_confirm'),
     path('reports/', views.ReportsView.as_view(), name='reports'),
     path('reports/export/', views.ExportReportView.as_view(), name='export_report'),
+    path('password/change/', views.PasswordChangeCustomView.as_view(), name='password_change'),
+    path('password/change/done/', views.PasswordChangeDoneCustomView.as_view(), name='password_change_done'),
 ]
