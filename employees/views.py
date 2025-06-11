@@ -818,65 +818,78 @@ class ReportsView(TemplateView):
 
 
 class ExportReportView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        report_data, training_programs = ReportService.generate_training_report()
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Отчет по обучению"
-        headers = ["Сотрудник", "Должность", "Подразделение"] + \
-            [program.name for program in training_programs]
-        ws.append(headers)
-        for cell in ws[1]:
-            cell.font = Font(bold=True)
-            cell.alignment = Alignment(horizontal="center")
-        for data in report_data:
-            first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
-            middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
-            employee_name = f"{
-                data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
-            row = [
-                employee_name,
-                str(data['employee'].position or "—"),
-                str(data['employee'].department or "—")
-            ]
-            for program in training_programs:
-                training = data['trainings'].get(program.id, {})
-                date = training.get('date', "Обучение не пройдено")
-                row.append(
-                    date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
-            ws.append(row)
-        for row_idx, data in enumerate(report_data, start=2):
-            for col_idx, program in enumerate(training_programs, start=4):
-                cell = ws.cell(row=row_idx, column=col_idx)
-                training = data['trainings'].get(program.id, {})
-                status_class = training.get('class', 'not-completed')
-                fill_colors = {
-                    'not-completed': 'FF9999',
-                    'overdue': 'FF3333',
-                    'warning': 'FFFF66',
-                    'completed': '99FF99'
-                }
-                cell.fill = PatternFill(
-                    start_color=fill_colors.get(status_class, 'FFFFFF'),
-                    end_color=fill_colors.get(status_class, 'FFFFFF'),
-                    fill_type="solid"
-                )
-        for col in ws.columns:
-            max_length = max(len(str(cell.value))
-                             for cell in col if cell.value)
-            ws.column_dimensions[col[0].column_letter].width = max_length + 2
-        response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename="training_report.xlsx"'
-        wb.save(response)
-        logger.info(
-            'Экспортирован отчет по обучению пользователем: %s',
-            request.user.username)
-        return response
-
     @log_view_action('Экспортирован', 'отчет по обучению')
     def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+        try:
+            # Генерация данных отчета
+            report_data, training_programs = ReportService.generate_training_report()
+
+            # Создание Excel-файла
+            wb = Workbook()
+            ws = wb.active
+            ws.title = "Отчет по обучению"
+            headers = ["Сотрудник", "Должность", "Подразделение"] + \
+                      [program.name for program in training_programs]
+            ws.append(headers)
+            for cell in ws[1]:
+                cell.font = Font(bold=True)
+                cell.alignment = Alignment(horizontal="center")
+            for data in report_data:
+                first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
+                middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
+                employee_name = f"{data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
+                row = [
+                    employee_name,
+                    str(data['employee'].position or "—"),
+                    str(data['employee'].department or "—")
+                ]
+                for program in training_programs:
+                    training = data['trainings'].get(program.id, {})
+                    date = training.get('date', "Обучение не пройдено")
+                    row.append(
+                        date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
+                ws.append(row)
+            for row_idx, data in enumerate(report_data, start=2):
+                for col_idx, program in enumerate(training_programs, start=4):
+                    cell = ws.cell(row=row_idx, column=col_idx)
+                    training = data['trainings'].get(program.id, {})
+                    status_class = training.get('class', 'not-completed')
+                    fill_colors = {
+                        'not-completed': 'FF9999',
+                        'overdue': 'FF3333',
+                        'warning': 'FFFF66',
+                        'completed': '99FF99'
+                    }
+                    cell.fill = PatternFill(
+                        start_color=fill_colors.get(status_class, 'FFFFFF'),
+                        end_color=fill_colors.get(status_class, 'FFFFFF'),
+                        fill_type="solid"
+                    )
+            for col in ws.columns:
+                max_length = max(len(str(cell.value))
+                                 for cell in col if cell.value)
+                ws.column_dimensions[col[0].column_letter].width = max_length + 2
+
+            # Создание HTTP-ответа
+            response = HttpResponse(
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename="training_report.xlsx"'
+            wb.save(response)
+
+            # Логирование успешного экспорта
+            logger.info(
+                'Экспортирован отчет по обучению пользователем: %s',
+                request.user.username)
+
+            return response
+
+        except Exception as e:
+            # Логирование ошибки
+            logger.error(f"Ошибка при экспорте отчета: {e}")
+            # Сообщение пользователю
+            messages.error(request, "Ошибка при генерации отчета. Пожалуйста, попробуйте позже.")
+            # Перенаправление на страницу отчетов
+            return redirect('employees:reports')
 
 
 class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
