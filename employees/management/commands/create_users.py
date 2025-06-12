@@ -1,9 +1,10 @@
 import logging
-from django.core.management.base import BaseCommand
+
 from django.contrib.auth.models import User, Group
-from django.conf import settings
+from django.core.management.base import BaseCommand
 
 logger = logging.getLogger('employees')
+
 
 class Command(BaseCommand):
     help = 'Создает пользователей ok, oob и mto с указанными группами'
@@ -42,6 +43,8 @@ class Command(BaseCommand):
 
             # Назначение группы
             user.groups.add(group)
-            logger.info(f"Пользователь {username} добавлен в группу {group.name}")
+            logger.info(
+                f"Пользователь {username} добавлен в группу {
+                    group.name}")
 
         logger.info('Создание пользователей завершено!')
