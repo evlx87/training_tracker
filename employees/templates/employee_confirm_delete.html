@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
-
 {% block title %}
 Удалить сотрудника
 {% endblock %}
-
 {% block content %}
 <div class="confirm-container">
     <h1>Удалить сотрудника</h1>
     <p><span class="icon">⚠️</span> Вы уверены, что хотите удалить сотрудника <span class="highlight">"{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}"</span>?</p>
-    {% if confirm_mode %}
-    <p class="confirm-warning">Подтверждение удаления доступно только пользователям группы MTO. Текущий пользователь: {{ request.user.username }}</p>
+    {% if not request.user.groups.all|dict_get:"name__in=['Moderators']" %}
+    <p class="confirm-warning">Ваш запрос на удаление будет отправлен на подтверждение модератору.</p>
+    {% else %}
+    <p class="confirm-warning">Вы можете подтвердить удаление как пользователь группы Moderators.</p>
     {% endif %}
     <form method="post">
         {% csrf_token %}

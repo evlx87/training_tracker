@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}
+Рассмотрение запроса на удаление
+{% endblock %}
+{% block content %}
+<div class="confirm-container">
+  <h1>Рассмотрение запроса на удаление</h1>
+  <p><span class="icon">⚠️</span> Запрос на удаление объекта <span class="highlight">"{{ deletion_request.content_object|default:'Объект удален' }}"</span> от пользователя <span class="highlight">{{ deletion_request.created_by.username }}</span> ({{ deletion_request.created_at|date:"d.m.Y H:i" }}).</p>
+  <p>Вы уверены, что хотите подтвердить или отклонить запрос?</p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="button-group">
+      <button type="submit" name="action" value="approve" class="button button--primary"><span class="icon">✅</span> Подтвердить</button>
+      <button type="submit" name="action" value="reject" class="button button--danger"><span class="icon">✖️</span> Отклонить</button>
+      <a href="{% url 'employees:deletion_request_list' %}" class="button button--info"><span class="icon">↩️</span> Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

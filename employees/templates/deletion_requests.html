@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}
+Запросы на удаление
+{% endblock %}
+{% block content %}
+<h1>Запросы на удаление</h1>
+{% if deletion_requests %}
+<div class="table-container">
+  <table class="table">
+    <thead>
+    <tr>
+      <th><span class="icon">📋</span> Объект</th>
+      <th><span class="icon">👤</span> Запросил</th>
+      <th><span class="icon">📅</span> Дата запроса</th>
+      <th><span class="icon">⚙️</span> Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for request in deletion_requests %}
+    <tr>
+      <td>{{ request.content_object|default:"Объект удален" }}</td>
+      <td>{{ request.created_by.username }}</td>
+      <td>{{ request.created_at|date:"d.m.Y H:i" }}</td>
+      <td class="actions">
+        <a href="{% url 'employees:deletion_request_confirm' request.pk %}" class="action-icon" title="Рассмотреть запрос">✎</a>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if is_paginated %}
+<ul class="pagination">
+  {% if page_obj.has_previous %}
+  <li class="page-item">
+    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+  </li>
+  {% else %}
+  <li class="page-item disabled">
+    <span class="page-link">Предыдущая</span>
+  </li>
+  {% endif %}
+  {% for num in paginator.page_range %}
+  {% if page_obj.number == num %}
+  <li class="page-item active" aria-current="page">
+    <span class="page-link">{{ num }}</span>
+  </li>
+  {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+  <li class="page-item">
+    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+  </li>
+  {% endif %}
+  {% endfor %}
+  {% if page_obj.has_next %}
+  <li class="page-item">
+    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+  </li>
+  {% else %}
+  <li class="page-item disabled">
+    <span class="page-link">Следующая</span>
+  </li>
+  {% endif %}
+</ul>
+{% endif %}
+{% else %}
+<div class="no-data">
+  <p>Запросы на удаление отсутствуют.</p>
+</div>
+{% endif %}
+{% endblock %}
