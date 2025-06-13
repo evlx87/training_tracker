@@ -3,15 +3,17 @@ from django.db import models
 
 class Department(models.Model):
     name = models.CharField(
-        max_length=100,
+        max_length=255,
         unique=True,
         verbose_name='Название')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Описание')
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = 'Подразделение'
         verbose_name_plural = 'Подразделения'
-
-    def __str__(self):
-        return self.name

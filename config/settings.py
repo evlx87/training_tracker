@@ -40,10 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'employees.apps.EmployeesConfig',
     'departments.apps.DepartmentsConfig',
     'positions.apps.PositionsConfig',
     'trainings.apps.TrainingsConfig',
+    'employees.apps.EmployeesConfig',
     'reports.apps.ReportsConfig',
 ]
 
