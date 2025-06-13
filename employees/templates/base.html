@@ -24,7 +24,7 @@
                 <a href="{% url 'employees:training_list' %}" class="dropdown-item">Программы обучения</a>
             </div>
         </div>
-        <!-- Остальные кнопки остаются без изменений -->
+        <!-- Остальные кнопки -->
         <a href="{% url 'employees:reports' %}" class="button button--primary button--small">Отчеты по обучению</a>
         {% if user|has_group:"Moderators" %}
         <a href="{% url 'employees:deletion_request_list' %}" class="button button--primary" data-icon="deletion-requests">Запросы на удаление</a>
@@ -44,6 +44,7 @@
     {% block content %}
     {% endblock %}
 </main>
+<!-- Опционально: подключение JavaScript для кликабельного меню -->
 <script src="{% static 'js/dropdown.js' %}"></script>
 </body>
 </html>
