@@ -30,6 +30,6 @@ urlpatterns = [
     path('reports/export/', views.ExportReportView.as_view(), name='export_report'),
     path('password/change/', views.PasswordChangeCustomView.as_view(), name='password_change'),
     path('password/change/done/', views.PasswordChangeDoneCustomView.as_view(), name='password_change_done'),
-    path('deletion-requests/', views.DeletionRequestListView.as_view(), name='deletion_request_list'),
     path('deletion-requests/<int:pk>/confirm/', views.DeletionRequestConfirmView.as_view(), name='deletion_request_confirm'),
+    path('deletion-requests/', views.DeletionRequestListView.as_view(), name='deletion_request_list'),
 ]

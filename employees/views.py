@@ -163,81 +163,63 @@ class DeletionRequestListView(LoginRequiredMixin, ListView):
                 'Только пользователи группы Moderators могут просматривать запросы на удаление.')
             logger.warning(
                 'Отказано в доступе к списку запросов на удаление пользователю: %s',
-                request.user.username
-            )
+                request.user.username)
             return redirect('employees:index')
         return super().get(request, *args, **kwargs)
 
 
-class DeletionRequestConfirmView(LoginRequiredMixin, View):
-    template_name = 'employees/deletion_request_confirm.html'
+class DeletionRequestConfirmView(LoginRequiredMixin, TemplateView):
+    template_name = 'deletion_request_confirm.html'
+    success_url = reverse_lazy('employees:deletion_request_list')
 
-    def get(self, request, *args, **kwargs):
-        deletion_request = get_object_or_404(
-            DeletionRequest,
-            pk=kwargs['pk'],
-            status=DeletionRequest.STATUS_PENDING)
-        if not request.user.groups.filter(name='Moderators').exists():
-            messages.error(
-                request,
-                'Только пользователи группы Moderators могут подтверждать запросы.')
-            logger.warning(
-                'Отказано в доступе к подтверждению запроса %s пользователю: %s',
-                deletion_request, request.user.username)
-            return redirect('employees:deletion_request_list')
-        context = {'deletion_request': deletion_request}
-        return TemplateView.as_view(template_name=self.template_name, extra_context=context)(
-            request, *args, **kwargs)
+    def get_object(self):
+        try:
+            return DeletionRequest.objects.get(pk=self.kwargs['pk'])
+        except DeletionRequest.DoesNotExist:
+            messages.error(self.request, 'Запрос на удаление не найден.')
+            logger.warning('Запрос на удаление #%s не найден.', self.kwargs['pk'])
+            return None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = self.get_object()
+        return context
 
     def post(self, request, *args, **kwargs):
-        deletion_request = get_object_or_404(
-            DeletionRequest,
-            pk=kwargs['pk'],
-            status=DeletionRequest.STATUS_PENDING)
+        deletion_request = self.get_object()
+        if not deletion_request:
+            return self.redirect_to_success()
+
         if not request.user.groups.filter(name='Moderators').exists():
-            messages.error(
-                request,
-                'Только пользователи группы Moderators могут подтверждать запросы.')
-            logger.warning(
-                'Отказано в подтверждении запроса %s пользователю: %s',
-                deletion_request, request.user.username)
-            return redirect('employees:deletion_request_list')
+            messages.error(request, 'Только модераторы могут обрабатывать запросы на удаление.')
+            logger.warning('Отказано в обработке запроса на удаление #%s пользователю: %s',
+                           deletion_request.pk, request.user.username)
+            return self.redirect_to_success()
 
-        action = request.POST.get('action')
-        deletion_request.reviewed_by = request.user
-        deletion_request.reviewed_at = timezone.now()
-
+        action = request.POST.get('confirm')
         if action == 'approve':
             deletion_request.status = DeletionRequest.STATUS_APPROVED
-            obj = deletion_request.content_object
-            if obj:
-                obj.delete()
-                deletion_request.save()
-                messages.success(request, f'Удаление {obj} подтверждено.')
-                logger.info(
-                    'Подтверждено удаление %s по запросу %s пользователем: %s',
-                    obj, deletion_request, request.user.username)
-            else:
-                deletion_request.save()
-                messages.error(request, 'Объект для удаления не найден.')
-                logger.error(
-                    'Объект не найден для запроса на удаление %s пользователем: %s',
-                    deletion_request, request.user.username)
+            try:
+                deletion_request.content_object.delete()
+            except AttributeError:
+                logger.warning('Объект для удаления в запросе #%s не существует.', deletion_request.pk)
+            deletion_request.reviewed_by = request.user
+            deletion_request.save()
+            messages.success(request, 'Запрос на удаление одобрен.')
+            logger.info('Запрос на удаление #%s одобрен пользователем: %s',
+                        deletion_request.pk, request.user.username)
         elif action == 'reject':
             deletion_request.status = DeletionRequest.STATUS_REJECTED
+            deletion_request.reviewed_by = request.user
             deletion_request.save()
             messages.success(request, 'Запрос на удаление отклонён.')
-            logger.info(
-                'Отклонён запрос на удаление %s пользователем: %s',
-                deletion_request, request.user.username)
-        else:
-            messages.error(request, 'Некорректное действие.')
-            logger.warning(
-                'Некорректное действие для запроса %s пользователем: %s',
-                deletion_request, request.user.username)
-            return redirect('employees:deletion_request_list')
+            logger.info('Запрос на удаление #%s отклонён пользователем: %s',
+                        deletion_request.pk, request.user.username)
 
-        return redirect('employees:deletion_request_list')
+        return self.redirect_to_success()
+
+    def redirect_to_success(self):
+        return redirect(self.success_url)
 
 
 class IndexView(TemplateView):
@@ -334,7 +316,7 @@ class EmployeeUpdateView(
 
 class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
     model = Employee
-    template_name = 'employees/employee_confirm_delete.html'
+    template_name = 'employee_confirm_delete.html'
     success_url = reverse_lazy('employees:employee_list')
 
     def dispatch(self, request, *args, **kwargs):

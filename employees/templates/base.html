@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-{% load static %}
-{% load auth_extras %}
+{% load static auth_extras %}
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -19,7 +18,7 @@
         <a href="{% url 'employees:position_list' %}" class="button button--primary button--small">Должности</a>
         <a href="{% url 'employees:reports' %}" class="button button--primary button--small">Отчеты по обучению</a>
         {% if user|has_group:"Moderators" %}
-        <a href="{% url 'deletion_requests' %}" class="button button--primary" data-icon="deletion-requests">Запросы на удаление</a>
+        <a href="{% url 'employees:deletion_request_list' %}" class="button button--primary" data-icon="deletion-requests">Запросы на удаление</a>
         {% endif %}
         <a href="{% url 'employees:password_change' %}" class="button button--primary button--small" data-icon="password-change">Смена пароля</a>
     </div>
@@ -30,22 +29,11 @@
             <button type="submit" class="button button--danger">Выход</button>
         </form>
     </div>
-    {% else %}
-    <div class="user-info">
-        <a href="{% url 'login' %}" class="button button--primary">Войти</a>
-    </div>
     {% endif %}
 </header>
-<div class="container">
-    {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-        <p class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</p>
-        {% endfor %}
-    </div>
-    {% endif %}
+<main>
     {% block content %}
     {% endblock %}
-</div>
+</main>
 </body>
 </html>

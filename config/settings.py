@@ -110,10 +110,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'ru-RU'
-TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_L10N = True
+LANGUAGE_CODE = 'ru-RU'
+TIME_ZONE = 'Europe/Moscow'
 DATE_FORMAT = 'd.m.Y'
 
 
