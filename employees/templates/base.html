@@ -9,13 +9,24 @@
 </head>
 <body>
 <header>
-    <h1>Training Tracker</h1>
+    <a href="{% url 'employees:index' %}" class="header-logo">
+        <h1>Training Tracker</h1>
+    </a>
     {% if user.is_authenticated %}
     <div class="button-container">
-        <a href="{% url 'employees:employee_list' %}" class="button button--primary button--small">Список сотрудников</a>
-        <a href="{% url 'employees:department_list' %}" class="button button--primary button--small">Структурные подразделения</a>
-        <a href="{% url 'employees:position_list' %}" class="button button--primary button--small">Должности</a>
-        <a href="{% url 'employees:training_list' %}" class="button button--primary button--small">Программы обучения</a>
+        <!-- Выпадающее меню -->
+        <div class="dropdown">
+            <button class="button button--primary button--small dropdown-toggle" data-icon="menu">
+                Управление
+            </button>
+            <div class="dropdown-menu">
+                <a href="{% url 'employees:employee_list' %}" class="dropdown-item">Список сотрудников</a>
+                <a href="{% url 'employees:department_list' %}" class="dropdown-item">Структурные подразделения</a>
+                <a href="{% url 'employees:position_list' %}" class="dropdown-item">Должности</a>
+                <a href="{% url 'employees:training_list' %}" class="dropdown-item">Программы обучения</a>
+            </div>
+        </div>
+        <!-- Остальные кнопки -->
         <a href="{% url 'employees:reports' %}" class="button button--primary button--small">Отчеты по обучению</a>
         {% if user|has_group:"Moderators" %}
         <a href="{% url 'employees:deletion_request_list' %}" class="button button--primary" data-icon="deletion-requests">Запросы на удаление</a>
@@ -35,5 +46,7 @@
     {% block content %}
     {% endblock %}
 </main>
+<!-- Опционально: подключение JavaScript для кликабельного меню -->
+<script src="{% static 'js/dropdown.js' %}"></script>
 </body>
 </html>
