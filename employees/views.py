@@ -1,10 +1,12 @@
 import logging
+from datetime import datetime
 from functools import wraps
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.views import PasswordChangeDoneView, PasswordChangeView
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -13,6 +15,7 @@ from django.views.generic import TemplateView, ListView, CreateView, UpdateView,
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Alignment
 
+from employees.models import DeletionRequest
 from .forms import EmployeeForm, DepartmentForm, PositionForm, TrainingProgramForm, TrainingRecordForm
 from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
 from .services import ReportService
@@ -53,49 +56,179 @@ def log_view_action(action, model_name):
     return decorator
 
 
-# Базовый класс для удаления с подтверждением от группы MTO
-class MTOConfirmedDeleteView(
-        LoginRequiredMixin,
-        UserPassesTestMixin,
-        DeleteView):
-    confirm_url_name = None
-    permission_required = None
+class EditorModeratedDeleteView(PermissionRequiredMixin, DeleteView):
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user = request.user
+        content_type = ContentType.objects.get_for_model(self.model)
 
-    def test_func(self):
-        user = self.request.user
-        has_permission = user.groups.filter(
-            name=settings.MTO_GROUP_NAME).exists() or user.has_perm(
-            self.permission_required)
-        logger.debug(
-            'Проверка прав доступа для удаления, пользователь: %s, имеет права: %s',
-            user.username,
-            has_permission)
-        return has_permission
+        # Проверяем, есть ли существующий запрос на удаление
+        existing_request = DeletionRequest.objects.filter(
+            content_type=content_type,
+            object_id=obj.pk,
+            status=DeletionRequest.STATUS_PENDING
+        ).first()
+
+        if existing_request:
+            messages.warning(
+                request, 'Запрос на удаление уже существует и ожидает подтверждения.')
+            logger.warning(
+                'Попытка повторного создания запроса на удаление %s пользователем: %s',
+                obj, user.username
+            )
+            return redirect(self.success_url)
+
+        # Если пользователь в группе Moderators, он может удалять напрямую
+        if user.groups.filter(name='Moderators').exists():
+            return super().get(request, *args, **kwargs)
+
+        # Если пользователь в группе Editors, создаем запрос на удаление
+        if user.groups.filter(name='Editors').exists():
+            DeletionRequest.objects.create(
+                content_type=content_type,
+                object_id=obj.pk,
+                created_by=user
+            )
+            messages.success(
+                request, 'Запрос на удаление отправлен. Ожидайте подтверждения от модератора.')
+            logger.info(
+                'Создан запрос на удаление %s пользователем: %s',
+                obj, user.username
+            )
+            return redirect(self.success_url)
+
+        messages.error(request, 'У вас нет прав для выполнения этой операции.')
+        logger.warning(
+            'Отказано в удалении %s пользователем: %s (нет прав)',
+            obj, user.username
+        )
+        return redirect(self.success_url)
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
-        user = request.user.username
-        if self.test_func():
-            logger.info(
-                'Удален %s: %s пользователем: %s',
-                self.model._meta.verbose_name, obj, user
+        user = request.user
+
+        # Только Moderators могут подтверждать удаление
+        if user.groups.filter(name='Moderators').exists():
+            content_type = ContentType.objects.get_for_model(self.model)
+            deletion_request = DeletionRequest.objects.filter(
+                content_type=content_type,
+                object_id=obj.pk,
+                status=DeletionRequest.STATUS_PENDING
+            ).first()
+
+            if deletion_request:
+                deletion_request.status = DeletionRequest.STATUS_APPROVED
+                deletion_request.reviewed_by = user
+                deletion_request.reviewed_at = datetime.now()
+                deletion_request.save()
+                logger.info(
+                    'Подтверждено удаление %s пользователем из группы Moderators: %s',
+                    obj, user.username
+                )
+                return super().post(request, *args, **kwargs)
+
+            messages.error(request, 'Запрос на удаление не найден.')
+            logger.warning(
+                'Не найден запрос на удаление %s для подтверждения пользователем: %s',
+                obj, user.username
             )
-            return super().post(request, *args, **kwargs)
+            return redirect(self.success_url)
+
         messages.error(
             request,
-            'Удаление требует подтверждения от пользователя из группы MTO.')
+            'Только пользователь из группы Moderators может подтвердить удаление.')
         logger.warning(
-            'Отказано в удалении %s: %s пользователем: %s, требуется подтверждение MTO',
-            self.model._meta.verbose_name,
-            obj,
-            user)
-        return redirect(self.confirm_url_name, pk=obj.pk)
+            'Отказано в подтверждении удаления %s пользователем: %s',
+            obj, user.username
+        )
+        return redirect(self.success_url)
+
+
+class DeletionRequestListView(LoginRequiredMixin, ListView):
+    model = DeletionRequest
+    template_name = 'deletion_requests.html'
+    context_object_name = 'deletion_requests'
+    paginate_by = 20
+
+    def get_queryset(self):
+        return DeletionRequest.objects.filter(
+            status=DeletionRequest.STATUS_PENDING).select_related('created_by', 'reviewed_by')
+
+    @log_view_action('Запрошен список', 'запросов на удаление')
+    def get(self, request, *args, **kwargs):
+        if not request.user.groups.filter(name='Moderators').exists():
+            messages.error(
+                request,
+                'Только пользователи группы Moderators могут просматривать запросы на удаление.')
+            logger.warning(
+                'Отказано в доступе к списку запросов на удаление пользователю: %s',
+                request.user.username)
+            return redirect('employees:index')
+        return super().get(request, *args, **kwargs)
+
+
+class DeletionRequestConfirmView(LoginRequiredMixin, TemplateView):
+    template_name = 'deletion_request_confirm.html'
+    success_url = reverse_lazy('employees:deletion_request_list')
+
+    def get_object(self):
+        try:
+            return DeletionRequest.objects.get(pk=self.kwargs['pk'])
+        except DeletionRequest.DoesNotExist:
+            messages.error(self.request, 'Запрос на удаление не найден.')
+            logger.warning('Запрос на удаление #%s не найден.', self.kwargs['pk'])
+            return None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.path.endswith('confirm/'):
-            context['confirm_mode'] = True
+        context['object'] = self.get_object()
         return context
+
+    def post(self, request, *args, **kwargs):
+        deletion_request = self.get_object()
+        if not deletion_request:
+            return self.redirect_to_success()
+
+        if not request.user.groups.filter(name='Moderators').exists():
+            messages.error(request, 'Только модераторы могут обрабатывать запросы на удаление.')
+            logger.warning('Отказано в обработке запроса на удаление #%s пользователю: %s',
+                           deletion_request.pk, request.user.username)
+            return self.redirect_to_success()
+
+        action = request.POST.get('confirm')
+        if action == 'approve':
+            # Сначала обновляем статус и сохраняем
+            deletion_request.status = DeletionRequest.STATUS_APPROVED
+            deletion_request.reviewed_by = request.user
+            deletion_request.save()  # Сохраняем до удаления content_object
+            # Теперь удаляем связанный объект
+            try:
+                if deletion_request.content_object:
+                    deletion_request.content_object.delete()
+                    logger.info('Объект %s удалён для запроса #%s.',
+                                deletion_request.content_object, deletion_request.pk)
+                else:
+                    logger.warning('Объект для удаления в запросе #%s уже отсутствует.',
+                                   deletion_request.pk)
+            except Exception as e:
+                logger.error('Ошибка при удалении объекта для запроса #%s: %s',
+                             deletion_request.pk, str(e))
+            messages.success(request, 'Запрос на удаление одобрен.')
+            logger.info('Запрос на удаление #%s одобрен пользователем: %s',
+                        deletion_request.pk, request.user.username)
+        elif action == 'reject':
+            deletion_request.status = DeletionRequest.STATUS_REJECTED
+            deletion_request.reviewed_by = request.user
+            deletion_request.save()
+            messages.success(request, 'Запрос на удаление отклонён.')
+            logger.info('Запрос на удаление #%s отклонён пользователем: %s',
+                        deletion_request.pk, request.user.username)
+
+        return self.redirect_to_success()
+
+    def redirect_to_success(self):
+        return redirect(self.success_url)
 
 
 class IndexView(TemplateView):
@@ -190,15 +323,54 @@ class EmployeeUpdateView(
         return super().form_invalid(form)
 
 
-class EmployeeDeleteView(MTOConfirmedDeleteView):
+class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
     model = Employee
     template_name = 'employee_confirm_delete.html'
     success_url = reverse_lazy('employees:employee_list')
-    confirm_url_name = 'employees:employee_delete_confirm'
-    permission_required = 'employees.delete_employee'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.groups.filter(name='Editors').exists():
+            logger.warning(f"Попытка удаления сотрудника {self.get_object()} пользователем {request.user} без прав Editors")
+            messages.error(request, 'У вас нет прав для инициирования удаления.')
+            return redirect('employees:employee_list')
+        logger.debug(f"Пользователь {request.user} инициирует удаление сотрудника {self.get_object()}")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        # Проверяем, есть ли существующий запрос на удаление
+        obj = self.get_object()
+        content_type = ContentType.objects.get_for_model(self.model)
+        existing_request = DeletionRequest.objects.filter(
+            content_type=content_type,
+            object_id=obj.pk,
+            status=DeletionRequest.STATUS_PENDING
+        ).first()
+        if existing_request:
+            messages.warning(request, 'Запрос на удаление уже существует и ожидает подтверждения.')
+            logger.warning(f"Попытка повторного создания запроса на удаление {obj} пользователем: {request.user}")
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        # Создаём запрос на удаление
+        DeletionRequest.objects.create(
+            content_type=ContentType.objects.get_for_model(self.model),
+            object_id=self.get_object().pk,
+            created_by=self.request.user,
+            status=DeletionRequest.STATUS_PENDING
+        )
+        messages.success(self.request, 'Запрос на удаление сотрудника успешно отправлен.')
+        logger.info(f"Создан запрос на удаление сотрудника {self.get_object()} пользователем {self.request.user}")
+        return redirect(self.success_url)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Подтверждение запроса на удаление'
+        context['employee'] = self.get_object()  # Для совместимости с шаблоном
+        return context
 
 
-class EmployeeDeleteConfirmView(MTOConfirmedDeleteView):
+class EmployeeDeleteConfirmView(EditorModeratedDeleteView):
     model = Employee
     template_name = 'employee_confirm_delete.html'
     success_url = reverse_lazy('employees:employee_list')
@@ -214,7 +386,7 @@ class EmployeeDeleteConfirmView(MTOConfirmedDeleteView):
                 obj,
                 user)
             return super(
-                MTOConfirmedDeleteView,
+                EditorModeratedDeleteView,
                 self).post(
                 request,
                 *
@@ -346,7 +518,7 @@ class TrainingRecordUpdateView(
         return super().form_invalid(form)
 
 
-class TrainingRecordDeleteView(MTOConfirmedDeleteView):
+class TrainingRecordDeleteView(EditorModeratedDeleteView):
     model = TrainingRecord
     template_name = 'training_record_confirm_delete.html'
     confirm_url_name = 'employees:training_record_delete_confirm'
@@ -363,7 +535,7 @@ class TrainingRecordDeleteView(MTOConfirmedDeleteView):
         return context
 
 
-class TrainingRecordDeleteConfirmView(MTOConfirmedDeleteView):
+class TrainingRecordDeleteConfirmView(EditorModeratedDeleteView):
     model = TrainingRecord
     template_name = 'training_record_confirm_delete.html'
     confirm_url_name = 'employees:training_record_delete_confirm'
@@ -388,7 +560,7 @@ class TrainingRecordDeleteConfirmView(MTOConfirmedDeleteView):
                 obj,
                 user)
             return super(
-                MTOConfirmedDeleteView,
+                EditorModeratedDeleteView,
                 self).post(
                 request,
                 *
@@ -483,7 +655,7 @@ class DepartmentUpdateView(
         return super().form_invalid(form)
 
 
-class DepartmentDeleteView(MTOConfirmedDeleteView):
+class DepartmentDeleteView(EditorModeratedDeleteView):
     model = Department
     template_name = 'department_confirm_delete.html'
     success_url = reverse_lazy('employees:department_list')
@@ -491,7 +663,7 @@ class DepartmentDeleteView(MTOConfirmedDeleteView):
     permission_required = 'employees.delete_department'
 
 
-class DepartmentDeleteConfirmView(MTOConfirmedDeleteView):
+class DepartmentDeleteConfirmView(EditorModeratedDeleteView):
     model = Department
     template_name = 'department_confirm_delete.html'
     success_url = reverse_lazy('employees:department_list')
@@ -507,7 +679,7 @@ class DepartmentDeleteConfirmView(MTOConfirmedDeleteView):
                 obj,
                 user)
             return super(
-                MTOConfirmedDeleteView,
+                EditorModeratedDeleteView,
                 self).post(
                 request,
                 *
@@ -600,7 +772,7 @@ class PositionUpdateView(
         return super().form_invalid(form)
 
 
-class PositionDeleteView(MTOConfirmedDeleteView):
+class PositionDeleteView(EditorModeratedDeleteView):
     model = Position
     template_name = 'position_confirm_delete.html'
     success_url = reverse_lazy('employees:position_list')
@@ -608,7 +780,7 @@ class PositionDeleteView(MTOConfirmedDeleteView):
     permission_required = 'employees.delete_position'
 
 
-class PositionDeleteConfirmView(MTOConfirmedDeleteView):
+class PositionDeleteConfirmView(EditorModeratedDeleteView):
     model = Position
     template_name = 'position_confirm_delete.html'
     success_url = reverse_lazy('employees:position_list')
@@ -624,7 +796,7 @@ class PositionDeleteConfirmView(MTOConfirmedDeleteView):
                 obj,
                 user)
             return super(
-                MTOConfirmedDeleteView,
+                EditorModeratedDeleteView,
                 self).post(
                 request,
                 *
@@ -721,7 +893,7 @@ class TrainingUpdateView(
         return super().form_invalid(form)
 
 
-class TrainingDeleteView(MTOConfirmedDeleteView):
+class TrainingDeleteView(EditorModeratedDeleteView):
     model = TrainingProgram
     template_name = 'training_confirm_delete.html'
     success_url = reverse_lazy('employees:training_list')
@@ -730,7 +902,7 @@ class TrainingDeleteView(MTOConfirmedDeleteView):
     context_object_name = 'training'
 
 
-class TrainingDeleteConfirmView(MTOConfirmedDeleteView):
+class TrainingDeleteConfirmView(EditorModeratedDeleteView):
     model = TrainingProgram
     template_name = 'training_confirm_delete.html'
     success_url = reverse_lazy('employees:training_list')
@@ -747,7 +919,7 @@ class TrainingDeleteConfirmView(MTOConfirmedDeleteView):
                 obj,
                 user)
             return super(
-                MTOConfirmedDeleteView,
+                EditorModeratedDeleteView,
                 self).post(
                 request,
                 *
@@ -820,76 +992,60 @@ class ReportsView(TemplateView):
 class ExportReportView(LoginRequiredMixin, View):
     @log_view_action('Экспортирован', 'отчет по обучению')
     def get(self, request, *args, **kwargs):
-        try:
-            # Генерация данных отчета
-            report_data, training_programs = ReportService.generate_training_report()
-
-            # Создание Excel-файла
-            wb = Workbook()
-            ws = wb.active
-            ws.title = "Отчет по обучению"
-            headers = ["Сотрудник", "Должность", "Подразделение"] + \
-                      [program.name for program in training_programs]
-            ws.append(headers)
-            for cell in ws[1]:
-                cell.font = Font(bold=True)
-                cell.alignment = Alignment(horizontal="center")
-            for data in report_data:
-                first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
-                middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
-                employee_name = f"{data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
-                row = [
-                    employee_name,
-                    str(data['employee'].position or "—"),
-                    str(data['employee'].department or "—")
-                ]
-                for program in training_programs:
-                    training = data['trainings'].get(program.id, {})
-                    date = training.get('date', "Обучение не пройдено")
-                    row.append(
-                        date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
-                ws.append(row)
-            for row_idx, data in enumerate(report_data, start=2):
-                for col_idx, program in enumerate(training_programs, start=4):
-                    cell = ws.cell(row=row_idx, column=col_idx)
-                    training = data['trainings'].get(program.id, {})
-                    status_class = training.get('class', 'not-completed')
-                    fill_colors = {
-                        'not-completed': 'FF9999',
-                        'overdue': 'FF3333',
-                        'warning': 'FFFF66',
-                        'completed': '99FF99'
-                    }
-                    cell.fill = PatternFill(
-                        start_color=fill_colors.get(status_class, 'FFFFFF'),
-                        end_color=fill_colors.get(status_class, 'FFFFFF'),
-                        fill_type="solid"
-                    )
-            for col in ws.columns:
-                max_length = max(len(str(cell.value))
-                                 for cell in col if cell.value)
-                ws.column_dimensions[col[0].column_letter].width = max_length + 2
-
-            # Создание HTTP-ответа
-            response = HttpResponse(
-                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = 'attachment; filename="training_report.xlsx"'
-            wb.save(response)
-
-            # Логирование успешного экспорта
-            logger.info(
-                'Экспортирован отчет по обучению пользователем: %s',
-                request.user.username)
-
-            return response
-
-        except Exception as e:
-            # Логирование ошибки
-            logger.error(f"Ошибка при экспорте отчета: {e}")
-            # Сообщение пользователю
-            messages.error(request, "Ошибка при генерации отчета. Пожалуйста, попробуйте позже.")
-            # Перенаправление на страницу отчетов
-            return redirect('employees:reports')
+        report_data, training_programs = ReportService.generate_training_report()
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Отчет по обучению"
+        headers = ["Сотрудник", "Должность", "Подразделение"] + \
+            [program.name for program in training_programs]
+        ws.append(headers)
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal="center")
+        for data in report_data:
+            first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
+            middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
+            employee_name = f"{
+                data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
+            row = [
+                employee_name,
+                str(data['employee'].position or "—"),
+                str(data['employee'].department or "—")
+            ]
+            for program in training_programs:
+                training = data['trainings'].get(program.id, {})
+                date = training.get('date', "Обучение не пройдено")
+                row.append(
+                    date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
+            ws.append(row)
+        for row_idx, data in enumerate(report_data, start=2):
+            for col_idx, program in enumerate(training_programs, start=4):
+                cell = ws.cell(row=row_idx, column=col_idx)
+                training = data['trainings'].get(program.id, {})
+                status_class = training.get('class', 'not-completed')
+                fill_colors = {
+                    'not-completed': 'FF9999',
+                    'overdue': 'FF3333',
+                    'warning': 'FFFF66',
+                    'completed': '99FF99'
+                }
+                cell.fill = PatternFill(
+                    start_color=fill_colors.get(status_class, 'FFFFFF'),
+                    end_color=fill_colors.get(status_class, 'FFFFFF'),
+                    fill_type="solid"
+                )
+        for col in ws.columns:
+            max_length = max(len(str(cell.value))
+                             for cell in col if cell.value)
+            ws.column_dimensions[col[0].column_letter].width = max_length + 2
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="training_report.xlsx"'
+        wb.save(response)
+        logger.info(
+            'Экспортирован отчет по обучению пользователем: %s',
+            request.user.username)
+        return response
 
 
 class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
@@ -908,12 +1064,17 @@ class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
 
     def form_invalid(self, form):
         user = self.request.user.username
-        logger.warning('Ошибка валидации формы смены пароля для пользователя: %s, ошибки: %s', user, form.errors)
+        logger.warning(
+            'Ошибка валидации формы смены пароля для пользователя: %s, ошибки: %s',
+            user,
+            form.errors)
         return super().form_invalid(form)
+
 
 class PasswordChangeDoneCustomView(LoginRequiredMixin, PasswordChangeDoneView):
     template_name = 'password_change_done.html'
 
-    @log_view_action('Открыта страница подтверждения смены пароля', 'пользователя')
+    @log_view_action('Открыта страница подтверждения смены пароля',
+                     'пользователя')
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)

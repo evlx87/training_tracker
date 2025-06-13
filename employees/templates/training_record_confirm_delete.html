@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
-
 {% block title %}
 Удалить запись об обучении
 {% endblock %}
-
 {% block content %}
 <div class="confirm-container">
     <h1>Удалить запись об обучении</h1>
-    <p><span class="icon">⚠️</span> Вы уверены, что хотите удалить запись <span class="highlight">"{{ training_record.training_program.name }}"</span> от {{ training_record.completion_date|date:"d.m.Y" }} для сотрудника <span class="highlight">{{ employee.last_name }} {{ employee.first_name }}</span>?</p>
-    {% if confirm_mode %}
-    <p class="confirm-warning">Подтверждение удаления доступно только пользователям группы MTO. Текущий пользователь: {{ request.user.username }}</p>
+    <p><span class="icon">⚠️</span> Вы уверены, что хотите удалить запись об обучении для <span class="highlight">"{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}"</span> по программе <span class="highlight">"{{ object.training_program.name }}"</span> от {{ object.completion_date|date:"d.m.Y" }}?</p>
+    {% if not request.user.groups.all|dict_get:"name__in=['Moderators']" %}
+    <p class="confirm-warning">Ваш запрос на удаление будет отправлен на подтверждение модератору.</p>
+    {% else %}
+    <p class="confirm-warning">Вы можете подтвердить удаление как пользователь группы Moderators.</p>
     {% endif %}
     <form method="post">
         {% csrf_token %}

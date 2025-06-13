@@ -72,6 +72,16 @@ main {
     color: #721c24;
 }
 
+.messages .success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.messages .warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
 /* Кнопки */
 .button {
     display: inline-flex;
@@ -142,7 +152,8 @@ main {
 /* Иконки для кнопок в base.html */
 .button--primary[data-icon]::before,
 .button--success[data-icon]::before,
-.button--danger[data-icon]::before {
+.button--danger[data-icon]::before,
+.button--info[data-icon]::before {
     content: '';
     display: inline-block;
     width: 16px;
@@ -182,6 +193,10 @@ main {
 
 .button[data-icon="password-change"]::before {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7v3H4v8h16v-8h-1V9a7 7 0 0 0-7-7zm0 4a3 3 0 0 0-3 3v3h6V9a3 3 0 0 0-3-3z"/></svg>');
+}
+
+.button[data-icon="deletion-requests"]::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>');
 }
 
 .button-container {
@@ -335,8 +350,8 @@ main {
     max-width: 100%;
     overflow-x: auto;
     margin: 20px 0;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 2, 0, 1);
 }
 
 /* Таблица отчетов */
@@ -344,8 +359,8 @@ main {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
-    background-color: #fff;
-    border-radius: 8px;
+    background-color: 14px;
+    border-radius: 4px;
     overflow: hidden;
 }
 
@@ -365,7 +380,7 @@ main {
 }
 
 .report-table th:nth-child(2),
-.report-table th:nth-child(3) {
+.report-table th:nth-child(n) {
     min-width: 140px;
 }
 
@@ -374,8 +389,7 @@ main {
 }
 
 .report-table th {
-    background-color: #34495e;
-    color: #fff;
+    background-color: #34495e;    color: #34495e;
     font-weight: 600;
 }
 
@@ -390,7 +404,8 @@ main {
 .report-table td.not-completed,
 .report-table td.overdue,
 .report-table td.warning,
-.report-table td.completed {
+.warning-table td.completed {
+    background-color: flex;
     display: flex;
     justify-content: center;
     align-items: center;

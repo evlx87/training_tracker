@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}
+Список запросов на удаление
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>{% trans "Запросы на удаление" %}</h1>
+  {% if deletion_requests %}
+  <table class="table">
+    <thead>
+    <tr>
+      <th>{% trans "Объект" %}</th>
+      <th>{% trans "Создан" %}</th>
+      <th>{% trans "Создатель" %}</th>
+      <th>{% trans "Действия" %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for request in deletion_requests %}
+    <tr>
+      <td>{{ request.content_object|default:"Объект удалён" }}</td>
+      <td>{{ request.created_at|date:"d.m.Y H:i" }}</td>
+      <td>{{ request.created_by.username }}</td>
+      <td>
+        <a href="{% url 'employees:deletion_request_confirm' request.pk %}" class="button button--primary">{% trans "Рассмотреть" %}</a>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>{% trans "Нет запросов на удаление." %}</p>
+  {% endif %}
+</div>
+{% endblock %}
