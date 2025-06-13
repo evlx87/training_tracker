@@ -198,13 +198,22 @@ class DeletionRequestConfirmView(LoginRequiredMixin, TemplateView):
 
         action = request.POST.get('confirm')
         if action == 'approve':
+            # Сначала обновляем статус и сохраняем
             deletion_request.status = DeletionRequest.STATUS_APPROVED
-            try:
-                deletion_request.content_object.delete()
-            except AttributeError:
-                logger.warning('Объект для удаления в запросе #%s не существует.', deletion_request.pk)
             deletion_request.reviewed_by = request.user
-            deletion_request.save()
+            deletion_request.save()  # Сохраняем до удаления content_object
+            # Теперь удаляем связанный объект
+            try:
+                if deletion_request.content_object:
+                    deletion_request.content_object.delete()
+                    logger.info('Объект %s удалён для запроса #%s.',
+                                deletion_request.content_object, deletion_request.pk)
+                else:
+                    logger.warning('Объект для удаления в запросе #%s уже отсутствует.',
+                                   deletion_request.pk)
+            except Exception as e:
+                logger.error('Ошибка при удалении объекта для запроса #%s: %s',
+                             deletion_request.pk, str(e))
             messages.success(request, 'Запрос на удаление одобрен.')
             logger.info('Запрос на удаление #%s одобрен пользователем: %s',
                         deletion_request.pk, request.user.username)
