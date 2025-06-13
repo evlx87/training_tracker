@@ -15,7 +15,7 @@ logger = logging.getLogger('positions')
 
 class PositionListView(LoginRequiredMixin, ListView):
     model = Position
-    template_name = 'positions.html'
+    template_name = 'position_list.html'
     context_object_name = 'positions'
     paginate_by = 20
 

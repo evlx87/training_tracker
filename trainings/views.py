@@ -15,7 +15,7 @@ logger = logging.getLogger('trainings')
 
 class TrainingProgramListView(LoginRequiredMixin, ListView):
     model = TrainingProgram
-    template_name = 'trainings.html'
+    template_name = 'training_list.html'
     context_object_name = 'trainings'
     paginate_by = 20
 

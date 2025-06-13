@@ -17,7 +17,7 @@ logger = logging.getLogger('reports')
 
 
 class ReportsView(TemplateView):
-    template_name = 'reports.html'
+    template_name = 'report_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

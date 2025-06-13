@@ -15,7 +15,7 @@ logger = logging.getLogger('departments')
 
 class DepartmentListView(LoginRequiredMixin, ListView):
     model = Department
-    template_name = 'departments.html'
+    template_name = ('department_list.html')
     context_object_name = 'departments'
     paginate_by = 20
 
