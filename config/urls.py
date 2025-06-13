@@ -14,11 +14,18 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import path, include, reverse_lazy
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.contrib.auth.views import LoginView, LogoutView
+from django.shortcuts import render
+from django.urls import path, include, reverse_lazy
+
+
+def custom_403(request, exception):
+    return render(request, '403.html', status=403)
+
+handler403 = custom_403
 
 urlpatterns = [
     path('admin/', admin.site.urls),

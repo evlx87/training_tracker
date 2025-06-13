@@ -186,7 +186,7 @@ LOGIN_URL = 'employees:login'
 LOGIN_REDIRECT_URL = 'employees:index'
 LOGOUT_REDIRECT_URL = 'employees:index'
 
-MTO_GROUP_NAME = 'MTO'
+MTO_GROUP_NAME = 'Moderators'
 
 CACHES = {
     'default': {
