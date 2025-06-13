@@ -1,4 +1,7 @@
-/* Общие стили */
+/* ==========================================================================
+   Общие стили
+   ========================================================================== */
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -7,7 +10,7 @@ body {
     background-color: #f7f9fc;
 }
 
-/* Контейнер */
+/* Контейнер основной разметки */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -15,7 +18,10 @@ body {
     box-sizing: border-box;
 }
 
-/* Заголовки */
+/* ==========================================================================
+   Типография и заголовки
+   ========================================================================== */
+
 h1 {
     text-align: center;
     margin: 40px 0;
@@ -24,7 +30,10 @@ h1 {
     font-weight: 600;
 }
 
-/* Шапка */
+/* ==========================================================================
+   Шапка сайта
+   ========================================================================== */
+
 header {
     display: flex;
     justify-content: space-between;
@@ -41,6 +50,7 @@ header h1 {
     color: #2c3e50;
 }
 
+/* Информация о пользователе */
 .user-info {
     display: flex;
     align-items: center;
@@ -52,12 +62,18 @@ header h1 {
     color: #34495e;
 }
 
-/* Основной контент */
+/* ==========================================================================
+   Основной контент
+   ========================================================================== */
+
 main {
     padding: 20px;
 }
 
-/* Сообщения */
+/* ==========================================================================
+   Сообщения
+   ========================================================================== */
+
 .messages {
     margin-bottom: 20px;
 }
@@ -82,7 +98,10 @@ main {
     color: #856404;
 }
 
-/* Кнопки */
+/* ==========================================================================
+   Кнопки
+   ========================================================================== */
+
 .button {
     display: inline-flex;
     align-items: center;
@@ -94,14 +113,15 @@ main {
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.1s;
-    box-sizing: border-box;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 .button .icon {
     margin-right: 6px;
 }
 
+/* Варианты кнопок */
 .button--primary {
     background-color: #4CAF50;
     color: white;
@@ -122,22 +142,13 @@ main {
     color: white;
 }
 
+/* Состояния кнопок */
 .button:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
-.button--large {
-    width: 200px;
-    height: 80px;
-    font-size: 16px;
-    line-height: 1.5;
-    padding: 10px;
-}
-
 .button--small {
-    display: flex;
-    flex-direction: row;
     width: 200px;
     height: 40px;
     font-size: 14px;
@@ -149,11 +160,16 @@ main {
     background-color: #45a049;
 }
 
-/* Иконки для кнопок в base.html */
-.button--primary[data-icon]::before,
-.button--success[data-icon]::before,
-.button--danger[data-icon]::before,
-.button--info[data-icon]::before {
+.button--large {
+    width: 200px;
+    height: 80px;
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 10px;
+}
+
+/* Иконки для кнопок */
+.button[data-icon]::before {
     content: '';
     display: inline-block;
     width: 16px;
@@ -180,7 +196,7 @@ main {
 }
 
 .button[data-icon="reports"]::before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1"></svg>');
 }
 
 .button[data-icon="add"]::before {
@@ -199,6 +215,11 @@ main {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>');
 }
 
+.button[data-icon="menu"]::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>');
+}
+
+/* Контейнер кнопок */
 .button-container {
     display: flex;
     justify-content: center;
@@ -206,8 +227,14 @@ main {
     flex-wrap: wrap;
 }
 
-/* Иконки действий */
-.training-icon, .view-icon, .action-icon, .delete-icon {
+/* ==========================================================================
+   Иконки действий
+   ========================================================================== */
+
+.training-icon,
+.view-icon,
+.action-icon,
+.delete-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -238,7 +265,8 @@ main {
     transform: scale(1.1);
 }
 
-.view-icon:hover, .action-icon:hover {
+.view-icon:hover,
+.action-icon:hover {
     color: #fff;
     background-color: #45a049;
     transform: scale(1.1);
@@ -257,7 +285,10 @@ main {
     gap: 8px;
 }
 
-/* Контейнер подтверждения удаления */
+/* ==========================================================================
+   Контейнер подтверждения удаления
+   ========================================================================== */
+
 .confirm-container {
     max-width: 600px;
     margin: 30px auto;
@@ -289,7 +320,10 @@ main {
     font-size: 14px;
 }
 
-/* Группа кнопок */
+/* ==========================================================================
+   Группа кнопок
+   ========================================================================== */
+
 .button-group {
     display: flex;
     justify-content: center;
@@ -298,7 +332,11 @@ main {
     flex-wrap: wrap;
 }
 
-/* Таблицы общего назначения (для списков) */
+/* ==========================================================================
+   Таблицы
+   ========================================================================== */
+
+/* Общие стили таблиц */
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -321,7 +359,6 @@ main {
     background-color: #34495e;
     font-weight: 600;
     color: #fff;
-    position: relative;
 }
 
 .table th .icon {
@@ -359,7 +396,7 @@ main {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
-    background-color: 14px;
+    background-color: #fff;
     border-radius: 4px;
     overflow: hidden;
 }
@@ -384,13 +421,10 @@ main {
     min-width: 140px;
 }
 
-.report-table th:not(:nth-child(-n+3)) {
-    min-width: 140px;
-}
-
 .report-table th {
-    background-color: #34495e;    color: #34495e;
+    background-color: #34495e;
     font-weight: 600;
+    color: #fff;
 }
 
 .report-table tr:nth-child(even) {
@@ -404,14 +438,37 @@ main {
 .report-table td.not-completed,
 .report-table td.overdue,
 .report-table td.warning,
-.warning-table td.completed {
-    background-color: flex;
+.report-table td.completed {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Легенда для отчетов */
+/* Статусы для таблиц */
+.not-completed {
+    background-color: #e6f3fa;
+    color: #2c5282;
+}
+
+.overdue {
+    background-color: #ffcccc;
+    color: #c0392b;
+}
+
+.warning {
+    background-color: #fff9e6;
+    color: #e67e22;
+}
+
+.completed {
+    background-color: #e6f4e6;
+    color: #27ae60;
+}
+
+/* ==========================================================================
+   Легенда для отчетов
+   ========================================================================== */
+
 .legend {
     display: flex;
     justify-content: center;
@@ -462,33 +519,10 @@ main {
     color: #27ae60;
 }
 
-/* Статусы для таблиц */
-.not-completed {
-    background-color: #e6f3fa;
-    color: #2c5282;
-}
+/* ==========================================================================
+   Сортировка
+   ========================================================================== */
 
-.overdue {
-    background-color: #ffcccc;
-    color: #c0392b;
-}
-
-.warning {
-    background-color: #fff9e6;
-    color: #e67e22;
-}
-
-.normal {
-    background-color: #e6f4e6;
-    color: #27ae60;
-}
-
-.report-table td.completed {
-    background-color: #e6f4e6;
-    color: #27ae60;
-}
-
-/* Сортировка */
 .sortable {
     cursor: pointer;
     position: relative;
@@ -505,12 +539,18 @@ main {
     content: '\25BC';
 }
 
-/* Сворачивание строк */
+/* ==========================================================================
+   Сворачивание строк
+   ========================================================================== */
+
 .employee-row.collapsed td:not(:first-child) {
     display: none;
 }
 
-/* Пагинация */
+/* ==========================================================================
+   Пагинация
+   ========================================================================== */
+
 .pagination {
     display: flex;
     justify-content: center;
@@ -550,7 +590,10 @@ main {
     cursor: not-allowed;
 }
 
-/* Формы */
+/* ==========================================================================
+   Формы
+   ========================================================================== */
+
 .form-container {
     max-width: 600px;
     margin: 20px auto;
@@ -696,7 +739,10 @@ main {
     to { opacity: 1; }
 }
 
-/* Сообщение об отсутствии данных */
+/* ==========================================================================
+   Сообщение об отсутствии данных
+   ========================================================================== */
+
 .no-data {
     max-width: 600px;
     margin: 30px auto;
@@ -718,7 +764,10 @@ main {
     margin-top: 10px;
 }
 
-/* Фильтры */
+/* ==========================================================================
+   Фильтры
+   ========================================================================== */
+
 .filters-container {
     display: flex;
     flex-wrap: wrap;
@@ -745,7 +794,10 @@ main {
     flex-wrap: wrap;
 }
 
-/* Инструкции */
+/* ==========================================================================
+   Инструкции
+   ========================================================================== */
+
 .instructions {
     max-width: 800px;
     margin: 30px auto;
@@ -785,7 +837,57 @@ main {
     margin-bottom: 12px;
 }
 
-/* Адаптивность */
+/* ==========================================================================
+   Выпадающее меню
+   ========================================================================== */
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 8px 0;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 10px 15px;
+    color: #2c3e50;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #f4f4f4;
+    color: #4CAF50;
+}
+
+/* ==========================================================================
+   Адаптивность
+   ========================================================================== */
+
 @media (max-width: 768px) {
     .container {
         padding: 15px;
@@ -838,7 +940,10 @@ main {
         font-size: 12px;
     }
 
-    .training-icon, .view-icon, .action-icon, .delete-icon {
+    .training-icon,
+    .view-icon,
+    .action-icon,
+    .delete-icon {
         width: 20px;
         height: 20px;
         font-size: 14px;
@@ -963,7 +1068,10 @@ main {
         font-size: 11px;
     }
 
-    .training-icon, .view-icon, .action-icon, .delete-icon {
+    .training-icon,
+    .view-icon,
+    .action-icon,
+    .delete-icon {
         width: 18px;
         height: 18px;
         font-size: 12px;
@@ -1057,51 +1165,4 @@ main {
         font-size: 11px;
         bottom: 110%;
     }
-}
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    min-width: 200px;
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    padding: 8px 0;
-}
-
-.dropdown:hover .dropdown-menu {
-    display: block;
-}
-
-.dropdown-item {
-    display: block;
-    padding: 10px 15px;
-    color: #2c3e50;
-    text-decoration: none;
-    font-size: 14px;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.dropdown-item:hover {
-    background-color: #f4f4f4;
-    color: #4CAF50;
-}
-
-/* Иконка для кнопки выпадающего меню */
-.button[data-icon="menu"]::before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>');
 }

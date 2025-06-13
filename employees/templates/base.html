@@ -9,7 +9,9 @@
 </head>
 <body>
 <header>
-    <h1>Training Tracker</h1>
+    <a href="{% url 'employees:index' %}" class="header-logo">
+        <h1>Training Tracker</h1>
+    </a>
     {% if user.is_authenticated %}
     <div class="button-container">
         <!-- Выпадающее меню -->
