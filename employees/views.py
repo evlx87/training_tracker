@@ -159,7 +159,7 @@ class DeletionRequestListView(LoginRequiredMixin, ListView):
             logger.warning(
                 'Отказано в доступе к списку запросов на удаление пользователю: %s',
                 request.user.username)
-            return redirect('employees:index')
+            return redirect('index')
         return super().get(request, *args, **kwargs)
 
 
@@ -236,7 +236,7 @@ class IndexView(TemplateView):
 
 class EmployeeListView(LoginRequiredMixin, ListView):
     model = Employee
-    template_name = 'employee_list.html'
+    template_name = 'employees/employee_list.html'
     context_object_name = 'employees'
     paginate_by = 20
 
@@ -258,7 +258,7 @@ class EmployeeCreateView(
     CreateView):
     model = Employee
     form_class = EmployeeForm
-    template_name = 'employee_form.html'
+    template_name = 'employees/employee_form.html'
     success_url = reverse_lazy('employees:employee_list')
     permission_required = 'employees.add_employee'
 
@@ -291,7 +291,7 @@ class EmployeeUpdateView(
     UpdateView):
     model = Employee
     form_class = EmployeeForm
-    template_name = 'employee_form.html'
+    template_name = 'employees/employee_form.html'
     success_url = reverse_lazy('employees:employee_list')
     permission_required = 'employees.change_employee'
 
@@ -320,7 +320,7 @@ class EmployeeUpdateView(
 
 class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
     model = Employee
-    template_name = 'employee_confirm_delete.html'
+    template_name = 'employees/employee_confirm_delete.html'
     success_url = reverse_lazy('employees:employee_list')
 
     def dispatch(self, request, *args, **kwargs):
@@ -367,7 +367,7 @@ class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
 
 class EmployeeDeleteConfirmView(EditorModeratedDeleteView):
     model = Employee
-    template_name = 'employee_confirm_delete.html'
+    template_name = 'employees/employee_confirm_delete.html'
     success_url = reverse_lazy('employees:employee_list')
     confirm_url_name = 'employees:employee_delete_confirm'
     permission_required = 'employees.delete_employee'
@@ -398,7 +398,7 @@ class EmployeeDeleteConfirmView(EditorModeratedDeleteView):
 
 
 class EmployeeTrainingsView(LoginRequiredMixin, TemplateView):
-    template_name = 'employee_trainings.html'
+    template_name = 'employees/employee_trainings.html'
 
     def get_context_data(self, **kwargs):
         logger.debug(
@@ -427,7 +427,7 @@ class TrainingRecordCreateView(
     CreateView):
     model = TrainingRecord
     form_class = TrainingRecordForm
-    template_name = 'training_record_form.html'
+    template_name = 'trainings/training_record_form.html'
     permission_required = 'employees.add_trainingrecord'
 
     def get_employee(self):
@@ -482,7 +482,7 @@ class TrainingRecordUpdateView(
     UpdateView):
     model = TrainingRecord
     form_class = TrainingRecordForm
-    template_name = 'training_record_form.html'
+    template_name = 'trainings/training_record_form.html'
     permission_required = 'employees.change_trainingrecord'
 
     def get_context_data(self, **kwargs):
@@ -515,7 +515,7 @@ class TrainingRecordUpdateView(
 
 class TrainingRecordDeleteView(EditorModeratedDeleteView):
     model = TrainingRecord
-    template_name = 'training_record_confirm_delete.html'
+    template_name = 'trainings/training_record_confirm_delete.html'
     confirm_url_name = 'employees:training_record_delete_confirm'
     permission_required = 'employees.delete_trainingrecord'
 
@@ -532,7 +532,7 @@ class TrainingRecordDeleteView(EditorModeratedDeleteView):
 
 class TrainingRecordDeleteConfirmView(EditorModeratedDeleteView):
     model = TrainingRecord
-    template_name = 'training_record_confirm_delete.html'
+    template_name = 'trainings/training_record_confirm_delete.html'
     confirm_url_name = 'employees:training_record_delete_confirm'
     permission_required = 'employees.delete_trainingrecord'
 
@@ -569,15 +569,6 @@ class TrainingRecordDeleteConfirmView(EditorModeratedDeleteView):
             obj,
             user)
         return self.render_to_response(self.get_context_data())
-
-
-
-
-
-
-
-
-
 
 
 class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):

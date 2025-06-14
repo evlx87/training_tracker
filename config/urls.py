@@ -21,6 +21,8 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect
 from django.urls import path, include, reverse_lazy
 
+from employees.views import IndexView
+
 
 def custom_403(request, exception):
     return render(request, '403.html', status=403)
@@ -28,11 +30,9 @@ def custom_403(request, exception):
 
 handler403 = custom_403
 
-def home_view(request):
-    return render(request, 'index.html')
 
 urlpatterns = [
-    path('', home_view, name='home'),
+    path('', IndexView.as_view(), name='index'),
     path('admin/', admin.site.urls),
     path('employees/', include('employees.urls')),
     path('departments/', include('departments.urls')),
