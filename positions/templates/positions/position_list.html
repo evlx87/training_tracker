@@ -4,7 +4,7 @@
 <h1>Список должностей</h1>
 
 <div class="form-group">
-    <a href="{% url 'employees:position_create' %}" class="button button--success"><span class="icon">➕</span> Добавить должность</a>
+    <a href="{% url 'positions:position_create' %}" class="button button--success"><span class="icon">➕</span> Добавить должность</a>
 </div>
 
 <div class="table-container">
@@ -20,8 +20,8 @@
             <tr>
                 <td>{{ position.name }}</td>
                 <td class="actions">
-                    <a href="{% url 'employees:position_edit' position.pk %}" class="action-icon" title="Редактировать">✎</a>
-                    <a href="{% url 'employees:position_delete' position.pk %}" class="delete-icon" title="Удалить">✖</a>
+                    <a href="{% url 'positions:position_edit' position.pk %}" class="action-icon" title="Редактировать">✎</a>
+                    <a href="{% url 'positions:position_delete' position.pk %}" class="delete-icon" title="Удалить">✖</a>
                 </td>
             </tr>
             {% empty %}

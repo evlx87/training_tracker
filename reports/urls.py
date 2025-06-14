@@ -4,7 +4,6 @@ from .views import ReportsView, ExportReportView
 app_name = 'reports'
 
 urlpatterns = [
-    path('', ReportsView.as_view(), name='reports'),
+    path('', ReportsView.as_view(), name='report_list'),
     path('export/', ExportReportView.as_view(), name='export_report'),
-
 ]

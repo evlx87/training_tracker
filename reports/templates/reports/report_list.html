@@ -34,10 +34,10 @@
             <button type="submit" class="button button--primary">
                 <span class="icon">✔</span> Применить
             </button>
-            <a href="{% url 'employees:reports' %}" class="button button--danger">
+            <a href="{% url 'reports:report_list' %}" class="button button--danger">
                 <span class="icon">✖</span> Сбросить
             </a>
-            <a href="{% url 'employees:export_report' %}" class="button button--success">
+            <a href="{% url 'reports:export_report' %}" class="button button--success">
                 <span class="icon">📊</span> Экспорт в Excel
             </a>
         </div>

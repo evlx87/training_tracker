@@ -18,7 +18,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import path, include, reverse_lazy
 
 
@@ -28,7 +28,11 @@ def custom_403(request, exception):
 
 handler403 = custom_403
 
+def home_view(request):
+    return render(request, 'index.html')
+
 urlpatterns = [
+    path('', home_view, name='home'),
     path('admin/', admin.site.urls),
     path('employees/', include('employees.urls')),
     path('departments/', include('departments.urls')),

@@ -4,7 +4,7 @@
 <h1>Список программ обучения</h1>
 
 <div class="form-group">
-    <a href="{% url 'employees:training_create' %}" class="button button--success"><span class="icon">➕</span> Добавить программу</a>
+    <a href="{% url 'trainings:training_create' %}" class="button button--success"><span class="icon">➕</span> Добавить программу</a>
 </div>
 
 <div class="table-container">
@@ -22,8 +22,8 @@
                 <td>{{ training.name }}</td>
                 <td>{{ training.recurrence_period|default:"—" }}</td>
                 <td class="actions">
-                    <a href="{% url 'employees:training_edit' training.pk %}" class="action-icon" title="Редактировать">✎</a>
-                    <a href="{% url 'employees:training_delete' training.pk %}" class="delete-icon" title="Удалить">✖</a>
+                    <a href="{% url 'trainings:training_edit' training.pk %}" class="action-icon" title="Редактировать">✎</a>
+                    <a href="{% url 'trainings:training_delete' training.pk %}" class="delete-icon" title="Удалить">✖</a>
                 </td>
             </tr>
             {% empty %}

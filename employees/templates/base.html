@@ -21,13 +21,13 @@
             </button>
             <div class="dropdown-menu">
                 <a href="{% url 'employees:employee_list' %}" class="dropdown-item">Список сотрудников</a>
-                <a href="{% url 'employees:department_list' %}" class="dropdown-item">Структурные подразделения</a>
-                <a href="{% url 'employees:position_list' %}" class="dropdown-item">Должности</a>
-                <a href="{% url 'employees:training_list' %}" class="dropdown-item">Программы обучения</a>
+                <a href="{% url 'departments:department_list' %}" class="dropdown-item">Структурные подразделения</a>
+                <a href="{% url 'positions:position_list' %}" class="dropdown-item">Должности</a>
+                <a href="{% url 'trainings:training_list' %}" class="dropdown-item">Программы обучения</a>
             </div>
         </div>
         <!-- Остальные кнопки -->
-        <a href="{% url 'employees:reports' %}" class="button button--primary button--small">Отчеты по обучению</a>
+        <a href="{% url 'reports:report_list' %}" class="button button--primary button--small">Отчеты по обучению</a>
         {% if user|has_group:"Moderators" %}
         <a href="{% url 'employees:deletion_request_list' %}" class="button button--primary" data-icon="deletion-requests">Запросы на удаление</a>
         {% endif %}
