@@ -15,7 +15,7 @@ logger = logging.getLogger('trainings')
 
 class TrainingProgramListView(LoginRequiredMixin, ListView):
     model = TrainingProgram
-    template_name = 'training_list.html'
+    template_name = 'trainings/training_list.html'
     context_object_name = 'trainings'
     paginate_by = 20
 
@@ -30,8 +30,8 @@ class TrainingProgramCreateView(
         CreateView):
     model = TrainingProgram
     form_class = TrainingProgramForm
-    template_name = 'training_form.html'
-    success_url = reverse_lazy('employees:training_list')
+    template_name = 'trainings/training_form.html'
+    success_url = reverse_lazy('trainings:training_list')
     permission_required = 'employees.add_trainingprogram'
 
     def get_context_data(self, **kwargs):
@@ -65,8 +65,8 @@ class TrainingProgramUpdateView(
         UpdateView):
     model = TrainingProgram
     form_class = TrainingProgramForm
-    template_name = 'training_form.html'
-    success_url = reverse_lazy('employees:training_list')
+    template_name = 'trainings/training_form.html'
+    success_url = reverse_lazy('trainings:training_list')
     permission_required = 'employees.change_trainingprogram'
 
     def get_context_data(self, **kwargs):
@@ -96,18 +96,18 @@ class TrainingProgramUpdateView(
 
 class TrainingProgramDeleteView(EditorModeratedDeleteView):
     model = TrainingProgram
-    template_name = 'training_confirm_delete.html'
-    success_url = reverse_lazy('employees:training_list')
-    confirm_url_name = 'employees:training_delete_confirm'
+    template_name = 'trainings/training_confirm_delete.html'
+    success_url = reverse_lazy('trainings:training_list')
+    confirm_url_name = 'trainings:training_delete_confirm'
     permission_required = 'employees.delete_trainingprogram'
     context_object_name = 'training'
 
 
 class TrainingProgramDeleteConfirmView(EditorModeratedDeleteView):
     model = TrainingProgram
-    template_name = 'training_confirm_delete.html'
-    success_url = reverse_lazy('employees:training_list')
-    confirm_url_name = 'employees:training_delete_confirm'
+    template_name = 'trainings/training_confirm_delete.html'
+    success_url = reverse_lazy('trainings:training_list')
+    confirm_url_name = 'trainings:training_delete_confirm'
     permission_required = 'employees.delete_trainingprogram'
     context_object_name = 'training'
 

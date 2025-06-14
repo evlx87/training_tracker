@@ -15,7 +15,7 @@ logger = logging.getLogger('positions')
 
 class PositionListView(LoginRequiredMixin, ListView):
     model = Position
-    template_name = 'position_list.html'
+    template_name = 'positions/position_list.html'
     context_object_name = 'positions'
     paginate_by = 20
 
@@ -30,7 +30,7 @@ class PositionCreateView(
         CreateView):
     model = Position
     form_class = PositionForm
-    template_name = 'position_form.html'
+    template_name = 'positions/position_form.html'
     success_url = reverse_lazy('employees:position_list')
     permission_required = 'employees.add_position'
 
@@ -63,7 +63,7 @@ class PositionUpdateView(
         UpdateView):
     model = Position
     form_class = PositionForm
-    template_name = 'position_form.html'
+    template_name = 'positions/position_form.html'
     success_url = reverse_lazy('employees:position_list')
     permission_required = 'employees.change_position'
 
@@ -92,7 +92,7 @@ class PositionUpdateView(
 
 class PositionDeleteView(EditorModeratedDeleteView):
     model = Position
-    template_name = 'position_confirm_delete.html'
+    template_name = 'positions/position_confirm_delete.html'
     success_url = reverse_lazy('employees:position_list')
     confirm_url_name = 'employees:position_delete_confirm'
     permission_required = 'employees.delete_position'
@@ -100,7 +100,7 @@ class PositionDeleteView(EditorModeratedDeleteView):
 
 class PositionDeleteConfirmView(EditorModeratedDeleteView):
     model = Position
-    template_name = 'position_confirm_delete.html'
+    template_name = 'positions/position_confirm_delete.html'
     success_url = reverse_lazy('employees:position_list')
     confirm_url_name = 'employees:position_delete_confirm'
     permission_required = 'employees.delete_position'

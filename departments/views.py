@@ -15,7 +15,7 @@ logger = logging.getLogger('departments')
 
 class DepartmentListView(LoginRequiredMixin, ListView):
     model = Department
-    template_name = ('department_list.html')
+    template_name = 'departments/department_list.html'
     context_object_name = 'departments'
     paginate_by = 20
 
@@ -30,7 +30,7 @@ class DepartmentCreateView(
         CreateView):
     model = Department
     form_class = DepartmentForm
-    template_name = 'department_form.html'
+    template_name = 'departments/department_form.html'
     success_url = reverse_lazy('employees:department_list')
     permission_required = 'employees.add_department'
 
@@ -63,7 +63,7 @@ class DepartmentUpdateView(
         UpdateView):
     model = Department
     form_class = DepartmentForm
-    template_name = 'department_form.html'
+    template_name = 'departments/department_form.html'
     success_url = reverse_lazy('employees:department_list')
     permission_required = 'employees.change_department'
 
@@ -94,7 +94,7 @@ class DepartmentUpdateView(
 
 class DepartmentDeleteView(EditorModeratedDeleteView):
     model = Department
-    template_name = 'department_confirm_delete.html'
+    template_name = 'departments/department_confirm_delete.html'
     success_url = reverse_lazy('employees:department_list')
     confirm_url_name = 'employees:department_delete_confirm'
     permission_required = 'employees.delete_department'
@@ -102,7 +102,7 @@ class DepartmentDeleteView(EditorModeratedDeleteView):
 
 class DepartmentDeleteConfirmView(EditorModeratedDeleteView):
     model = Department
-    template_name = 'department_confirm_delete.html'
+    template_name = 'departments/department_confirm_delete.html'
     success_url = reverse_lazy('employees:department_list')
     confirm_url_name = 'employees:department_delete_confirm'
     permission_required = 'employees.delete_department'
