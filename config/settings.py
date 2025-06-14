@@ -40,7 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'departments.apps.DepartmentsConfig',
+    'positions.apps.PositionsConfig',
+    'trainings.apps.TrainingsConfig',
     'employees.apps.EmployeesConfig',
+    'reports.apps.ReportsConfig',
 ]
 
 MIDDLEWARE = [
@@ -182,11 +186,11 @@ LOGGING = {
     },
 }
 
-LOGIN_URL = 'employees:login'
-LOGIN_REDIRECT_URL = 'employees:index'
-LOGOUT_REDIRECT_URL = 'employees:index'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'index'
 
-MTO_GROUP_NAME = 'Moderators'
+MODERATOR_GROUP_NAME = 'Moderators'
 
 CACHES = {
     'default': {

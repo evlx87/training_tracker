@@ -1,42 +1,14 @@
 import logging
+
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
-from django.urls import reverse
+
+from departments.models import Department
+from positions.models import Position
+from trainings.models import TrainingProgram
 
 logger = logging.getLogger('employees')
-
-
-class Department(models.Model):
-    name = models.CharField(
-        max_length=255,
-        unique=True,
-        verbose_name='Название')
-    description = models.TextField(
-        blank=True,
-        null=True,
-        verbose_name='Описание')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Подразделение'
-        verbose_name_plural = 'Подразделения'
-
-
-class Position(models.Model):
-    name = models.CharField(
-        max_length=255,
-        unique=True,
-        verbose_name='Название')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Должность'
-        verbose_name_plural = 'Должности'
 
 
 class Employee(models.Model):
@@ -81,22 +53,6 @@ class Employee(models.Model):
         unique_together = ['last_name', 'first_name', 'middle_name']
 
 
-class TrainingProgram(models.Model):
-    name = models.CharField(
-        max_length=255,
-        unique=True,
-        verbose_name='Название')
-    recurrence_period = models.IntegerField(
-        null=True, blank=True, verbose_name='Периодичность (годы)')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Программа обучения'
-        verbose_name_plural = 'Программы обучения'
-
-
 class TrainingRecord(models.Model):
     employee = models.ForeignKey(
         Employee,
@@ -127,43 +83,31 @@ class TrainingRecord(models.Model):
 
 
 class DeletionRequest(models.Model):
-    STATUS_PENDING = 'pending'
-    STATUS_APPROVED = 'approved'
-    STATUS_REJECTED = 'rejected'
+    STATUS_PENDING = 'PENDING'
+    STATUS_APPROVED = 'APPROVED'
+    STATUS_REJECTED = 'REJECTED'
     STATUS_CHOICES = [
-        (STATUS_PENDING, 'Ожидает подтверждения'),
-        (STATUS_APPROVED, 'Подтверждено'),
+        (STATUS_PENDING, 'В ожидании'),
+        (STATUS_APPROVED, 'Одобрено'),
         (STATUS_REJECTED, 'Отклонено'),
     ]
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
-    created_by = models.ForeignKey(
-        'auth.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='deletion_requests')
-    created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Дата создания')
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default=STATUS_PENDING,
-        verbose_name='Статус')
-    reviewed_by = models.ForeignKey(
-        'auth.User',
+        default=STATUS_PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+        User,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True,
-        related_name='reviewed_deletion_requests',
-        verbose_name='Рассмотрел')
-    reviewed_at = models.DateTimeField(
-        null=True, blank=True, verbose_name='Дата рассмотрения')
-
-    def __str__(self):
-        return f"Запрос на удаление {self.content_object} от {self.created_by} ({self.get_status_display()})"
+        related_name='deletion_requests')
 
     class Meta:
         verbose_name = 'Запрос на удаление'
         verbose_name_plural = 'Запросы на удаление'
+
+    def __str__(self):
+        return f"Запрос на удаление {self.content_type} #{self.object_id}"

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ action }} должность
+{% endblock %}
+
+{% block content %}
+<h1>{{ action }} должность</h1>
+<div class="form-container">
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="messages error">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        <div class="form-group{% if form.name.errors %} has-error{% endif %}">
+            <label for="{{ form.name.id_for_label }}"><span class="icon">💼</span> Название:</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+            <span class="field-errors">{{ form.name.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="button-group">
+            <button type="submit" class="button button--primary"><span class="icon">💾</span> Сохранить</button>
+            <a href="{% url 'positions:position_list' %}" class="button button--danger"><span class="icon">✖️</span> Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

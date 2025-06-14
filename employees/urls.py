@@ -5,31 +5,19 @@ from . import views
 app_name = 'employees'
 
 urlpatterns = [
-    path('', views.IndexView.as_view(), name='index'),
-    path('employees/', views.EmployeeListView.as_view(), name='employee_list'),
-    path('employees/create/', views.EmployeeCreateView.as_view(), name='employee_create'),
-    path('employees/<int:pk>/edit/', views.EmployeeUpdateView.as_view(), name='employee_edit'),
-    path('employees/<int:pk>/delete/', views.EmployeeDeleteView.as_view(), name='employee_delete'),
-    path('employees/<int:pk>/trainings/', views.EmployeeTrainingsView.as_view(), name='employee_trainings'),
+    path('', views.EmployeeListView.as_view(), name='employee_list'),
+    path('create/', views.EmployeeCreateView.as_view(), name='employee_create'),
+    path('<int:pk>/edit/', views.EmployeeUpdateView.as_view(), name='employee_edit'),
+    path('<int:pk>/delete/', views.EmployeeDeleteView.as_view(), name='employee_delete'),
+    path('<int:pk>/trainings/', views.EmployeeTrainingsView.as_view(), name='employee_trainings'),
+
     path('training-records/create/<int:employee_pk>/', views.TrainingRecordCreateView.as_view(), name='training_record_create'),
     path('training-records/<int:pk>/edit/', views.TrainingRecordUpdateView.as_view(), name='training_record_edit'),
     path('training-records/<int:pk>/delete/', views.TrainingRecordDeleteView.as_view(), name='training_record_delete'),
-    path('departments/', views.DepartmentListView.as_view(), name='department_list'),
-    path('departments/create/', views.DepartmentCreateView.as_view(), name='department_create'),
-    path('departments/<int:pk>/edit/', views.DepartmentUpdateView.as_view(), name='department_edit'),
-    path('departments/<int:pk>/delete/', views.DepartmentDeleteView.as_view(), name='department_delete'),
-    path('positions/', views.PositionListView.as_view(), name='position_list'),
-    path('positions/create/', views.PositionCreateView.as_view(), name='position_create'),
-    path('positions/<int:pk>/edit/', views.PositionUpdateView.as_view(), name='position_edit'),
-    path('positions/<int:pk>/delete/', views.PositionDeleteView.as_view(), name='position_delete'),
-    path('trainings/', views.TrainingListView.as_view(), name='training_list'),
-    path('trainings/create/', views.TrainingCreateView.as_view(), name='training_create'),
-    path('trainings/<int:pk>/edit/', views.TrainingUpdateView.as_view(), name='training_edit'),
-    path('trainings/<int:pk>/delete/', views.TrainingDeleteView.as_view(), name='training_delete'),
-    path('reports/', views.ReportsView.as_view(), name='reports'),
-    path('reports/export/', views.ExportReportView.as_view(), name='export_report'),
-    path('password/change/', views.PasswordChangeCustomView.as_view(), name='password_change'),
-    path('password/change/done/', views.PasswordChangeDoneCustomView.as_view(), name='password_change_done'),
+
+    path('password-change/', views.PasswordChangeCustomView.as_view(), name='password_change'),
+    path('password-change/done/', views.PasswordChangeDoneCustomView.as_view(), name='password_change_done'),
+
     path('deletion-requests/<int:pk>/confirm/', views.DeletionRequestConfirmView.as_view(), name='deletion_request_confirm'),
     path('deletion-requests/', views.DeletionRequestListView.as_view(), name='deletion_request_list'),
 ]

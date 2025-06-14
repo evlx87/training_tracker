@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Список программ обучения</h1>
+
+<div class="form-group">
+    <a href="{% url 'trainings:training_create' %}" class="button button--success"><span class="icon">➕</span> Добавить программу</a>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Периодичность (лет)</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for training in trainings %}
+            <tr>
+                <td>{{ training.name }}</td>
+                <td>{{ training.recurrence_period|default:"—" }}</td>
+                <td class="actions">
+                    <a href="{% url 'trainings:training_edit' training.pk %}" class="action-icon" title="Редактировать">✎</a>
+                    <a href="{% url 'trainings:training_delete' training.pk %}" class="delete-icon" title="Удалить">✖</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Программы обучения не найдены.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <span class="page-link">Предыдущая</span>
+    </li>
+    {% endif %}
+
+    {% for num in paginator.page_range %}
+    {% if page_obj.number == num %}
+    <li class="page-item active" aria-current="page">
+        <span class="page-link">{{ num }}</span>
+    </li>
+    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+    </li>
+    {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <span class="page-link">Следующая</span>
+    </li>
+    {% endif %}
+</ul>
+{% endif %}
+
+{% endblock %}

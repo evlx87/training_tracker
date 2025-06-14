@@ -18,18 +18,27 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import path, include, reverse_lazy
+
+from employees.views import IndexView
 
 
 def custom_403(request, exception):
     return render(request, '403.html', status=403)
 
+
 handler403 = custom_403
 
+
 urlpatterns = [
+    path('', IndexView.as_view(), name='index'),
     path('admin/', admin.site.urls),
+    path('employees/', include('employees.urls')),
+    path('departments/', include('departments.urls')),
+    path('positions/', include('positions.urls')),
+    path('trainings/', include('trainings.urls')),
+    path('reports/', include('reports.urls')),
     path('login/', LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page=reverse_lazy('login')), name='logout'),
-    path('', include('employees.urls', namespace='employees')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

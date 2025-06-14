@@ -1,7 +1,9 @@
+from datetime import date
+
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
+from .models import Employee, TrainingRecord
 
 
 class EmployeeForm(forms.ModelForm):
@@ -37,39 +39,6 @@ class EmployeeForm(forms.ModelForm):
             raise ValidationError(
                 'Дата увольнения должна быть пустой, если сотрудник не уволен.')
         return cleaned_data
-
-
-class DepartmentForm(forms.ModelForm):
-    class Meta:
-        model = Department
-        fields = ['name', 'description']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-input'}),
-            'description': forms.Textarea(attrs={'class': 'form-textarea'}),
-        }
-
-
-class PositionForm(forms.ModelForm):
-    class Meta:
-        model = Position
-        fields = ['name']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-input'}),
-        }
-
-
-class TrainingProgramForm(forms.ModelForm):
-    class Meta:
-        model = TrainingProgram
-        fields = ['name', 'recurrence_period']
-        widgets = {
-            'name': forms.TextInput(
-                attrs={
-                    'class': 'form-input'}),
-            'recurrence_period': forms.NumberInput(
-                attrs={
-                    'class': 'form-input'}),
-        }
 
 
 class TrainingRecordForm(forms.ModelForm):

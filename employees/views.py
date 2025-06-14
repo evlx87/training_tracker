@@ -7,18 +7,13 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.views import PasswordChangeDoneView, PasswordChangeView
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView
-from openpyxl import Workbook
-from openpyxl.styles import PatternFill, Font, Alignment
 
 from employees.models import DeletionRequest
-from .forms import EmployeeForm, DepartmentForm, PositionForm, TrainingProgramForm, TrainingRecordForm
-from .models import Employee, Department, Position, TrainingProgram, TrainingRecord
-from .services import ReportService
+from .forms import EmployeeForm, TrainingRecordForm
+from .models import Employee, TrainingRecord
 
 # Настройка логгера
 logger = logging.getLogger('employees')
@@ -164,7 +159,7 @@ class DeletionRequestListView(LoginRequiredMixin, ListView):
             logger.warning(
                 'Отказано в доступе к списку запросов на удаление пользователю: %s',
                 request.user.username)
-            return redirect('employees:index')
+            return redirect('index')
         return super().get(request, *args, **kwargs)
 
 
@@ -241,7 +236,7 @@ class IndexView(TemplateView):
 
 class EmployeeListView(LoginRequiredMixin, ListView):
     model = Employee
-    template_name = 'employee_list.html'
+    template_name = 'employees/employee_list.html'
     context_object_name = 'employees'
     paginate_by = 20
 
@@ -258,12 +253,12 @@ class EmployeeListView(LoginRequiredMixin, ListView):
 
 
 class EmployeeCreateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        CreateView):
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    CreateView):
     model = Employee
     form_class = EmployeeForm
-    template_name = 'employee_form.html'
+    template_name = 'employees/employee_form.html'
     success_url = reverse_lazy('employees:employee_list')
     permission_required = 'employees.add_employee'
 
@@ -291,12 +286,12 @@ class EmployeeCreateView(
 
 
 class EmployeeUpdateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        UpdateView):
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UpdateView):
     model = Employee
     form_class = EmployeeForm
-    template_name = 'employee_form.html'
+    template_name = 'employees/employee_form.html'
     success_url = reverse_lazy('employees:employee_list')
     permission_required = 'employees.change_employee'
 
@@ -325,7 +320,7 @@ class EmployeeUpdateView(
 
 class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
     model = Employee
-    template_name = 'employee_confirm_delete.html'
+    template_name = 'employees/employee_confirm_delete.html'
     success_url = reverse_lazy('employees:employee_list')
 
     def dispatch(self, request, *args, **kwargs):
@@ -372,7 +367,7 @@ class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
 
 class EmployeeDeleteConfirmView(EditorModeratedDeleteView):
     model = Employee
-    template_name = 'employee_confirm_delete.html'
+    template_name = 'employees/employee_confirm_delete.html'
     success_url = reverse_lazy('employees:employee_list')
     confirm_url_name = 'employees:employee_delete_confirm'
     permission_required = 'employees.delete_employee'
@@ -403,7 +398,7 @@ class EmployeeDeleteConfirmView(EditorModeratedDeleteView):
 
 
 class EmployeeTrainingsView(LoginRequiredMixin, TemplateView):
-    template_name = 'employee_trainings.html'
+    template_name = 'employees/employee_trainings.html'
 
     def get_context_data(self, **kwargs):
         logger.debug(
@@ -427,12 +422,12 @@ class EmployeeTrainingsView(LoginRequiredMixin, TemplateView):
 
 
 class TrainingRecordCreateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        CreateView):
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    CreateView):
     model = TrainingRecord
     form_class = TrainingRecordForm
-    template_name = 'training_record_form.html'
+    template_name = 'trainings/training_record_form.html'
     permission_required = 'employees.add_trainingrecord'
 
     def get_employee(self):
@@ -482,12 +477,12 @@ class TrainingRecordCreateView(
 
 
 class TrainingRecordUpdateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        UpdateView):
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UpdateView):
     model = TrainingRecord
     form_class = TrainingRecordForm
-    template_name = 'training_record_form.html'
+    template_name = 'trainings/training_record_form.html'
     permission_required = 'employees.change_trainingrecord'
 
     def get_context_data(self, **kwargs):
@@ -520,7 +515,7 @@ class TrainingRecordUpdateView(
 
 class TrainingRecordDeleteView(EditorModeratedDeleteView):
     model = TrainingRecord
-    template_name = 'training_record_confirm_delete.html'
+    template_name = 'trainings/training_record_confirm_delete.html'
     confirm_url_name = 'employees:training_record_delete_confirm'
     permission_required = 'employees.delete_trainingrecord'
 
@@ -537,7 +532,7 @@ class TrainingRecordDeleteView(EditorModeratedDeleteView):
 
 class TrainingRecordDeleteConfirmView(EditorModeratedDeleteView):
     model = TrainingRecord
-    template_name = 'training_record_confirm_delete.html'
+    template_name = 'trainings/training_record_confirm_delete.html'
     confirm_url_name = 'employees:training_record_delete_confirm'
     permission_required = 'employees.delete_trainingrecord'
 
@@ -574,478 +569,6 @@ class TrainingRecordDeleteConfirmView(EditorModeratedDeleteView):
             obj,
             user)
         return self.render_to_response(self.get_context_data())
-
-
-class DepartmentListView(LoginRequiredMixin, ListView):
-    model = Department
-    template_name = 'departments.html'
-    context_object_name = 'departments'
-    paginate_by = 20
-
-    @log_view_action('Запрошен список', 'подразделений')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-
-class DepartmentCreateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        CreateView):
-    model = Department
-    form_class = DepartmentForm
-    template_name = 'department_form.html'
-    success_url = reverse_lazy('employees:department_list')
-    permission_required = 'employees.add_department'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['action'] = 'Добавить'
-        return context
-
-    @log_view_action('Открыта форма создания', 'подразделения')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        department = form.save()
-        logger.info('Создано подразделение: %s пользователем: %s',
-                    department, self.request.user.username)
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        logger.warning(
-            'Ошибка валидации формы создания подразделения: %s пользователем: %s',
-            form.errors,
-            self.request.user.username)
-        return super().form_invalid(form)
-
-
-class DepartmentUpdateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        UpdateView):
-    model = Department
-    form_class = DepartmentForm
-    template_name = 'department_form.html'
-    success_url = reverse_lazy('employees:department_list')
-    permission_required = 'employees.change_department'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['action'] = 'Редактировать'
-        return context
-
-    @log_view_action('Открыта форма редактирования', 'подразделения')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        department = form.save()
-        logger.info(
-            'Обновлено подразделение: %s пользователем: %s',
-            department,
-            self.request.user.username)
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        logger.warning(
-            'Ошибка валидации формы редактирования подразделения: %s пользователем: %s',
-            form.errors,
-            self.request.user.username)
-        return super().form_invalid(form)
-
-
-class DepartmentDeleteView(EditorModeratedDeleteView):
-    model = Department
-    template_name = 'department_confirm_delete.html'
-    success_url = reverse_lazy('employees:department_list')
-    confirm_url_name = 'employees:department_delete_confirm'
-    permission_required = 'employees.delete_department'
-
-
-class DepartmentDeleteConfirmView(EditorModeratedDeleteView):
-    model = Department
-    template_name = 'department_confirm_delete.html'
-    success_url = reverse_lazy('employees:department_list')
-    confirm_url_name = 'employees:department_delete_confirm'
-    permission_required = 'employees.delete_department'
-
-    def post(self, request, *args, **kwargs):
-        obj = self.get_object()
-        user = request.user.username
-        if request.user.groups.filter(name=settings.MTO_GROUP_NAME).exists():
-            logger.info(
-                'Подтверждено удаление подразделения: %s пользователем из группы MTO: %s',
-                obj,
-                user)
-            return super(
-                EditorModeratedDeleteView,
-                self).post(
-                request,
-                *
-                args,
-                **kwargs)
-        messages.error(
-            request,
-            'Только пользователь из группы MTO может подтвердить удаление.')
-        logger.warning(
-            'Отказано в подтверждении удаления подразделения: %s пользователем: %s',
-            obj,
-            user)
-        return self.render_to_response(self.get_context_data())
-
-
-class PositionListView(LoginRequiredMixin, ListView):
-    model = Position
-    template_name = 'positions.html'
-    context_object_name = 'positions'
-    paginate_by = 20
-
-    @log_view_action('Запрошен список', 'должностей')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-
-class PositionCreateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        CreateView):
-    model = Position
-    form_class = PositionForm
-    template_name = 'position_form.html'
-    success_url = reverse_lazy('employees:position_list')
-    permission_required = 'employees.add_position'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['action'] = 'Добавить'
-        return context
-
-    @log_view_action('Открыта форма создания', 'должности')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        position = form.save()
-        logger.info('Создана должность: %s пользователем: %s',
-                    position, self.request.user.username)
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        logger.warning(
-            'Ошибка валидации формы создания должности: %s пользователем: %s',
-            form.errors, self.request.user.username
-        )
-        return super().form_invalid(form)
-
-
-class PositionUpdateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        UpdateView):
-    model = Position
-    form_class = PositionForm
-    template_name = 'position_form.html'
-    success_url = reverse_lazy('employees:position_list')
-    permission_required = 'employees.change_position'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['action'] = 'Редактировать'
-        return context
-
-    @log_view_action('Открыта форма редактирования', 'должности')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        position = form.save()
-        logger.info('Обновлена должность: %s пользователем: %s',
-                    position, self.request.user.username)
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        logger.warning(
-            'Ошибка валидации формы редактирования должности: %s пользователем: %s',
-            form.errors,
-            self.request.user.username)
-        return super().form_invalid(form)
-
-
-class PositionDeleteView(EditorModeratedDeleteView):
-    model = Position
-    template_name = 'position_confirm_delete.html'
-    success_url = reverse_lazy('employees:position_list')
-    confirm_url_name = 'employees:position_delete_confirm'
-    permission_required = 'employees.delete_position'
-
-
-class PositionDeleteConfirmView(EditorModeratedDeleteView):
-    model = Position
-    template_name = 'position_confirm_delete.html'
-    success_url = reverse_lazy('employees:position_list')
-    confirm_url_name = 'employees:position_delete_confirm'
-    permission_required = 'employees.delete_position'
-
-    def post(self, request, *args, **kwargs):
-        obj = self.get_object()
-        user = request.user.username
-        if request.user.groups.filter(name=settings.MTO_GROUP_NAME).exists():
-            logger.info(
-                'Подтверждено удаление должности: %s пользователем из группы MTO: %s',
-                obj,
-                user)
-            return super(
-                EditorModeratedDeleteView,
-                self).post(
-                request,
-                *
-                args,
-                **kwargs)
-        messages.error(
-            request,
-            'Только пользователь из группы MTO может подтвердить удаление.')
-        logger.warning(
-            'Отказано в подтверждении удаления должности: %s пользователем: %s',
-            obj,
-            user)
-        return self.render_to_response(self.get_context_data())
-
-
-class TrainingListView(LoginRequiredMixin, ListView):
-    model = TrainingProgram
-    template_name = 'trainings.html'
-    context_object_name = 'trainings'
-    paginate_by = 20
-
-    @log_view_action('Запрошен список', 'программ обучения')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-
-class TrainingCreateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        CreateView):
-    model = TrainingProgram
-    form_class = TrainingProgramForm
-    template_name = 'training_form.html'
-    success_url = reverse_lazy('employees:training_list')
-    permission_required = 'employees.add_trainingprogram'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['action'] = 'Добавить'
-        return context
-
-    @log_view_action('Открыта форма создания', 'программы обучения')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        training = form.save()
-        logger.info(
-            'Создана программа обучения: %s пользователем: %s',
-            training,
-            self.request.user.username)
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        logger.warning(
-            'Ошибка валидации формы создания программы обучения: %s пользователем: %s',
-            form.errors,
-            self.request.user.username)
-        return super().form_invalid(form)
-
-
-class TrainingUpdateView(
-        LoginRequiredMixin,
-        PermissionRequiredMixin,
-        UpdateView):
-    model = TrainingProgram
-    form_class = TrainingProgramForm
-    template_name = 'training_form.html'
-    success_url = reverse_lazy('employees:training_list')
-    permission_required = 'employees.change_trainingprogram'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['action'] = 'Редактировать'
-        return context
-
-    @log_view_action('Открыта форма редактирования', 'программы обучения')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        training = form.save()
-        logger.info(
-            'Обновлена программа обучения: %s пользователем: %s',
-            training,
-            self.request.user.username)
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        logger.warning(
-            'Ошибка валидации формы редактирования программы обучения: %s пользователем: %s',
-            form.errors,
-            self.request.user.username)
-        return super().form_invalid(form)
-
-
-class TrainingDeleteView(EditorModeratedDeleteView):
-    model = TrainingProgram
-    template_name = 'training_confirm_delete.html'
-    success_url = reverse_lazy('employees:training_list')
-    confirm_url_name = 'employees:training_delete_confirm'
-    permission_required = 'employees.delete_trainingprogram'
-    context_object_name = 'training'
-
-
-class TrainingDeleteConfirmView(EditorModeratedDeleteView):
-    model = TrainingProgram
-    template_name = 'training_confirm_delete.html'
-    success_url = reverse_lazy('employees:training_list')
-    confirm_url_name = 'employees:training_delete_confirm'
-    permission_required = 'employees.delete_trainingprogram'
-    context_object_name = 'training'
-
-    def post(self, request, *args, **kwargs):
-        obj = self.get_object()
-        user = request.user.username
-        if request.user.groups.filter(name=settings.MTO_GROUP_NAME).exists():
-            logger.info(
-                'Подтверждено удаление программы обучения: %s пользователем из группы MTO: %s',
-                obj,
-                user)
-            return super(
-                EditorModeratedDeleteView,
-                self).post(
-                request,
-                *
-                args,
-                **kwargs)
-        messages.error(
-            request,
-            'Только пользователь из группы MTO может подтвердить удаление.')
-        logger.warning(
-            'Отказано в подтверждении удаления программы обучения: %s пользователем: %s',
-            obj,
-            user)
-        return self.render_to_response(self.get_context_data())
-
-
-class ReportsView(TemplateView):
-    template_name = 'reports.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        selected_employees = self.request.GET.getlist('employees')
-        selected_program = self.request.GET.get('program')
-        selected_employees = [emp for emp in selected_employees if emp]
-        logger.debug(
-            "Selected employees after filtering: %s",
-            selected_employees)
-        report_data, training_programs = ReportService.generate_training_report(
-            selected_employees, selected_program)
-        if selected_employees:
-            report_data = [
-                data for data in report_data if str(
-                    data['employee'].pk) in selected_employees]
-        logger.debug(
-            "Report data length after filtering: %s",
-            len(report_data))
-        sort_by = self.request.GET.get('sort_by')
-        sort_order = self.request.GET.get('sort_order', 'asc')
-        if sort_by and sort_by.isdigit():
-            report_data.sort(
-                key=lambda x: x['trainings'].get(
-                    int(sort_by), {}).get(
-                    'date', 'Обучение не пройдено'), reverse=(
-                    sort_order == 'desc'))
-        context['report_data'] = report_data
-        context['training_programs'] = training_programs
-        context['employees'] = Employee.objects.all()
-        context['departments'] = Department.objects.all()
-        context['selected_employees'] = selected_employees
-        context['selected_program'] = selected_program
-        if selected_program and selected_program.isdigit():
-            program = TrainingProgram.objects.filter(
-                id=int(selected_program)).first()
-            context['selected_program_name'] = program.name if program else "Неизвестная программа"
-        total_employees = len(report_data)
-        context['total_employees'] = total_employees
-        trained_counts = {}
-        for program in training_programs:
-            trained_count = sum(
-                1 for data in report_data if data['trainings'].get(
-                    program.id, {}).get('date') != "Обучение не пройдено")
-            trained_counts[program.name] = trained_count
-        context['trained_counts'] = trained_counts
-        return context
-
-    @log_view_action('Открыта страница', 'отчетов')
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-
-class ExportReportView(LoginRequiredMixin, View):
-    @log_view_action('Экспортирован', 'отчет по обучению')
-    def get(self, request, *args, **kwargs):
-        report_data, training_programs = ReportService.generate_training_report()
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Отчет по обучению"
-        headers = ["Сотрудник", "Должность", "Подразделение"] + \
-            [program.name for program in training_programs]
-        ws.append(headers)
-        for cell in ws[1]:
-            cell.font = Font(bold=True)
-            cell.alignment = Alignment(horizontal="center")
-        for data in report_data:
-            first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
-            middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
-            employee_name = f"{
-                data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
-            row = [
-                employee_name,
-                str(data['employee'].position or "—"),
-                str(data['employee'].department or "—")
-            ]
-            for program in training_programs:
-                training = data['trainings'].get(program.id, {})
-                date = training.get('date', "Обучение не пройдено")
-                row.append(
-                    date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
-            ws.append(row)
-        for row_idx, data in enumerate(report_data, start=2):
-            for col_idx, program in enumerate(training_programs, start=4):
-                cell = ws.cell(row=row_idx, column=col_idx)
-                training = data['trainings'].get(program.id, {})
-                status_class = training.get('class', 'not-completed')
-                fill_colors = {
-                    'not-completed': 'FF9999',
-                    'overdue': 'FF3333',
-                    'warning': 'FFFF66',
-                    'completed': '99FF99'
-                }
-                cell.fill = PatternFill(
-                    start_color=fill_colors.get(status_class, 'FFFFFF'),
-                    end_color=fill_colors.get(status_class, 'FFFFFF'),
-                    fill_type="solid"
-                )
-        for col in ws.columns:
-            max_length = max(len(str(cell.value))
-                             for cell in col if cell.value)
-            ws.column_dimensions[col[0].column_letter].width = max_length + 2
-        response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename="training_report.xlsx"'
-        wb.save(response)
-        logger.info(
-            'Экспортирован отчет по обучению пользователем: %s',
-            request.user.username)
-        return response
 
 
 class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
