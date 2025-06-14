@@ -186,9 +186,9 @@ LOGGING = {
     },
 }
 
-LOGIN_URL = 'employees:login'
-LOGIN_REDIRECT_URL = 'employees:index'
-LOGOUT_REDIRECT_URL = 'employees:index'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'index'
 
 MODERATOR_GROUP_NAME = 'Moderators'
 
