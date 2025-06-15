@@ -1,10 +1,12 @@
 import logging
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views import View
 from django.views.generic import TemplateView
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Alignment
+
 from departments.models import Department
 from employees.models import Employee
 from employees.services import ReportService
@@ -14,7 +16,7 @@ from trainings.models import TrainingProgram
 logger = logging.getLogger('reports')
 
 
-class ReportsView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+class ReportsView(TemplateView):
     template_name = 'reports/report_list.html'
     permission_required = 'employees.view_report'
 

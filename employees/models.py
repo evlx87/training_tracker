@@ -71,20 +71,49 @@ class Employee(models.Model):
 
 
 class DeletionRequest(models.Model):
+    STATUS_PENDING = 'pending'
+    STATUS_APPROVED = 'approved'
+    STATUS_REJECTED = 'rejected'
+    STATUS_CHOICES = (
+        (STATUS_PENDING, 'Ожидает'),
+        (STATUS_APPROVED, 'Одобрено'),
+        (STATUS_REJECTED, 'Отклонено'),
+    )
+
     content_type = models.ForeignKey(
         'contenttypes.ContentType',
-        on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+        on_delete=models.CASCADE,
+        verbose_name='Тип объекта')
+    object_id = models.PositiveIntegerField(verbose_name='ID объекта')
     content_object = GenericForeignKey('content_type', 'object_id')
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='deletion_requests')
-    created_at = models.DateTimeField(auto_now_add=True)
+        related_name='deletion_requests',
+        verbose_name='Автор запроса')
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата создания')
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+        verbose_name='Статус')
+    reviewed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='reviewed_deletion_requests',
+        verbose_name='Обработал',
+        blank=True)
+    reviewed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='Дата обработки')
 
     def __str__(self):
-        return f'Запрос на удаление {self.content_object} от {self.created_by}'
+        return f'Запрос на удаление {self.content_object} от {self.created_by} ({self.get_status_display()})'
 
     class Meta:
         verbose_name = 'Запрос на удаление'

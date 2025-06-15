@@ -9,6 +9,7 @@ from django.contrib.auth.views import PasswordChangeDoneView, PasswordChangeView
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView
 
 from employees.models import DeletionRequest
@@ -193,11 +194,10 @@ class DeletionRequestConfirmView(LoginRequiredMixin, TemplateView):
 
         action = request.POST.get('confirm')
         if action == 'approve':
-            # Сначала обновляем статус и сохраняем
             deletion_request.status = DeletionRequest.STATUS_APPROVED
             deletion_request.reviewed_by = request.user
-            deletion_request.save()  # Сохраняем до удаления content_object
-            # Теперь удаляем связанный объект
+            deletion_request.reviewed_at = timezone.now()
+            deletion_request.save()
             try:
                 if deletion_request.content_object:
                     deletion_request.content_object.delete()
@@ -215,6 +215,7 @@ class DeletionRequestConfirmView(LoginRequiredMixin, TemplateView):
         elif action == 'reject':
             deletion_request.status = DeletionRequest.STATUS_REJECTED
             deletion_request.reviewed_by = request.user
+            deletion_request.reviewed_at = timezone.now()
             deletion_request.save()
             messages.success(request, 'Запрос на удаление отклонён.')
             logger.info('Запрос на удаление #%s отклонён пользователем: %s',
@@ -375,7 +376,7 @@ class EmployeeDeleteConfirmView(EditorModeratedDeleteView):
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
         user = request.user.username
-        if request.user.groups.filter(name=settings.MTO_GROUP_NAME).exists():
+        if request.user.groups.filter(name=settings.MODERATOR_GROUP_NAME).exists():
             logger.info(
                 'Подтверждено удаление сотрудника: %s пользователем из группы MTO: %s',
                 obj,
