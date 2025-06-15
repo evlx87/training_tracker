@@ -1,9 +1,10 @@
-from datetime import timezone, timedelta
-
+from datetime import timedelta
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+
 from departments.models import Department
 from positions.models import Position
 from trainings.models import TrainingProgram
