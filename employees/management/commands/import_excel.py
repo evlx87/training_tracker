@@ -8,7 +8,6 @@ from django.core.management.base import BaseCommand
 
 from employees.models import Employee, Department, Position, TrainingProgram, TrainingRecord
 
-# Настройка логгера
 logger = logging.getLogger('employees')
 
 
@@ -23,19 +22,16 @@ class Command(BaseCommand):
         if not os.path.exists(file_path):
             logger.error(f"Файл не найден: {file_path}")
             return
-
         try:
             df = pd.read_excel(file_path, header=[0, 1, 2], engine='openpyxl')
         except Exception as e:
             logger.error(f"Ошибка чтения файла: {e}")
             return
-
         logger.info(f"Заголовки столбцов: {df.columns.tolist()}")
-
         programs = {
             'Охрана труда': 3,
             'Пожарная безопасность': 3,
-            'Электробезопасность': 3,
+            'Электробезопасность': 1,
             'Первая помощь': 3,
             'Ответственный за БДД': None,
             'Антитеррор': None
@@ -48,7 +44,6 @@ class Command(BaseCommand):
             )
             program_objects[name] = program
             logger.debug(f"Создана/получена программа обучения: {name}")
-
         for index, row in df.iterrows():
             logger.debug(f"Обрабатывается строка {index}")
             try:
@@ -88,15 +83,14 @@ class Command(BaseCommand):
                 logger.warning(
                     f"Ошибка доступа к столбцу в строке {index}: {e}")
                 continue
-
             if pd.isna(last_name) or pd.isna(first_name):
                 logger.warning(
                     f"Пропущена строка {index}: отсутствует Фамилия или Имя ({last_name}, {first_name})")
                 continue
-
             logger.info(f"Обработка сотрудника: {last_name} {first_name}")
             is_dismissed = 'уволена' in note.lower()
             is_on_maternity_leave = 'декрет' in note.lower()
+            is_safety_commission_member = 'член комиссии по охране труда' in note.lower()
             dismissal_date = None
             if is_dismissed and 'с ' in note.lower():
                 try:
@@ -108,18 +102,18 @@ class Command(BaseCommand):
                 except (ValueError, IndexError):
                     logger.warning(
                         f"Не удалось разобрать дату увольнения для {last_name}: {note}")
-
             department, _ = Department.objects.get_or_create(
                 name=department_name,
                 defaults={'description': ''}
             )
             logger.debug(f"Создана/получена должность: {department_name}")
-
             position, _ = Position.objects.get_or_create(
-                name=position_name
+                name=position_name,
+                defaults={
+                    'is_manager': 'руководитель' in position_name.lower(),
+                    'is_teacher': 'преподаватель' in position_name.lower() or 'учитель' in position_name.lower()}
             )
             logger.debug(f"Создана/получена должность: {position_name}")
-
             employee, _ = Employee.objects.get_or_create(
                 last_name=last_name,
                 first_name=first_name,
@@ -129,11 +123,11 @@ class Command(BaseCommand):
                     'department': department,
                     'is_dismissed': is_dismissed,
                     'is_on_maternity_leave': is_on_maternity_leave,
+                    'is_safety_commission_member': is_safety_commission_member,
                     'dismissal_date': dismissal_date
                 }
             )
             logger.info(f"Сотрудник добавлен/обновлен: {employee}")
-
             for program_name in programs.keys():
                 program_obj = program_objects[program_name]
                 for column in df.columns:

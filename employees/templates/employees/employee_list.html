@@ -1,43 +1,41 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <h1>Список сотрудников</h1>
-
 <div class="form-group">
     <a href="{% url 'employees:employee_create' %}" class="button button--success"><span class="icon">➕</span> Добавить сотрудника</a>
 </div>
-
 <div class="table-container">
     <table class="table">
         <thead>
-            <tr>
-                <th>ФИО</th>
-                <th>Должность</th>
-                <th>Подразделение</th>
-                <th>Действия</th>
-            </tr>
+        <tr>
+            <th>ФИО</th>
+            <th>Должность</th>
+            <th>Подразделение</th>
+            <th>Член комиссии по ОТ</th>
+            <th>Действия</th>
+        </tr>
         </thead>
         <tbody>
-            {% for employee in employees %}
-            <tr>
-                <td>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</td>
-                <td>{{ employee.position|default:"—" }}</td>
-                <td>{{ employee.department|default:"—" }}</td>
-                <td class="actions">
-                    <a href="{% url 'employees:employee_trainings' employee.id %}" class="training-icon" title="Обучение">📚</a>
-                    <a href="{% url 'employees:employee_edit' employee.id %}" class="action-icon" title="Редактировать">✎</a>
-                    <a href="{% url 'employees:employee_delete' employee.id %}" class="delete-icon" title="Удалить">✖</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4">Сотрудники не найдены.</td>
-            </tr>
-            {% endfor %}
+        {% for employee in employees %}
+        <tr>
+            <td>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</td>
+            <td>{{ employee.position|default:"—" }}</td>
+            <td>{{ employee.department|default:"—" }}</td>
+            <td>{{ employee.is_safety_commission_member|yesno:"Да,Нет" }}</td>
+            <td class="actions">
+                <a href="{% url 'employees:employee_trainings' employee.id %}" class="training-icon" title="Обучение">📚</a>
+                <a href="{% url 'employees:employee_edit' employee.id %}" class="action-icon" title="Редактировать">✎</a>
+                <a href="{% url 'employees:employee_delete' employee.id %}" class="delete-icon" title="Удалить">✖</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">Сотрудники не найдены.</td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>
-
 {% if is_paginated %}
 <ul class="pagination">
     {% if page_obj.has_previous %}
@@ -49,7 +47,6 @@
         <span class="page-link">Предыдущая</span>
     </li>
     {% endif %}
-
     {% for num in paginator.page_range %}
     {% if page_obj.number == num %}
     <li class="page-item active" aria-current="page">
@@ -61,7 +58,6 @@
     </li>
     {% endif %}
     {% endfor %}
-
     {% if page_obj.has_next %}
     <li class="page-item">
         <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
