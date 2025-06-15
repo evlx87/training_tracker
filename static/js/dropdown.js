@@ -5,20 +5,18 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const dropdown = this.parentElement;
             const dropdownMenu = dropdown.querySelector('.dropdown-menu');
-            const isVisible = dropdownMenu.style.display === 'block';
-            // Скрыть все другие выпадающие меню
+            dropdownMenu.classList.toggle('show');
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.style.display = 'none';
+                if (menu !== dropdownMenu) {
+                    menu.classList.remove('show');
+                }
             });
-            // Переключить текущее меню
-            dropdownMenu.style.display = isVisible ? 'none' : 'block';
         });
     });
-    // Закрыть меню при клике вне его
     document.addEventListener('click', function (e) {
         if (!e.target.closest('.dropdown')) {
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.style.display = 'none';
+                menu.classList.remove('show');
             });
         }
     });

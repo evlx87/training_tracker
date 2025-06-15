@@ -866,6 +866,10 @@ main {
     padding: 8px 0;
 }
 
+.dropdown-menu.show {
+    display: block;
+}
+
 .dropdown:hover .dropdown-menu {
     display: block;
 }

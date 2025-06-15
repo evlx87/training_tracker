@@ -34,6 +34,15 @@ class EmployeeForm(forms.ModelForm):
             'is_safety_commission_member': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        hire_date = cleaned_data.get('hire_date')
+        dismissal_date = cleaned_data.get('dismissal_date')
+        if hire_date and dismissal_date and dismissal_date < hire_date:
+            raise forms.ValidationError(
+                "Дата увольнения не может быть раньше даты приема на работу.")
+        return cleaned_data
+
 
 class TrainingRecordForm(forms.ModelForm):
     class Meta:
