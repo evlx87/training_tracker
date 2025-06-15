@@ -31,8 +31,8 @@ class PositionCreateView(
     model = Position
     form_class = PositionForm
     template_name = 'positions/position_form.html'
-    success_url = reverse_lazy('employees:position_list')
-    permission_required = 'employees.add_position'
+    success_url = reverse_lazy('positions:position_list')
+    permission_required = 'positions.add_position'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -64,8 +64,8 @@ class PositionUpdateView(
     model = Position
     form_class = PositionForm
     template_name = 'positions/position_form.html'
-    success_url = reverse_lazy('employees:position_list')
-    permission_required = 'employees.change_position'
+    success_url = reverse_lazy('positions:position_list')
+    permission_required = 'positions.change_position'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -93,17 +93,17 @@ class PositionUpdateView(
 class PositionDeleteView(EditorModeratedDeleteView):
     model = Position
     template_name = 'positions/position_confirm_delete.html'
-    success_url = reverse_lazy('employees:position_list')
-    confirm_url_name = 'employees:position_delete_confirm'
-    permission_required = 'employees.delete_position'
+    success_url = reverse_lazy('positions:position_list')
+    confirm_url_name = 'positions:position_delete_confirm'
+    permission_required = 'positions.delete_position'
 
 
 class PositionDeleteConfirmView(EditorModeratedDeleteView):
     model = Position
     template_name = 'positions/position_confirm_delete.html'
-    success_url = reverse_lazy('employees:position_list')
-    confirm_url_name = 'employees:position_delete_confirm'
-    permission_required = 'employees.delete_position'
+    success_url = reverse_lazy('positions:position_list')
+    confirm_url_name = 'positions:position_delete_confirm'
+    permission_required = 'positions.delete_position'
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
