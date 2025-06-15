@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
-
 {% block title %}
 {{ action }} сотрудника
 {% endblock %}
-
 {% block content %}
 <h1>{{ action }} сотрудника</h1>
 <div class="form-container">
@@ -93,6 +91,13 @@
             {{ form.is_external_part_time }}
             {% if form.is_external_part_time.errors %}
             <span class="field-errors">{{ form.is_external_part_time.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group form-checkbox{% if form.is_safety_commission_member.errors %} has-error{% endif %}">
+            <label for="{{ form.is_safety_commission_member.id_for_label }}"><span class="icon">🛡️</span> Член комиссии по охране труда:</label>
+            {{ form.is_safety_commission_member }}
+            {% if form.is_safety_commission_member.errors %}
+            <span class="field-errors">{{ form.is_safety_commission_member.errors }}</span>
             {% endif %}
         </div>
         <div class="button-group">
