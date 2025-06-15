@@ -399,6 +399,8 @@ class EmployeeDeleteConfirmView(EditorModeratedDeleteView):
 
 class EmployeeTrainingsView(LoginRequiredMixin, TemplateView):
     template_name = 'employees/employee_trainings.html'
+    context_object_name = 'training_records'
+    permission_required = 'employees.view_employee'
 
     def get_context_data(self, **kwargs):
         logger.debug(

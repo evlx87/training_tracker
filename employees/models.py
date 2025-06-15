@@ -117,7 +117,7 @@ class TrainingRecord(models.Model):
         if not self.training_program.recurrence_period:
             return False
         next_training_date = self.completion_date + \
-            timedelta(days=365 * self.training_program.recurrence_period)
+            timedelta(days=self.training_program.recurrence_period * 365)
         return next_training_date < timezone.now().date()
 
     class Meta:
