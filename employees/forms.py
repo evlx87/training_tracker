@@ -47,10 +47,11 @@ class EmployeeForm(forms.ModelForm):
 class TrainingRecordForm(forms.ModelForm):
     class Meta:
         model = TrainingRecord
-        fields = ['training_program', 'completion_date']
+        fields = ['training_program', 'completion_date', 'details']
         widgets = {
             'training_program': forms.Select(attrs={'class': 'form-input'}),
-            'completion_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'text', 'placeholder': 'ДД.ММ.ГГГГ'}),
+            'completion_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'text'}),
+            'details': forms.Textarea(attrs={'class': 'form-textarea'}),
         }
 
 

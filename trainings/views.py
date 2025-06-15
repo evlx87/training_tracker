@@ -114,9 +114,9 @@ class TrainingProgramDeleteConfirmView(EditorModeratedDeleteView):
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
         user = request.user.username
-        if request.user.groups.filter(name=settings.MTO_GROUP_NAME).exists():
+        if request.user.groups.filter(name=settings.MODERATOR_GROUP_NAME).exists():
             logger.info(
-                'Подтверждено удаление программы обучения: %s пользователем из группы MTO: %s',
+                'Подтверждено удаление программы обучения: %s пользователем из группы модераторов: %s',
                 obj,
                 user)
             return super(
@@ -128,7 +128,7 @@ class TrainingProgramDeleteConfirmView(EditorModeratedDeleteView):
                 **kwargs)
         messages.error(
             request,
-            'Только пользователь из группы MTO может подтвердить удаление.')
+            'Только пользователь из группы Moderators может подтвердить удаление.')
         logger.warning(
             'Отказано в подтверждении удаления программы обучения: %s пользователем: %s',
             obj,

@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
-
 {% block title %}
 {{ action }} запись об обучении
 {% endblock %}
-
 {% block content %}
 <h1>{{ action }} запись для {{ employee }}</h1>
 <div class="form-container">
@@ -28,6 +26,14 @@
             <span class="field-errors">{{ form.completion_date.errors }}</span>
             {% endif %}
             <span class="tooltip-text">Формат: ДД.ММ.ГГГГ</span>
+        </div>
+        <div class="form-group{% if form.details.errors %} has-error{% endif %} form-tooltip">
+            <label for="{{ form.details.id_for_label }}"><span class="icon">📝</span> Детали:<span class="optional">(необязательно)</span></label>
+            {{ form.details }}
+            {% if form.details.errors %}
+            <span class="field-errors">{{ form.details.errors }}</span>
+            {% endif %}
+            <span class="tooltip-text">Укажите дополнительные сведения, например, номер группы или комментарий.</span>
         </div>
         <div class="button-group">
             <button type="submit" class="button button--primary"><span class="icon">💾</span> Сохранить</button>
