@@ -31,8 +31,8 @@ class DepartmentCreateView(
     model = Department
     form_class = DepartmentForm
     template_name = 'departments/department_form.html'
-    success_url = reverse_lazy('employees:department_list')
-    permission_required = 'employees.add_department'
+    success_url = reverse_lazy('departments:department_list')
+    permission_required = 'departments.add_department'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -64,8 +64,8 @@ class DepartmentUpdateView(
     model = Department
     form_class = DepartmentForm
     template_name = 'departments/department_form.html'
-    success_url = reverse_lazy('employees:department_list')
-    permission_required = 'employees.change_department'
+    success_url = reverse_lazy('departments:department_list')
+    permission_required = 'departments.change_department'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -95,24 +95,24 @@ class DepartmentUpdateView(
 class DepartmentDeleteView(EditorModeratedDeleteView):
     model = Department
     template_name = 'departments/department_confirm_delete.html'
-    success_url = reverse_lazy('employees:department_list')
-    confirm_url_name = 'employees:department_delete_confirm'
-    permission_required = 'employees.delete_department'
+    success_url = reverse_lazy('departments:department_list')
+    confirm_url_name = 'departments:department_delete_confirm'
+    permission_required = 'departments.delete_department'
 
 
 class DepartmentDeleteConfirmView(EditorModeratedDeleteView):
     model = Department
     template_name = 'departments/department_confirm_delete.html'
-    success_url = reverse_lazy('employees:department_list')
-    confirm_url_name = 'employees:department_delete_confirm'
-    permission_required = 'employees.delete_department'
+    success_url = reverse_lazy('departments:department_list')
+    confirm_url_name = 'departments:department_delete_confirm'
+    permission_required = 'departments.delete_department'
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
         user = request.user.username
-        if request.user.groups.filter(name=settings.MTO_GROUP_NAME).exists():
+        if request.user.groups.filter(name=settings.MODERATOR_GROUP_NAME).exists():
             logger.info(
-                'Подтверждено удаление подразделения: %s пользователем из группы MTO: %s',
+                'Подтверждено удаление подразделения: %s пользователем из группы модераторов: %s',
                 obj,
                 user)
             return super(

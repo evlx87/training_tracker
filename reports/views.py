@@ -1,5 +1,5 @@
 import logging
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponse
 from django.views import View
 from django.views.generic import TemplateView
@@ -14,8 +14,9 @@ from trainings.models import TrainingProgram
 logger = logging.getLogger('reports')
 
 
-class ReportsView(TemplateView):
+class ReportsView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = 'reports/report_list.html'
+    permission_required = 'employees.view_report'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -36,7 +37,8 @@ class ReportsView(TemplateView):
             len(report_data))
         sort_by = self.request.GET.get('sort_by')
         sort_order = self.request.GET.get('sort_order', 'asc')
-        if sort_by and sort_by.isdigit():
+        if sort_by and sort_by.isdigit() and int(
+                sort_by) in [program.id for program in training_programs]:
             report_data.sort(
                 key=lambda x: x['trainings'].get(
                     int(sort_by), {}).get(
