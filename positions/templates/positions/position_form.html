@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
-
 {% block title %}
 {{ action }} должность
 {% endblock %}
-
 {% block content %}
 <h1>{{ action }} должность</h1>
 <div class="form-container">
@@ -19,6 +17,20 @@
             {{ form.name }}
             {% if form.name.errors %}
             <span class="field-errors">{{ form.name.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group form-checkbox{% if form.is_manager.errors %} has-error{% endif %}">
+            <label for="{{ form.is_manager.id_for_label }}"><span class="icon">👑</span> Руководитель:</label>
+            {{ form.is_manager }}
+            {% if form.is_manager.errors %}
+            <span class="field-errors">{{ form.is_manager.errors }}</span>
+            {% endif %}
+        </div>
+        <div class="form-group form-checkbox{% if form.is_teacher.errors %} has-error{% endif %}">
+            <label for="{{ form.is_teacher.id_for_label }}"><span class="icon">📚</span> Педагогический работник:</label>
+            {{ form.is_teacher }}
+            {% if form.is_teacher.errors %}
+            <span class="field-errors">{{ form.is_teacher.errors }}</span>
             {% endif %}
         </div>
         <div class="button-group">
