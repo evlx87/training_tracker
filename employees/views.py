@@ -575,7 +575,7 @@ class TrainingRecordDeleteConfirmView(EditorModeratedDeleteView):
 
 
 class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
-    template_name = 'password_change_form.html'
+    template_name = 'auth/password_change_form.html'
     success_url = reverse_lazy('employees:password_change_done')
 
     @log_view_action('Открыта форма смены пароля', 'пользователя')
@@ -598,7 +598,7 @@ class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
 
 
 class PasswordChangeDoneCustomView(LoginRequiredMixin, PasswordChangeDoneView):
-    template_name = 'password_change_done.html'
+    template_name = 'auth/password_change_done.html'
 
     @log_view_action('Открыта страница подтверждения смены пароля',
                      'пользователя')

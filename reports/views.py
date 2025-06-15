@@ -9,14 +9,14 @@ from openpyxl.styles import PatternFill, Font, Alignment
 
 from departments.models import Department
 from employees.models import Employee
-from employees.services import ReportService
+from reports.services import ReportService
 from employees.views import log_view_action
 from trainings.models import TrainingProgram
 
 logger = logging.getLogger('reports')
 
 
-class ReportsView(TemplateView):
+class ReportsView(LoginRequiredMixin, TemplateView):
     template_name = 'reports/report_list.html'
     permission_required = 'employees.view_report'
 
@@ -24,21 +24,44 @@ class ReportsView(TemplateView):
         context = super().get_context_data(**kwargs)
         selected_employees = self.request.GET.getlist('employees')
         selected_program = self.request.GET.get('program')
+        exclude_not_completed = self.request.GET.get(
+            'exclude_not_completed') == 'on'
         selected_employees = [emp for emp in selected_employees if emp]
         logger.debug(
             "Selected employees after filtering: %s",
             selected_employees)
         report_data, training_programs = ReportService.generate_training_report(
             selected_employees, selected_program)
+
         if selected_employees:
             report_data = [
                 data for data in report_data if str(
                     data['employee'].pk) in selected_employees]
+
+        if exclude_not_completed:
+            if selected_program and selected_program.isdigit():
+                # Исключаем сотрудников, у которых нет записи по выбранной
+                # программе
+                report_data = [
+                    data for data in report_data
+                    if data['trainings'].get(int(selected_program), {}).get('date') != "Обучение не пройдено"
+                ]
+            else:
+                # Исключаем сотрудников, у которых нет ни одной записи об
+                # обучении
+                report_data = [
+                    data for data in report_data
+                    if any(
+                        training.get('date') != "Обучение не пройдено"
+                        for training in data['trainings'].values()
+                    )
+                ]
         logger.debug(
             "Report data length after filtering: %s",
             len(report_data))
         sort_by = self.request.GET.get('sort_by')
         sort_order = self.request.GET.get('sort_order', 'asc')
+
         if sort_by and sort_by.isdigit() and int(
                 sort_by) in [program.id for program in training_programs]:
             report_data.sort(
@@ -53,10 +76,13 @@ class ReportsView(TemplateView):
         context['departments'] = Department.objects.all()
         context['selected_employees'] = selected_employees
         context['selected_program'] = selected_program
+        context['exclude_not_completed'] = exclude_not_completed
+
         if selected_program and selected_program.isdigit():
             program = TrainingProgram.objects.filter(
                 id=int(selected_program)).first()
             context['selected_program_name'] = program.name if program else "Неизвестная программа"
+
         total_employees = len(report_data)
         context['total_employees'] = total_employees
         trained_counts = {}
@@ -77,20 +103,44 @@ class ExportReportView(LoginRequiredMixin, View):
     @log_view_action('Экспортирован', 'отчет по обучению')
     def get(self, request, *args, **kwargs):
         try:
-            report_data, training_programs = ReportService.generate_training_report()
+            selected_employees = request.GET.getlist('employees')
+            selected_program = request.GET.get('program')
+            exclude_not_completed = request.GET.get(
+                'exclude_not_completed') == 'on'
+
+            report_data, training_programs = ReportService.generate_training_report(
+                selected_employees, selected_program)
+
+            if selected_employees:
+                report_data = [
+                    data for data in report_data if str(data['employee'].pk) in selected_employees]
+
+            # Применяем фильтр исключения сотрудников без обучения
+            if exclude_not_completed:
+                if selected_program and selected_program.isdigit():
+                    report_data = [
+                        data for data in report_data
+                        if data['trainings'].get(int(selected_program), {}).get('date') != "Обучение не пройдено"
+                    ]
+                else:
+                    report_data = [
+                        data for data in report_data
+                        if any(
+                            training.get('date') != "Обучение не пройдено"
+                            for training in data['trainings'].values()
+                        )
+                    ]
+
             wb = Workbook()
             ws = wb.active
             ws.title = "Отчет по обучению"
-            headers = ["Сотрудник",
-                       "Должность",
-                       "Руководитель",
-                       "Педагогический работник",
-                       "Член комиссии по ОТ",
-                       "Подразделение"] + [program.name for program in training_programs]
+            headers = ["Сотрудник", "Должность", "Руководитель", "Педагогический работник",
+                       "Член комиссии по ОТ", "Подразделение"] + [program.name for program in training_programs]
             ws.append(headers)
             for cell in ws[1]:
                 cell.font = Font(bold=True)
                 cell.alignment = Alignment(horizontal="center")
+
             for data in report_data:
                 first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
                 middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
@@ -110,6 +160,7 @@ class ExportReportView(LoginRequiredMixin, View):
                     row.append(
                         date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
                 ws.append(row)
+
             for row_idx, data in enumerate(report_data, start=2):
                 for col_idx, program in enumerate(training_programs, start=7):
                     cell = ws.cell(row=row_idx, column=col_idx)
@@ -126,10 +177,12 @@ class ExportReportView(LoginRequiredMixin, View):
                         end_color=fill_colors.get(status_class, 'FFFFFF'),
                         fill_type="solid"
                     )
+
             for col in ws.columns:
                 max_length = max(len(str(cell.value))
                                  for cell in col if cell.value)
                 ws.column_dimensions[col[0].column_letter].width = max_length + 2
+
             response = HttpResponse(
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = 'attachment; filename="training_report.xlsx"'
