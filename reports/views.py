@@ -105,17 +105,17 @@ class ExportReportView(LoginRequiredMixin, View):
         try:
             selected_employees = request.GET.getlist('employees')
             selected_program = request.GET.get('program')
-            exclude_not_completed = request.GET.get(
-                'exclude_not_completed') == 'on'
+            exclude_not_completed = request.GET.get('exclude_not_completed') == 'on'
 
             report_data, training_programs = ReportService.generate_training_report(
                 selected_employees, selected_program)
 
+            # Фильтрация данных по сотрудникам
             if selected_employees:
                 report_data = [
                     data for data in report_data if str(data['employee'].pk) in selected_employees]
 
-            # Применяем фильтр исключения сотрудников без обучения
+            # Фильтрация по exclude_not_completed
             if exclude_not_completed:
                 if selected_program and selected_program.isdigit():
                     report_data = [
@@ -134,18 +134,28 @@ class ExportReportView(LoginRequiredMixin, View):
             wb = Workbook()
             ws = wb.active
             ws.title = "Отчет по обучению"
-            headers = ["Сотрудник", "Должность", "Руководитель", "Педагогический работник",
-                       "Член комиссии по ОТ", "Подразделение"] + [program.name for program in training_programs]
+
+            # Определяем заголовки
+            base_headers = ["Сотрудник", "Должность", "Руководитель", "Педагогический работник",
+                            "Член комиссии по ОТ", "Подразделение"]
+            if selected_program and selected_program.isdigit():
+                # Если выбрана программа, добавляем только ее
+                program = TrainingProgram.objects.filter(id=int(selected_program)).first()
+                program_headers = [program.name] if program else []
+            else:
+                # Иначе добавляем все программы
+                program_headers = [program.name for program in training_programs]
+            headers = base_headers + program_headers
             ws.append(headers)
             for cell in ws[1]:
                 cell.font = Font(bold=True)
                 cell.alignment = Alignment(horizontal="center")
 
+            # Формируем строки данных
             for data in report_data:
                 first_initial = data['employee'].first_name[0] if data['employee'].first_name else ""
                 middle_initial = data['employee'].middle_name[0] if data['employee'].middle_name else ""
-                employee_name = f"{
-                    data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
+                employee_name = f"{data['employee'].last_name} {first_initial}. {middle_initial}.".strip()
                 row = [
                     employee_name,
                     str(data['employee'].position or "—"),
@@ -154,17 +164,27 @@ class ExportReportView(LoginRequiredMixin, View):
                     "Да" if data['employee'].is_safety_commission_member else "Нет",
                     str(data['employee'].department or "—")
                 ]
-                for program in training_programs:
-                    training = data['trainings'].get(program.id, {})
+                # Добавляем данные по программам
+                if selected_program and selected_program.isdigit():
+                    # Только для выбранной программы
+                    training = data['trainings'].get(int(selected_program), {})
                     date = training.get('date', "Обучение не пройдено")
-                    row.append(
-                        date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
+                    row.append(date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
+                else:
+                    # Для всех программ
+                    for program in training_programs:
+                        training = data['trainings'].get(program.id, {})
+                        date = training.get('date', "Обучение не пройдено")
+                        row.append(date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
                 ws.append(row)
 
+            # Применяем цветовую заливку для колонок с программами
+            start_col_idx = len(base_headers) + 1  # Индекс первой колонки с программой
             for row_idx, data in enumerate(report_data, start=2):
-                for col_idx, program in enumerate(training_programs, start=7):
-                    cell = ws.cell(row=row_idx, column=col_idx)
-                    training = data['trainings'].get(program.id, {})
+                if selected_program and selected_program.isdigit():
+                    # Только для выбранной программы
+                    cell = ws.cell(row=row_idx, column=start_col_idx)
+                    training = data['trainings'].get(int(selected_program), {})
                     status_class = training.get('class', 'not-completed')
                     fill_colors = {
                         'not-completed': 'FF9999',
@@ -177,21 +197,39 @@ class ExportReportView(LoginRequiredMixin, View):
                         end_color=fill_colors.get(status_class, 'FFFFFF'),
                         fill_type="solid"
                     )
+                else:
+                    # Для всех программ
+                    for col_idx, program in enumerate(training_programs, start=start_col_idx):
+                        cell = ws.cell(row=row_idx, column=col_idx)
+                        training = data['trainings'].get(program.id, {})
+                        status_class = training.get('class', 'not-completed')
+                        fill_colors = {
+                            'not-completed': 'FF9999',
+                            'overdue': 'FF3333',
+                            'warning': 'FFFF66',
+                            'completed': '99FF99'
+                        }
+                        cell.fill = PatternFill(
+                            start_color=fill_colors.get(status_class, 'FFFFFF'),
+                            end_color=fill_colors.get(status_class, 'FFFFFF'),
+                            fill_type="solid"
+                        )
 
+            # Настраиваем ширину колонок
             for col in ws.columns:
-                max_length = max(len(str(cell.value))
-                                 for cell in col if cell.value)
+                max_length = max(len(str(cell.value)) for cell in col if cell.value)
                 ws.column_dimensions[col[0].column_letter].width = max_length + 2
 
             response = HttpResponse(
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = 'attachment; filename="training_report.xlsx"'
+            # Динамическое имя файла
+            filename = "training_report_filtered.xlsx" if selected_employees or selected_program or exclude_not_completed else "training_report_all.xlsx"
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
             wb.save(response)
-            logger.info(
-                'Экспортирован отчет по обучению пользователем: %s',
-                request.user.username)
+            logger.info('Экспортирован %s отчет по обучению пользователем: %s',
+                        'отфильтрованный' if selected_employees or selected_program or exclude_not_completed else 'полный',
+                        request.user.username)
             return response
         except Exception as e:
             logger.error(f"Ошибка при экспорте отчета: {e}")
-            return HttpResponse(
-                "Ошибка при создании отчета. Пожалуйста, попробуйте позже.", status=500)
+            return HttpResponse("Ошибка при создании отчета. Пожалуйста, попробуйте позже.", status=500)
