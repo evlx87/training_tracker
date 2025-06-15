@@ -37,6 +37,9 @@
         <div class="buttons-group">
             <button type="submit" class="button button--primary"><span class="icon">🔍</span> Применить</button>
             {% if report_data %}
+            <a href="{% url 'reports:report_list' %}" class="button button--danger">
+                <span class="icon">✖</span> Сбросить
+            </a>
             <a href="{% url 'reports:export_report' %}?employees={{ request.GET.employees|urlencode }}&program={{ request.GET.program|urlencode }}&exclude_not_completed={{ request.GET.exclude_not_completed|urlencode }}"
                class="button button--success"><span class="icon">📥</span> Экспорт в Excel</a>
             {% endif %}
