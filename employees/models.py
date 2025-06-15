@@ -1,14 +1,12 @@
-import logging
+from datetime import timezone, timedelta
 
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
-
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from departments.models import Department
 from positions.models import Position
 from trainings.models import TrainingProgram
-
-logger = logging.getLogger('employees')
 
 
 class Employee(models.Model):
@@ -26,12 +24,14 @@ class Employee(models.Model):
         Position,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name='Должность')
+        verbose_name='Должность'
+    )
     department = models.ForeignKey(
         Department,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name='Подразделение')
+        verbose_name='Подразделение'
+    )
     hire_date = models.DateField(
         null=True,
         blank=True,
@@ -43,71 +43,84 @@ class Employee(models.Model):
         default=False, verbose_name='В декрете')
     is_external_part_time = models.BooleanField(
         default=False, verbose_name='Внешний совместитель')
+    is_safety_commission_member = models.BooleanField(
+        default=False, verbose_name='Член комиссии по охране труда')
+
+    def clean(self):
+        if self.dismissal_date and not self.is_dismissed:
+            raise ValidationError(
+                'Дата увольнения указана, но сотрудник не помечен как уволенный.')
+        if self.is_dismissed and not self.dismissal_date:
+            raise ValidationError(
+                'Сотрудник помечен как уволенный, но дата увольнения не указана.')
+        super().clean()
 
     def __str__(self):
-        return f'{self.last_name} {self.first_name} {self.middle_name or ""}'.strip()
+        middle_name = f' {self.middle_name}' if self.middle_name else ''
+        return f'{self.last_name} {self.first_name}{middle_name}'
 
     class Meta:
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
-        unique_together = ['last_name', 'first_name', 'middle_name']
+        unique_together = (
+            'last_name',
+            'first_name',
+            'middle_name',
+            'birth_date')
+
+
+class DeletionRequest(models.Model):
+    content_type = models.ForeignKey(
+        'contenttypes.ContentType',
+        on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='deletion_requests')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Запрос на удаление {self.content_object} от {self.created_by}'
+
+    class Meta:
+        verbose_name = 'Запрос на удаление'
+        verbose_name_plural = 'Запросы на удаление'
 
 
 class TrainingRecord(models.Model):
     employee = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
-        verbose_name='Сотрудник')
+        verbose_name='Сотрудник'
+    )
     training_program = models.ForeignKey(
         TrainingProgram,
         on_delete=models.CASCADE,
-        verbose_name='Программа обучения')
+        verbose_name='Программа обучения'
+    )
     completion_date = models.DateField(verbose_name='Дата прохождения')
-    details = models.TextField(blank=True, verbose_name='Детали')
+    details = models.TextField(blank=True, null=True, verbose_name='Детали')
+
+    def clean(self):
+        if self.completion_date and self.completion_date > timezone.now().date():
+            raise ValidationError('Дата прохождения не может быть в будущем.')
+        super().clean()
 
     def __str__(self):
         return f'{self.employee} - {self.training_program} ({self.completion_date})'
 
+    @property
     def is_overdue(self):
         if not self.training_program.recurrence_period:
             return False
-        from datetime import date, timedelta
-        expiry_date = self.completion_date + \
-            timedelta(days=self.training_program.recurrence_period * 365)
-        return date.today() > expiry_date
+        next_training_date = self.completion_date + \
+            timedelta(days=365 * self.training_program.recurrence_period)
+        return next_training_date < timezone.now().date()
 
     class Meta:
         verbose_name = 'Запись об обучении'
         verbose_name_plural = 'Записи об обучении'
-        unique_together = ['employee', 'training_program', 'completion_date']
-
-
-class DeletionRequest(models.Model):
-    STATUS_PENDING = 'PENDING'
-    STATUS_APPROVED = 'APPROVED'
-    STATUS_REJECTED = 'REJECTED'
-    STATUS_CHOICES = [
-        (STATUS_PENDING, 'В ожидании'),
-        (STATUS_APPROVED, 'Одобрено'),
-        (STATUS_REJECTED, 'Отклонено'),
-    ]
-
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default=STATUS_PENDING)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='deletion_requests')
-
-    class Meta:
-        verbose_name = 'Запрос на удаление'
-        verbose_name_plural = 'Запросы на удаление'
-
-    def __str__(self):
-        return f"Запрос на удаление {self.content_type} #{self.object_id}"
+        unique_together = ('employee', 'training_program', 'completion_date')

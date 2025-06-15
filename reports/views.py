@@ -1,12 +1,10 @@
 import logging
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views import View
 from django.views.generic import TemplateView
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Alignment
-
 from departments.models import Department
 from employees.models import Employee
 from employees.services import ReportService
@@ -42,8 +40,9 @@ class ReportsView(TemplateView):
             report_data.sort(
                 key=lambda x: x['trainings'].get(
                     int(sort_by), {}).get(
-                    'date', 'Обучение не пройдено'), reverse=(
-                        sort_order == 'desc'))
+                    'date', 'Обучение не пройдено'),
+                reverse=(sort_order == 'desc')
+            )
         context['report_data'] = report_data
         context['training_programs'] = training_programs
         context['employees'] = Employee.objects.all()
@@ -77,8 +76,12 @@ class ExportReportView(LoginRequiredMixin, View):
         wb = Workbook()
         ws = wb.active
         ws.title = "Отчет по обучению"
-        headers = ["Сотрудник", "Должность", "Подразделение"] + \
-                  [program.name for program in training_programs]
+        headers = ["Сотрудник",
+                   "Должность",
+                   "Руководитель",
+                   "Педагогический работник",
+                   "Член комиссии",
+                   "Подразделение"] + [program.name for program in training_programs]
         ws.append(headers)
         for cell in ws[1]:
             cell.font = Font(bold=True)
@@ -91,6 +94,9 @@ class ExportReportView(LoginRequiredMixin, View):
             row = [
                 employee_name,
                 str(data['employee'].position or "—"),
+                "Да" if data['employee'].position and data['employee'].position.is_manager else "Нет",
+                "Да" if data['employee'].position and data['employee'].position.is_teacher else "Нет",
+                "Да" if data['employee'].is_safety_commission_member else "Нет",
                 str(data['employee'].department or "—")
             ]
             for program in training_programs:
@@ -100,7 +106,7 @@ class ExportReportView(LoginRequiredMixin, View):
                     date if date == "Обучение не пройдено" else date.strftime("%d.%m.%y"))
             ws.append(row)
         for row_idx, data in enumerate(report_data, start=2):
-            for col_idx, program in enumerate(training_programs, start=4):
+            for col_idx, program in enumerate(training_programs, start=7):
                 cell = ws.cell(row=row_idx, column=col_idx)
                 training = data['trainings'].get(program.id, {})
                 status_class = training.get('class', 'not-completed')

@@ -13,11 +13,8 @@ class Command(BaseCommand):
     help = 'Назначает права доступа группам Editors и Moderators'
 
     def handle(self, *args, **kwargs):
-        # Получение или создание групп
         editors_group, _ = Group.objects.get_or_create(name='Editors')
         moderators_group, _ = Group.objects.get_or_create(name='Moderators')
-
-        # Модели, для которых назначаются права
         models = [
             Employee,
             Department,
@@ -26,21 +23,11 @@ class Command(BaseCommand):
             TrainingRecord]
         content_types = {model.__name__.lower(): ContentType.objects.get_for_model(
             model) for model in models}
-
-        # Права для группы Editors (добавление и изменение)
-        editor_permissions = [
-            'add_{model}',
-            'change_{model}',
-        ]
-
-        # Права для группы Moderators (добавление, изменение и удаление)
+        editor_permissions = ['add_{model}', 'change_{model}']
         moderator_permissions = [
             'add_{model}',
             'change_{model}',
-            'delete_{model}',
-        ]
-
-        # Назначение прав для Editors
+            'delete_{model}']
         for model_name in content_types.keys():
             for perm in editor_permissions:
                 permission_codename = perm.format(model=model_name)
@@ -55,8 +42,6 @@ class Command(BaseCommand):
                 except Permission.DoesNotExist:
                     logger.warning(
                         f"Право '{permission_codename}' не найдено для модели {model_name}")
-
-        # Назначение прав для Moderators
         for model_name in content_types.keys():
             for perm in moderator_permissions:
                 permission_codename = perm.format(model=model_name)
@@ -71,5 +56,4 @@ class Command(BaseCommand):
                 except Permission.DoesNotExist:
                     logger.warning(
                         f"Право '{permission_codename}' не найдено для модели {model_name}")
-
         logger.info('Назначение прав группам завершено!')
