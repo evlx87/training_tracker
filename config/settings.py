@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'trainings.apps.TrainingsConfig',
     'employees.apps.EmployeesConfig',
     'reports.apps.ReportsConfig',
+    'instructions.apps.InstructionsConfig',
 ]
 
 MIDDLEWARE = [
@@ -183,6 +184,11 @@ LOGGING = {
             'propagate': False,
         },
         'employees.auth': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'instructions': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
