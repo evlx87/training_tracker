@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ instruction.title }}
+{% endblock %}
+
+{% block content %}
+<div class="instructions">
+    <h2><span class="icon">📖</span> {{ instruction.title }}</h2>
+    <p><strong>Категория:</strong> {{ instruction.category }}</p>
+    <p><strong>Дата создания:</strong> {{ instruction.created_at|date:"d.m.Y" }}</p>
+    <p><strong>Последнее обновление:</strong> {{ instruction.updated_at|date:"d.m.Y" }}</p>
+    <div class="instruction-content">
+        {{ instruction.content|linebreaks }}
+    </div>
+    <div class="button-group">
+        <a href="{% url 'instructions:instruction_list' %}" class="button button--primary"><span class="icon">↩️</span> Назад к списку</a>
+    </div>
+</div>
+{% endblock %}

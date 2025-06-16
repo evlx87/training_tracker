@@ -18,6 +18,7 @@ urlpatterns = [
     path('positions/', include('positions.urls')),
     path('trainings/', include('trainings.urls')),
     path('reports/', include('reports.urls')),
+    path('instructions/', include('instructions.urls')),
     path('login/', LoginView.as_view(template_name='auth/login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page=reverse_lazy('login')), name='logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

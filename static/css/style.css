@@ -226,6 +226,10 @@ main {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>');
 }
 
+.button[data-icon="instructions"]::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v.01"/><path d="M12 8v4"/></svg>');
+}
+
 /* Контейнер кнопок */
 .button-container {
     display: flex;
@@ -862,6 +866,13 @@ main {
     margin-bottom: 12px;
 }
 
+.instruction-content {
+    margin: 20px 0;
+    font-size: 15px;
+    color: #34495e;
+    line-height: 1.8;
+}
+
 /* ==========================================================================
    Выпадающее меню
    ========================================================================== */
@@ -1065,6 +1076,10 @@ main {
     .instructions ol {
         font-size: 14px;
     }
+
+    .instruction-content {
+        font-size: 14px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1201,5 +1216,20 @@ main {
         width: 150px;
         font-size: 10px;
         bottom: 110%;
+    }
+
+    .instructions {
+        padding: 10px;
+        margin: 15px auto;
+    }
+
+    .instructions h2 {
+        font-size: 16px;
+    }
+
+    .instructions p,
+    .instructions ol,
+    .instruction-content {
+        font-size: 13px;
     }
 }
