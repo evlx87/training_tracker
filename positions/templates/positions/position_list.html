@@ -1,14 +1,42 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Список должностей</h1>
+
 <div class="form-group">
     <a href="{% url 'positions:position_create' %}" class="button button--success"><span class="icon">➕</span> Добавить должность</a>
 </div>
+
+<div class="filters-container">
+    <form class="filter-form" method="get">
+        <div class="form-group">
+            <label for="is_manager" class="form-checkbox">
+                <input type="checkbox" name="is_manager" id="is_manager" {% if is_manager %}checked{% endif %}>
+                Только руководители
+            </label>
+        </div>
+        <div class="form-group">
+            <label for="is_teacher" class="form-checkbox">
+                <input type="checkbox" name="is_teacher" id="is_teacher" {% if is_teacher %}checked{% endif %}>
+                Только педагогические работники
+            </label>
+        </div>
+        <div class="buttons-group">
+            <button type="submit" class="button button--primary"><span class="icon">🔍</span> Найти</button>
+            <a href="{% url 'positions:position_list' %}" class="button button--danger"><span class="icon">✖️</span> Сбросить</a>
+        </div>
+    </form>
+</div>
+
 <div class="table-container">
     <table class="table">
         <thead>
         <tr>
-            <th>Название</th>
+            <th class="sortable">
+                <a href="?sort_by=name&sort_order={% if sort_by == 'name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&is_manager={{ is_manager }}&is_teacher={{ is_teacher }}&page=1"
+                   class="sort-icon {% if sort_by == 'name' %}{{ sort_order }}{% endif %}">
+                    Название
+                </a>
+            </th>
             <th>Руководитель</th>
             <th>Педагогический работник</th>
             <th>Действия</th>
@@ -33,11 +61,12 @@
         </tbody>
     </table>
 </div>
+
 {% if is_paginated %}
 <ul class="pagination">
     {% if page_obj.has_previous %}
     <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}&is_manager={{ is_manager }}&is_teacher={{ is_teacher }}">Предыдущая</a>
     </li>
     {% else %}
     <li class="page-item disabled">
@@ -51,13 +80,13 @@
     </li>
     {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
     <li class="page-item">
-        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        <a class="page-link" href="?page={{ num }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}&is_manager={{ is_manager }}&is_teacher={{ is_teacher }}">{{ num }}</a>
     </li>
     {% endif %}
     {% endfor %}
     {% if page_obj.has_next %}
     <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}&is_manager={{ is_manager }}&is_teacher={{ is_teacher }}">Следующая</a>
     </li>
     {% else %}
     <li class="page-item disabled">

@@ -19,6 +19,33 @@ class PositionListView(LoginRequiredMixin, ListView):
     context_object_name = 'positions'
     paginate_by = 20
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # Фильтрация
+        is_manager = self.request.GET.get('is_manager', '')
+        is_teacher = self.request.GET.get('is_teacher', '')
+        if is_manager == 'on':
+            queryset = queryset.filter(is_manager=True)
+        if is_teacher == 'on':
+            queryset = queryset.filter(is_teacher=True)
+        # Сортировка
+        sort_by = self.request.GET.get('sort_by', 'name')  # По умолчанию сортировка по имени
+        sort_order = self.request.GET.get('sort_order', 'asc')  # По умолчанию по возрастанию
+        if sort_by == 'name':
+            if sort_order == 'desc':
+                queryset = queryset.order_by('-name')
+            else:
+                queryset = queryset.order_by('name')
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['sort_by'] = self.request.GET.get('sort_by', 'name')
+        context['sort_order'] = self.request.GET.get('sort_order', 'asc')
+        context['is_manager'] = self.request.GET.get('is_manager', '')
+        context['is_teacher'] = self.request.GET.get('is_teacher', '')
+        return context
+
     @log_view_action('Запрошен список', 'должностей')
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -26,7 +53,6 @@ class PositionListView(LoginRequiredMixin, ListView):
 
 class PositionCreateView(
         LoginRequiredMixin,
-        PermissionRequiredMixin,
         CreateView):
     model = Position
     form_class = PositionForm
@@ -59,7 +85,6 @@ class PositionCreateView(
 
 class PositionUpdateView(
         LoginRequiredMixin,
-        PermissionRequiredMixin,
         UpdateView):
     model = Position
     form_class = PositionForm

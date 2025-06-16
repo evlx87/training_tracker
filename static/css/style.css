@@ -18,6 +18,12 @@ body {
     box-sizing: border-box;
 }
 
+/* Сброс стилей для ссылок внутри таблиц */
+.table a {
+    color: inherit; /* Наследовать цвет от родителя */
+    text-decoration: none; /* Убрать подчеркивание */
+}
+
 /* ==========================================================================
    Типография и заголовки
    ========================================================================== */
@@ -209,7 +215,7 @@ main {
 }
 
 .button[data-icon="password-change"]::before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7v3H4v8h16v-8h-1V9a7 7 0 0 0-7-7zm0 4a3 3 0 0 0-3 3v3h6V9a3 3 0 0 0-3-3z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 .modec1f37d4f4e3c 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7v3H4v8h16v-8h-1V9a7 7 0 0 0-7-7zm0 4a3 3 0 0 0-3 3v3h6V9a3 3 0 0 0-3-3z"/></svg>');
 }
 
 .button[data-icon="deletion-requests"]::before {
@@ -483,17 +489,17 @@ main {
     align-items: center;
     justify-content: center;
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 4px;
     font-size: 14px;
     font-weight: 500;
     color: #34495e;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0,0.1);
     transition: transform 0.1s;
 }
 
 .legend-item:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
 }
 
 .legend-item .icon {
@@ -529,15 +535,33 @@ main {
     position: relative;
 }
 
-.sort-icon::after {
-    content: '\25B2';
+.table th .sort-icon {
+    color: #fff; /* Белый цвет текста */
+    text-decoration: none; /* Убираем подчеркивание */
+    display: inline-flex; /* Для корректного выравнивания текста и стрелок */
+    align-items: center; /* Вертикальное выравнивание */
+}
+
+.table th .sort-icon:hover {
+    color: #e0e0e0; /* Легкое осветление при наведении */
+}
+
+.table th .sort-icon::after {
+    content: '\25B2'; /* Стрелка вверх по умолчанию */
+    color: #fff; /* Белый цвет для стрелки */
     font-size: 10px;
     margin-left: 5px;
     display: inline-block;
 }
 
-.sortable.asc .sort-icon::after {
-    content: '\25BC';
+.table th .sort-icon.asc::after {
+    content: '\25BC'; /* Стрелка вниз для asc */
+    color: #fff; /* Белый цвет */
+}
+
+.table th .sort-icon.desc::after {
+    content: '\25B2'; /* Стрелка вверх для desc */
+    color: #fff; /* Белый цвет */
 }
 
 /* ==========================================================================
@@ -567,7 +591,7 @@ main {
 .pagination .page-link {
     display: inline-block;
     padding: 8px 12px;
-    border: 1px solid #e0e0e0;
+    border: 6px;
     border-radius: 6px;
     color: #4CAF50;
     text-decoration: none;
@@ -598,10 +622,10 @@ main {
 .form-container {
     max-width: 600px;
     margin: 20px auto;
-    padding: 25px;
+    padding: 20px;
     background-color: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     border-left: 4px solid #4CAF50;
 }
 
@@ -616,14 +640,14 @@ main {
     box-sizing: border-box;
     font-size: 14px;
     background-color: #fff;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
     transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
 }
 
 .form-input select {
     cursor: pointer;
     padding-right: 30px;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23333" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>');
     background-repeat: no-repeat;
     background-position: right 10px center;
 }
@@ -632,7 +656,7 @@ main {
 .form-textarea:focus,
 .form-input select:focus {
     border-color: #4CAF50;
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 0 8px rgba(76,175,80,0.3);
     transform: translateY(-1px);
 }
 
@@ -700,7 +724,7 @@ main {
 .form-group.has-error .form-textarea,
 .form-group.has-error select {
     border-color: #f44336;
-    box-shadow: 0 0 8px rgba(244, 67, 54, 0.3);
+    box-shadow: 0 0 8px rgba(244,67,54,0.3);
 }
 
 .form-group.has-error label {
@@ -751,7 +775,7 @@ main {
     background-color: #ffffff;
     border-left: 4px solid #17a2b8;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     text-align: center;
     font-size: 15px;
     color: #34495e;
@@ -773,11 +797,11 @@ main {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     padding: 20px;
     background-color: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     align-items: flex-end;
 }
 
@@ -796,8 +820,8 @@ main {
 }
 
 /* ==========================================================================
-   Инструкции
-   ========================================================================== */
+ Инструкции
+ ========================================================================== */
 
 .instructions {
     max-width: 800px;
@@ -806,7 +830,7 @@ main {
     background-color: #ffffff;
     border-left: 4px solid #4CAF50;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     text-align: left;
 }
 
@@ -819,7 +843,7 @@ main {
 }
 
 .instructions h2 .icon {
-    margin-right: 8px;
+    margin-right: 10px;
     color: #4CAF50;
 }
 
@@ -861,8 +885,8 @@ main {
     min-width: 200px;
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     z-index: 1000;
     padding: 8px 0;
 }
@@ -900,17 +924,17 @@ main {
 
     h1 {
         font-size: 24px;
-        margin: 30px 0;
+        margin: 20px 0;
     }
 
     .table th,
     .table td {
         padding: 8px;
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .report-table {
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .report-table th,
@@ -924,7 +948,7 @@ main {
     }
 
     .report-table th:nth-child(2),
-    .report-table th:nth-child(3) {
+    .report-table th:nth-child(n) {
         min-width: 120px;
     }
 
@@ -973,20 +997,24 @@ main {
         gap: 10px;
     }
 
+    .pagination .page-item {
+        margin: 0 3px;
+    }
+
     .pagination .page-link {
         padding: 6px 10px;
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .form-container {
-        padding: 20px;
+        padding: 15px;
     }
 
     .form-input,
     .form-textarea,
     .form-input select {
         padding: 10px;
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .form-group label {
@@ -1008,7 +1036,7 @@ main {
     .filters-container {
         flex-direction: column;
         align-items: stretch;
-        padding: 8px;
+        padding: 10px;
     }
 
     .legend {
@@ -1017,7 +1045,7 @@ main {
 
     .legend-item {
         padding: 6px 12px;
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .employee-row.collapsed td:not(:first-child) {
@@ -1025,12 +1053,12 @@ main {
     }
 
     .instructions {
-        padding: 20px;
+        padding: 15px;
         margin: 20px auto;
     }
 
     .instructions h2 {
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .instructions p,
@@ -1047,7 +1075,7 @@ main {
     }
 
     .report-table {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .report-table th,
@@ -1068,7 +1096,7 @@ main {
     }
 
     .button--small {
-        width: 120px;
+        width: 110px;
         height: 32px;
         font-size: 11px;
     }
@@ -1110,30 +1138,34 @@ main {
         width: 100%;
     }
 
+    .pagination .page-item {
+        margin: 0 2px;
+    }
+
     .pagination .page-link {
         padding: 4px 8px;
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .form-container {
-        padding: 15px;
+        padding: 10px;
     }
 
     .form-input,
     .form-textarea,
     .form-input select {
         padding: 8px;
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .form-group label {
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .form-text,
     .form-group .optional,
     .form-group .field-errors {
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .no-data {
@@ -1144,30 +1176,30 @@ main {
 
     .legend-item {
         padding: 5px 10px;
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .filters-container {
-        padding: 8px;
+        padding: 6px;
     }
 
     .buttons-group {
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
     }
 
-    header .button-container {
+    header .filters-container {
         flex-direction: row;
         justify-content: flex-start;
-        gap: 8px;
+        gap: 6px;
         overflow-x: auto;
-        padding-bottom: 10px;
+        padding-bottom: 6px;
         white-space: nowrap;
     }
 
     .form-tooltip .tooltip-text {
         width: 150px;
-        font-size: 11px;
+        font-size: 10px;
         bottom: 110%;
     }
 }
