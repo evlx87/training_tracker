@@ -53,7 +53,6 @@ class PositionListView(LoginRequiredMixin, ListView):
 
 class PositionCreateView(
         LoginRequiredMixin,
-        PermissionRequiredMixin,
         CreateView):
     model = Position
     form_class = PositionForm
@@ -86,7 +85,6 @@ class PositionCreateView(
 
 class PositionUpdateView(
         LoginRequiredMixin,
-        PermissionRequiredMixin,
         UpdateView):
     model = Position
     form_class = PositionForm

@@ -43,7 +43,6 @@ class DepartmentListView(LoginRequiredMixin, ListView):
 
 class DepartmentCreateView(
         LoginRequiredMixin,
-        PermissionRequiredMixin,
         CreateView):
     model = Department
     form_class = DepartmentForm
@@ -76,7 +75,6 @@ class DepartmentCreateView(
 
 class DepartmentUpdateView(
         LoginRequiredMixin,
-        PermissionRequiredMixin,
         UpdateView):
     model = Department
     form_class = DepartmentForm

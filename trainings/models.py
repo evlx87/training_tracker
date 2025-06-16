@@ -5,7 +5,8 @@ class TrainingProgram(models.Model):
     name = models.CharField(
         max_length=255,
         unique=True,
-        verbose_name='Название')
+        verbose_name='Название',
+        db_index=True)
     recurrence_period = models.IntegerField(
         null=True, blank=True, verbose_name='Периодичность (годы)')
 
