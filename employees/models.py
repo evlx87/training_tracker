@@ -11,7 +11,7 @@ from trainings.models import TrainingProgram
 
 
 class Employee(models.Model):
-    last_name = models.CharField(max_length=255, verbose_name='Фамилия')
+    last_name = models.CharField(max_length=255, verbose_name='Фамилия', db_index=True)
     first_name = models.CharField(max_length=255, verbose_name='Имя')
     middle_name = models.CharField(
         max_length=255,
