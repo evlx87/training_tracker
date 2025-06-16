@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Список сотрудников</h1>
+<div class="filters-container">
+    <form class="filter-form" method="get">
+        <div class="form-group">
+            <label for="search_last_name"><span class="icon">🔍</span> Поиск по фамилии:</label>
+            <input type="text" name="search_last_name" id="search_last_name" class="form-input"
+                   value="{{ search_last_name|default_if_none:'' }}" placeholder="Введите фамилию">
+        </div>
+        <div class="buttons-group">
+            <button type="submit" class="button button--primary"><span class="icon">🔍</span> Найти</button>
+            <a href="{% url 'employees:employee_list' %}" class="button button--danger"><span class="icon">✖️</span> Сбросить</a>
+        </div>
+    </form>
+</div>
 <div class="form-group">
     <a href="{% url 'employees:employee_create' %}" class="button button--success"><span class="icon">➕</span> Добавить сотрудника</a>
 </div>
@@ -8,7 +21,12 @@
     <table class="table">
         <thead>
         <tr>
-            <th>ФИО</th>
+            <th class="sortable">
+                <a href="?sort_by=last_name&sort_order={% if sort_by == 'last_name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&search_last_name={{ search_last_name|default_if_none:'' }}"
+                   class="sort-icon {% if sort_by == 'last_name' %}{{ sort_order }}{% endif %}">
+                    ФИО
+                </a>
+            </th>
             <th>Должность</th>
             <th>Подразделение</th>
             <th>Член комиссии по ОТ</th>
@@ -40,7 +58,7 @@
 <ul class="pagination">
     {% if page_obj.has_previous %}
     <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}&search_last_name={{ search_last_name|default_if_none:'' }}">Предыдущая</a>
     </li>
     {% else %}
     <li class="page-item disabled">
@@ -54,13 +72,13 @@
     </li>
     {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
     <li class="page-item">
-        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        <a class="page-link" href="?page={{ num }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}&search_last_name={{ search_last_name|default_if_none:'' }}">{{ num }}</a>
     </li>
     {% endif %}
     {% endfor %}
     {% if page_obj.has_next %}
     <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}&search_last_name={{ search_last_name|default_if_none:'' }}">Следующая</a>
     </li>
     {% else %}
     <li class="page-item disabled">

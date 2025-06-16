@@ -242,11 +242,29 @@ class EmployeeListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = Employee.objects.select_related('position', 'department')
-        logger.debug(
-            'Получен запрос списка сотрудников, размер: %s',
-            queryset.count())
+        queryset = super().get_queryset()
+        # Поиск по фамилии
+        search_last_name = self.request.GET.get('search_last_name', '').strip()
+        if search_last_name:
+            queryset = queryset.filter(last_name__istartswith=search_last_name)
+
+        # Сортировка
+        sort_by = self.request.GET.get('sort_by', 'last_name')
+        sort_order = self.request.GET.get('sort_order', 'asc')
+        if sort_by == 'last_name':
+            if sort_order == 'desc':
+                queryset = queryset.order_by('-last_name', '-first_name', '-middle_name')
+            else:
+                queryset = queryset.order_by('last_name', 'first_name', 'middle_name')
+        # Добавьте другие поля для сортировки, если нужно
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_last_name'] = self.request.GET.get('search_last_name', '')
+        context['sort_by'] = self.request.GET.get('sort_by', 'last_name')
+        context['sort_order'] = self.request.GET.get('sort_order', 'asc')
+        return context
 
     @log_view_action('Запрошен список', 'сотрудников')
     def get(self, request, *args, **kwargs):

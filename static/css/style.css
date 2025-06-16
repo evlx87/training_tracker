@@ -1171,3 +1171,17 @@ main {
         bottom: 110%;
     }
 }
+
+.sort-icon {
+    color: #fff;
+    text-decoration: none;
+}
+.sort-icon:hover {
+    color: #e0e0e0;
+}
+.sort-icon.asc::after {
+    content: '\25BC'; /* Стрелка вниз */
+}
+.sort-icon.desc::after {
+    content: '\25B2'; /* Стрелка вверх */
+}
