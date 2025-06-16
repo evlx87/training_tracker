@@ -28,7 +28,7 @@
         </div>
         <!-- Остальные кнопки -->
         <a href="{% url 'reports:report_list' %}" class="button button--primary button--small">Отчеты по обучению</a>
-        <a href="{% url 'instructions:instruction_list' %}" class="dropdown-item" data-icon="instructions">Помощь</a>
+        <a href="{% url 'instructions:instruction_list' %}" class="button button--primary button--small">Помощь</a>
         {% if user|has_group:"Moderators" %}
         <a href="{% url 'employees:deletion_request_list' %}" class="button button--primary" data-icon="deletion-requests">Запросы на удаление</a>
         {% endif %}
