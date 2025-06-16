@@ -11,7 +11,12 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Название</th>
+                <th class="sortable">
+                    <a href="?sort_by=name&sort_order={% if sort_by == 'name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+                       class="sort-icon {% if sort_by == 'name' %}{{ sort_order }}{% endif %}">
+                        Название
+                    </a>
+                </th>
                 <th>Действия</th>
             </tr>
         </thead>
@@ -37,7 +42,7 @@
 <ul class="pagination">
     {% if page_obj.has_previous %}
     <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}">Предыдущая</a>
     </li>
     {% else %}
     <li class="page-item disabled">
@@ -52,14 +57,14 @@
     </li>
     {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
     <li class="page-item">
-        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        <a class="page-link" href="?page={{ num }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}">{{ num }}</a>
     </li>
     {% endif %}
     {% endfor %}
 
     {% if page_obj.has_next %}
     <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}">Следующая</a>
     </li>
     {% else %}
     <li class="page-item disabled">

@@ -19,6 +19,23 @@ class DepartmentListView(LoginRequiredMixin, ListView):
     context_object_name = 'departments'
     paginate_by = 20
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        sort_by = self.request.GET.get('sort_by', 'name')  # По умолчанию сортировка по имени
+        sort_order = self.request.GET.get('sort_order', 'asc')  # По умолчанию по возрастанию
+        if sort_by == 'name':
+            if sort_order == 'desc':
+                queryset = queryset.order_by('-name')
+            else:
+                queryset = queryset.order_by('name')
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['sort_by'] = self.request.GET.get('sort_by', 'name')
+        context['sort_order'] = self.request.GET.get('sort_order', 'asc')
+        return context
+
     @log_view_action('Запрошен список', 'подразделений')
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
