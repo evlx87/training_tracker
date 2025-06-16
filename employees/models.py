@@ -11,8 +11,13 @@ from trainings.models import TrainingProgram
 
 
 class Employee(models.Model):
-    last_name = models.CharField(max_length=255, verbose_name='Фамилия', db_index=True)
-    first_name = models.CharField(max_length=255, verbose_name='Имя')
+    last_name = models.CharField(
+        max_length=255,
+        verbose_name='Фамилия',
+        db_index=True)
+    first_name = models.CharField(
+        max_length=255,
+        verbose_name='Имя')
     middle_name = models.CharField(
         max_length=255,
         blank=True,
@@ -37,15 +42,22 @@ class Employee(models.Model):
         null=True,
         blank=True,
         verbose_name='Дата трудоустройства')
-    is_dismissed = models.BooleanField(default=False, verbose_name='Уволен')
+    is_dismissed = models.BooleanField(
+        default=False,
+        verbose_name='Уволен')
     dismissal_date = models.DateField(
-        null=True, blank=True, verbose_name='Дата увольнения')
+        null=True,
+        blank=True,
+        verbose_name='Дата увольнения')
     is_on_maternity_leave = models.BooleanField(
-        default=False, verbose_name='В декрете')
+        default=False,
+        verbose_name='В декрете')
     is_external_part_time = models.BooleanField(
-        default=False, verbose_name='Внешний совместитель')
+        default=False,
+        verbose_name='Внешний совместитель')
     is_safety_commission_member = models.BooleanField(
-        default=False, verbose_name='Член комиссии по охране труда')
+        default=False,
+        verbose_name='Член комиссии по охране труда')
 
     def clean(self):
         if self.dismissal_date and not self.is_dismissed:

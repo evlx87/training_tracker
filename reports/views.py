@@ -24,31 +24,23 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         selected_employees = self.request.GET.getlist('employees')
         selected_program = self.request.GET.get('program')
-        exclude_not_completed = self.request.GET.get(
-            'exclude_not_completed') == 'on'
+        exclude_not_completed = self.request.GET.get('exclude_not_completed') == 'on'
         selected_employees = [emp for emp in selected_employees if emp]
-        logger.debug(
-            "Selected employees after filtering: %s",
-            selected_employees)
+        logger.debug("Selected employees after filtering: %s", selected_employees)
         report_data, training_programs = ReportService.generate_training_report(
             selected_employees, selected_program)
 
         if selected_employees:
             report_data = [
-                data for data in report_data if str(
-                    data['employee'].pk) in selected_employees]
+                data for data in report_data if str(data['employee'].pk) in selected_employees]
 
         if exclude_not_completed:
             if selected_program and selected_program.isdigit():
-                # Исключаем сотрудников, у которых нет записи по выбранной
-                # программе
                 report_data = [
                     data for data in report_data
                     if data['trainings'].get(int(selected_program), {}).get('date') != "Обучение не пройдено"
                 ]
             else:
-                # Исключаем сотрудников, у которых нет ни одной записи об
-                # обучении
                 report_data = [
                     data for data in report_data
                     if any(
@@ -56,31 +48,34 @@ class ReportsView(LoginRequiredMixin, TemplateView):
                         for training in data['trainings'].values()
                     )
                 ]
-        logger.debug(
-            "Report data length after filtering: %s",
-            len(report_data))
-        sort_by = self.request.GET.get('sort_by')
-        sort_order = self.request.GET.get('sort_order', 'asc')
+        logger.debug("Report data length after filtering: %s", len(report_data))
 
-        if sort_by and sort_by.isdigit() and int(
-                sort_by) in [program.id for program in training_programs]:
+        # Сортировка по ФИО сотрудника
+        sort_by = self.request.GET.get('sort_by', 'last_name')  # По умолчанию сортировка по ФИО
+        sort_order = self.request.GET.get('sort_order', 'asc')  # По умолчанию по возрастанию
+        if sort_by == 'last_name':
             report_data.sort(
-                key=lambda x: x['trainings'].get(
-                    int(sort_by), {}).get(
-                    'date', 'Обучение не пройдено'),
+                key=lambda x: x['employee'].last_name.lower(),
                 reverse=(sort_order == 'desc')
             )
+        elif sort_by and sort_by.isdigit() and int(sort_by) in [program.id for program in training_programs]:
+            report_data.sort(
+                key=lambda x: x['trainings'].get(int(sort_by), {}).get('date', 'Обучение не пройдено'),
+                reverse=(sort_order == 'desc')
+            )
+
         context['report_data'] = report_data
         context['training_programs'] = training_programs
-        context['employees'] = Employee.objects.all()
+        context['employees'] = Employee.objects.all().order_by('last_name')  # Сортировка сотрудников в фильтре
         context['departments'] = Department.objects.all()
         context['selected_employees'] = selected_employees
         context['selected_program'] = selected_program
         context['exclude_not_completed'] = exclude_not_completed
+        context['sort_by'] = sort_by
+        context['sort_order'] = sort_order
 
         if selected_program and selected_program.isdigit():
-            program = TrainingProgram.objects.filter(
-                id=int(selected_program)).first()
+            program = TrainingProgram.objects.filter(id=int(selected_program)).first()
             context['selected_program_name'] = program.name if program else "Неизвестная программа"
 
         total_employees = len(report_data)

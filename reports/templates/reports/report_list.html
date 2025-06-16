@@ -32,20 +32,18 @@
         </div>
         <div class="form-group form-checkbox">
             <label for="exclude_not_completed"><span class="icon">✖</span> Исключить сотрудников без обучения:</label>
-            <input type="checkbox" id="exclude_not_completed" name="exclude_not_completed" {% if request.GET.exclude_not_completed %}checked{% endif %}>
+            <input type="checkbox" id="exclude_not_completed" name="exclude_not_completed" {% if exclude_not_completed %}checked{% endif %}>
         </div>
         <div class="buttons-group">
             <button type="submit" class="button button--primary"><span class="icon">🔍</span> Применить</button>
             <a href="{% url 'reports:report_list' %}" class="button button--danger">
                 <span class="icon">✖</span> Сбросить
             </a>
-            <!-- Первая кнопка: Экспорт всех данных (всегда видима) -->
-            <a href="{% url 'reports:export_report' %}" class="button button--success">
+            <a href="{% url 'reports:export_report' %}?sort_by={{ sort_by }}&sort_order={{ sort_order }}" class="button button--success">
                 <span class="icon">📥</span> Экспорт всех данных
             </a>
-            <!-- Вторая кнопка: Экспорт с фильтрами (видима при применении фильтров) -->
             {% if selected_employees or selected_program or exclude_not_completed %}
-            <a href="{% url 'reports:export_report' %}?{% for emp in selected_employees %}employees={{ emp }}&{% endfor %}{% if selected_program %}program={{ selected_program }}&{% endif %}{% if exclude_not_completed %}exclude_not_completed=on{% endif %}"
+            <a href="{% url 'reports:export_report' %}?{% for emp in selected_employees %}employees={{ emp }}&{% endfor %}{% if selected_program %}program={{ selected_program }}&{% endif %}{% if exclude_not_completed %}exclude_not_completed=on&{% endif %}sort_by={{ sort_by }}&sort_order={{ sort_order }}"
                class="button button--info">
                 <span class="icon">📈</span> Экспорт с фильтрами
             </a>
@@ -72,11 +70,13 @@
     <table class="report-table">
         <thead>
         <tr>
-            <th>Сотрудник</th>
+            <th class="sortable">
+                <a href="?{% for emp in selected_employees %}employees={{ emp }}&{% endfor %}{% if selected_program %}program={{ selected_program }}&{% endif %}{% if exclude_not_completed %}exclude_not_completed=on&{% endif %}sort_by=last_name&sort_order={% if sort_by == 'last_name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                   class="sort-icon {% if sort_by == 'last_name' %}{{ sort_order }}{% endif %}">
+                    Сотрудник
+                </a>
+            </th>
             <th>Должность</th>
-            <th>Руководитель</th>
-            <th>Педагогический работник</th>
-            <th>Член комиссии</th>
             <th>Подразделение</th>
             {% if selected_program %}
             <th>{{ selected_program_name }}</th>
@@ -88,9 +88,6 @@
         <tr class="employee-row">
             <td>{{ data.employee.last_name }} {{ data.employee.first_name.0 }}. {% if data.employee.middle_name %}{{ data.employee.middle_name.0 }}.{% endif %}</td>
             <td>{{ data.employee.position|default:"—" }}</td>
-            <td>{{ data.employee.position.is_manager|yesno:"Да,Нет" }}</td>
-            <td>{{ data.employee.position.is_teacher|yesno:"Да,Нет" }}</td>
-            <td>{{ data.employee.is_safety_commission_member|yesno:"Да,Нет" }}</td>
             <td>{{ data.employee.department|default:"—" }}</td>
             {% if selected_program %}
             {% with training_status=data.trainings|int_key:selected_program %}
