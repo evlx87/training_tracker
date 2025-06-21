@@ -143,24 +143,27 @@ class TrainingRecord(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Программа обучения'
     )
-    completion_date = models.DateField(verbose_name='Дата прохождения')
-    details = models.TextField(blank=True, null=True, verbose_name='Детали')
-
-    def clean(self):
-        if self.completion_date and self.completion_date > timezone.now().date():
-            raise ValidationError('Дата прохождения не может быть в будущем.')
-        super().clean()
+    completion_date = models.DateField(
+        verbose_name='Дата прохождения'
+    )
+    details = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Детали'
+    )
+    document = models.FileField(
+        upload_to='training_documents/',
+        blank=True,
+        null=True,
+        verbose_name='Скан документа'
+    )
+    is_verified = models.BooleanField(
+        default=False,
+        verbose_name='Подтверждено'
+    )
 
     def __str__(self):
-        return f'{self.employee} - {self.training_program} ({self.completion_date})'
-
-    @property
-    def is_overdue(self):
-        if not self.training_program.recurrence_period:
-            return False
-        next_training_date = self.completion_date + \
-            timedelta(days=self.training_program.recurrence_period * 365)
-        return next_training_date < timezone.now().date()
+        return f"{self.employee} - {self.training_program} ({self.completion_date})"
 
     class Meta:
         verbose_name = 'Запись об обучении'

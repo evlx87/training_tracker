@@ -497,10 +497,7 @@ class TrainingRecordCreateView(
         return super().form_invalid(form)
 
 
-class TrainingRecordUpdateView(
-    LoginRequiredMixin,
-    PermissionRequiredMixin,
-    UpdateView):
+class TrainingRecordUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = TrainingRecord
     form_class = TrainingRecordForm
     template_name = 'trainings/training_record_form.html'
@@ -508,7 +505,11 @@ class TrainingRecordUpdateView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['employee'] = self.get_object().employee
+        employee_pk = self.request.GET.get('employee_pk')
+        if employee_pk:
+            context['employee'] = Employee.objects.get(pk=employee_pk)
+        else:
+            context['employee'] = self.get_object().employee
         context['action'] = 'Редактировать'
         return context
 
@@ -522,15 +523,12 @@ class TrainingRecordUpdateView(
             'Обновлена запись об обучении для %s пользователем: %s',
             training_record.employee, self.request.user.username
         )
-        return redirect(
-            'employees:employee_trainings',
-            pk=training_record.employee.pk)
+        return redirect('employees:employee_trainings', employee_pk=training_record.employee.pk)
 
     def form_invalid(self, form):
         logger.warning(
             'Ошибка валидации формы редактирования записи об обучении: %s пользователем: %s',
-            form.errors,
-            self.request.user.username)
+            form.errors, self.request.user.username)
         return super().form_invalid(form)
 
 
@@ -540,15 +538,20 @@ class TrainingRecordDeleteView(EditorModeratedDeleteView):
     confirm_url_name = 'employees:training_record_delete_confirm'
     permission_required = 'employees.delete_trainingrecord'
 
-    def get_success_url(self):
-        return reverse_lazy(
-            'employees:employee_trainings', kwargs={
-                'pk': self.get_object().employee.pk})
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['employee'] = self.get_object().employee
+        employee_pk = self.request.GET.get('employee_pk')
+        if employee_pk:
+            context['employee'] = Employee.objects.get(pk=employee_pk)
+        else:
+            context['employee'] = self.get_object().employee
         return context
+
+    def get_success_url(self):
+        employee_pk = self.request.GET.get('employee_pk')
+        if employee_pk:
+            return reverse_lazy('employees:employee_trainings', kwargs={'employee_pk': employee_pk})
+        return reverse_lazy('employees:employee_trainings', kwargs={'employee_pk': self.get_object().employee.pk})
 
 
 class TrainingRecordDeleteConfirmView(EditorModeratedDeleteView):
