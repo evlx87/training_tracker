@@ -49,10 +49,10 @@
 </div>
 
 <div class="legend">
-    <span class="legend-item not-completed"><span class="icon">✖</span> Не пройдено</span>
-    <span class="legend-item overdue"><span class="icon">⏰</span> Просрочено</span>
-    <span class="legend-item warning"><span class="icon">⚠</span> Скоро истекает</span>
-    <span class="legend-item completed"><span class="icon">✔</span> Пройдено</span>
+    <span class="legend-item not-completed">Не пройдено</span>
+    <span class="legend-item overdue">Просрочено</span>
+    <span class="legend-item warning">Скоро истекает</span>
+    <span class="legend-item completed">Пройдено</span>
 </div>
 
 {% if selected_employees or selected_program %}
@@ -113,7 +113,6 @@
                     {% else %}
                         <span class="not-verified-icon" title="Не подтверждено">❌</span>
                     {% endif %}
-                    {{ training_status.class|get_status_icon }}
                     {% else %}
                     ✖
                     {% endif %}
@@ -130,7 +129,6 @@
                     {% else %}
                         <span class="not-verified-icon" title="Не подтверждено">❌</span>
                     {% endif %}
-                    {{ training_status.class|get_status_icon }}
                     {% else %}
                     ✖
                     {% endif %}
