@@ -2,11 +2,7 @@
 {% block content %}
 <h1>Список должностей</h1>
 
-<div class="form-group">
-    <a href="{% url 'positions:position_create' %}" class="button button--success"><span class="icon">➕</span> Добавить должность</a>
-</div>
-
-<div class="filters-container">
+<div class="form-container">
     <form class="filter-form" method="get">
         <div class="form-group">
             <label for="is_manager" class="form-checkbox">
@@ -25,6 +21,10 @@
             <a href="{% url 'positions:position_list' %}" class="button button--danger"><span class="icon">✖️</span> Сбросить</a>
         </div>
     </form>
+</div>
+
+<div class="form-group">
+    <a href="{% url 'positions:position_create' %}" class="button button--success"><span class="icon">➕</span> Добавить должность</a>
 </div>
 
 <div class="table-container">

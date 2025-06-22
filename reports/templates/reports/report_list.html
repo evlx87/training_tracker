@@ -1,168 +1,148 @@
 {% extends 'base.html' %}
+{% load report_filters %}
+{% block title %}
+Отчеты по обучению
+{% endblock %}
 {% block content %}
-<h1>Отчет по обучению</h1>
-<div class="filters-container">
-    <form class="filter-form" method="get">
+<h1>Отчеты по обучению</h1>
+<div class="form-container">
+    <form method="get" class="filter-form">
         <div class="form-group">
             <label for="employees"><span class="icon">👤</span> Сотрудники:</label>
-            <select name="employees" id="employees" class="form-input" multiple>
+            <select id="employees" name="employees" multiple class="form-input" size="5">
+                <option value="" {% if not selected_employees %}selected{% endif %}>Все сотрудники</option>
                 {% for employee in employees %}
                 <option value="{{ employee.pk }}"
                         {% if employee.pk|stringformat:"s" in selected_employees %}selected{% endif %}>
-                    {{ employee.last_name }} {{ employee.first_name.0 }}. {{ employee.middle_name.0|default:"" }}.
+                {{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default_if_none:"" }}
                 </option>
                 {% endfor %}
             </select>
         </div>
         <div class="form-group">
             <label for="program"><span class="icon">📚</span> Программа обучения:</label>
-            <select name="program" id="program" class="form-input">
-                <option value="">Все программы</option>
+            <select id="program" name="program" class="form-input">
+                <option value="" {% if not selected_program %}selected{% endif %}>Все программы</option>
                 {% for program in training_programs %}
-                <option value="{{ program.pk }}"
-                        {% if selected_program == program.pk|stringformat:"s" %}selected{% endif %}>
-                    {{ program.name }}
+                <option value="{{ program.id }}" {% if selected_program|add:"0" == program.id|add:"0" %}selected{% endif %}>
+                {{ program.name }}
                 </option>
                 {% endfor %}
             </select>
         </div>
         <div class="form-group form-checkbox">
-            <label for="exclude_not_completed"><span class="icon">✔️</span> Исключить непройденные:</label>
-            <input type="checkbox" name="exclude_not_completed" id="exclude_not_completed"
-                   {% if exclude_not_completed %}checked{% endif %}>
+            <label for="exclude_not_completed"><span class="icon">✖</span> Исключить сотрудников без обучения:</label>
+            <input type="checkbox" id="exclude_not_completed" name="exclude_not_completed" {% if exclude_not_completed %}checked{% endif %}>
         </div>
         <div class="buttons-group">
-            <button type="submit" class="button button--primary"><span class="icon">🔍</span> Фильтровать</button>
-            <a href="{% url 'reports:report_list' %}" class="button button--danger"><span class="icon">✖️</span> Сбросить</a>
-            <a href="{% url 'reports:export_report' %}?employees={{ selected_employees|join:'&employees=' }}&program={{ selected_program|default:'' }}&exclude_not_completed={{ exclude_not_completed|yesno:'on,' }}"
-               class="button button--info"><span class="icon">📤</span> Экспорт в Excel</a>
+            <button type="submit" class="button button--primary"><span class="icon">🔍</span> Применить</button>
+            <a href="{% url 'reports:report_list' %}" class="button button--danger">
+                <span class="icon">✖</span> Сбросить
+            </a>
+            <a href="{% url 'reports:export_report' %}?sort_by={{ sort_by }}&sort_order={{ sort_order }}" class="button button--success">
+                <span class="icon">📥</span> Экспорт всех данных
+            </a>
+            {% if selected_employees or selected_program or exclude_not_completed %}
+            <a href="{% url 'reports:export_report' %}?{% for emp in selected_employees %}employees={{ emp }}&{% endfor %}{% if selected_program %}program={{ selected_program }}&{% endif %}{% if exclude_not_completed %}exclude_not_completed=on&{% endif %}sort_by={{ sort_by }}&sort_order={{ sort_order }}"
+               class="button button--info">
+                <span class="icon">📈</span> Экспорт с фильтрами
+            </a>
+            {% endif %}
         </div>
     </form>
 </div>
 <div class="legend">
-    <span class="legend-item completed"><span class="icon">✅</span> Пройдено</span>
-    <span class="legend-item warning"><span class="icon">⚠️</span> Требуется повторное обучение</span>
-    <span class="legend-item overdue"><span class="icon">⏰</span> Просрочено</span>
-    <span class="legend-item not-completed"><span class="icon">❌</span> Не пройдено</span>
+    <div class="legend-item not-completed">
+        <span class="icon">✖</span> Не пройдено
+    </div>
+    <div class="legend-item overdue">
+        <span class="icon">⏰</span> Просрочено
+    </div>
+    <div class="legend-item warning">
+        <span class="icon">⚠</span> Скоро истекает
+    </div>
+    <div class="legend-item completed">
+        <span class="icon">✔</span> Пройдено
+    </div>
 </div>
+{% if selected_employees or selected_program %}
 <div class="table-container">
     <table class="report-table">
         <thead>
-            <tr>
-                <th class="sortable">
-                    <a href="?sort_by=last_name&sort_order={% if sort_by == 'last_name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&employees={{ selected_employees|join:'&employees=' }}&program={{ selected_program|default:'' }}&exclude_not_completed={{ exclude_not_completed|yesno:'on,' }}"
-                       class="sort-icon {% if sort_by == 'last_name' %}{{ sort_order }}{% endif %}">
-                        Сотрудник
-                    </a>
-                </th>
-                <th>Должность</th>
-                <th>Руководитель</th>
-                <th>Педагогический работник</th>
-                <th>Член комиссии по ОТ</th>
-                <th>Подразделение</th>
-                {% if selected_program %}
-                <th class="sortable">
-                    <a href="?sort_by={{ selected_program }}&sort_order={% if sort_by == selected_program and sort_order == 'asc' %}desc{% else %}asc{% endif %}&employees={{ selected_employees|join:'&employees=' }}&program={{ selected_program|default:'' }}&exclude_not_completed={{ exclude_not_completed|yesno:'on,' }}"
-                       class="sort-icon {% if sort_by == selected_program %}{{ sort_order }}{% endif %}">
-                        {{ selected_program_name }}
-                    </a>
-                </th>
-                <th>Статус подтверждения</th>
-                {% else %}
-                {% for program in training_programs %}
-                <th class="sortable">
-                    <a href="?sort_by={{ program.pk }}&sort_order={% if sort_by == program.pk|stringformat:'s' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&employees={{ selected_employees|join:'&employees=' }}&program={{ selected_program|default:'' }}&exclude_not_completed={{ exclude_not_completed|yesno:'on,' }}"
-                       class="sort-icon {% if sort_by == program.pk|stringformat:'s' %}{{ sort_order }}{% endif %}">
-                        {{ program.name }}
-                    </a>
-                </th>
-                <th>Статус подтверждения</th>
-                {% endfor %}
-                {% endif %}
-            </tr>
+        <tr>
+            <th class="sortable">
+                <a href="?{% for emp in selected_employees %}employees={{ emp }}&{% endfor %}{% if selected_program %}program={{ selected_program }}&{% endif %}{% if exclude_not_completed %}exclude_not_completed=on&{% endif %}sort_by=last_name&sort_order={% if sort_by == 'last_name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                   class="sort-icon {% if sort_by == 'last_name' %}{{ sort_order }}{% endif %}">
+                    Сотрудник
+                </a>
+            </th>
+            <th>Должность</th>
+            <th>Подразделение</th>
+            {% if selected_program %}
+            <th>{{ selected_program_name }}</th>
+            {% endif %}
+        </tr>
         </thead>
         <tbody>
-            {% for data in report_data %}
-            <tr>
-                <td>{{ data.employee.last_name }} {{ data.employee.first_name.0 }}. {{ data.employee.middle_name.0|default:"" }}.</td>
-                <td>{{ data.employee.position|default:"—" }}</td>
-                <td>{{ data.employee.position.is_manager|yesno:"Да,Нет" }}</td>
-                <td>{{ data.employee.position.is_teacher|yesno:"Да,Нет" }}</td>
-                <td>{{ data.employee.is_safety_commission_member|yesno:"Да,Нет" }}</td>
-                <td>{{ data.employee.department|default:"—" }}</td>
-                {% if selected_program %}
-                <td class="{{ data.trainings|get_item:selected_program|dict_get:'class' }}">
-                    {{ data.trainings|get_item:selected_program|dict_get:'date'|default:"Обучение не пройдено" }}
-                </td>
-                <td>
-                    {% if data.trainings|get_item:selected_program|dict_get:'is_verified' %}
-                        Подтверждено
-                    {% else %}
-                        Не подтверждено
-                    {% endif %}
-                </td>
+        {% for data in report_data %}
+        <tr class="employee-row">
+            <td>{{ data.employee.last_name }} {{ data.employee.first_name.0 }}. {% if data.employee.middle_name %}{{ data.employee.middle_name.0 }}.{% endif %}</td>
+            <td>{{ data.employee.position|default:"—" }}</td>
+            <td>{{ data.employee.department|default:"—" }}</td>
+            {% if selected_program %}
+            {% with training_status=data.trainings|int_key:selected_program %}
+            <td class="{{ training_status|dict_get:'class'|default:'not-completed' }}"
+                title="{{ training_status|dict_get:'details'|default:'' }}">
+                {% if training_status and training_status.date != "Обучение не пройдено" %}
+                {{ training_status.date|date:"d.m.y" }}
+                <span class="icon">{{ training_status.class|get_status_icon }}</span>
                 {% else %}
-                {% for program in training_programs %}
-                <td class="{{ data.trainings|get_item:program.id|dict_get:'class' }}">
-                    {{ data.trainings|get_item:program.id|dict_get:'date'|default:"Обучение не пройдено" }}
-                </td>
-                <td>
-                    {% if data.trainings|get_item:program.id|dict_get:'is_verified' %}
-                        Подтверждено
-                    {% else %}
-                        Не подтверждено
-                    {% endif %}
-                </td>
-                {% endfor %}
+                <span class="icon">✖</span>
                 {% endif %}
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="{% if selected_program %}8{% else %}{{ training_programs|length|add:6|add:training_programs|length }}{% endif %}">
-                    Данные для отчета отсутствуют.
-                </td>
-            </tr>
-            {% endfor %}
+            </td>
+            {% endwith %}
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">Данные не найдены.</td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>
-{% if is_paginated %}
-<ul class="pagination">
-    {% if page_obj.has_previous %}
-    <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}&employees={{ selected_employees|join:'&employees=' }}&program={{ selected_program|default:'' }}&exclude_not_completed={{ exclude_not_completed|yesno:'on,' }}">Предыдущая</a>
-    </li>
-    {% else %}
-    <li class="page-item disabled">
-        <span class="page-link">Предыдущая</span>
-    </li>
-    {% endif %}
-    {% for num in paginator.page_range %}
-    {% if page_obj.number == num %}
-    <li class="page-item active" aria-current="page">
-        <span class="page-link">{{ num }}</span>
-    </li>
-    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-    <li class="page-item">
-        <a class="page-link" href="?page={{ num }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}&employees={{ selected_employees|join:'&employees=' }}&program={{ selected_program|default:'' }}&exclude_not_completed={{ exclude_not_completed|yesno:'on,' }}">{{ num }}</a>
-    </li>
-    {% endif %}
-    {% endfor %}
-    {% if page_obj.has_next %}
-    <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}&employees={{ selected_employees|join:'&employees=' }}&program={{ selected_program|default:'' }}&exclude_not_completed={{ exclude_not_completed|yesno:'on,' }}">Следующая</a>
-    </li>
-    {% else %}
-    <li class="page-item disabled">
-        <span class="page-link">Следующая</span>
-    </li>
-    {% endif %}
-</ul>
-{% endif %}
-<div>
-    <p><strong>Общее количество сотрудников:</strong> {{ total_employees }}</p>
-    {% for program_name, count in trained_counts.items %}
-    <p><strong>{{ program_name }}:</strong> {{ count }} чел.</p>
-    {% endfor %}
+{% else %}
+<div class="instructions">
+    <h2><span class="icon">📋</span> Инструкция по работе с отчетом</h2>
+    <p>На этой странице вы можете сформировать отчет по обучению сотрудников. Для этого выполните следующие шаги:</p>
+    <ol>
+        <li>В разделе <strong>Сотрудники</strong> выберите одного или нескольких сотрудников, которых хотите включить в отчет. Для выбора всех сотрудников оставьте поле пустым.</li>
+        <li>В разделе <strong>Программа обучения</strong> выберите конкретную программу, чтобы отобразить данные только по ней. Если выбрать <strong>Все программы</strong>, отчет будет содержать общую информацию.</li>
+        <li>Установите флажок <strong>Исключить сотрудников без обучения</strong>, чтобы отобразить только тех сотрудников, которые прошли хотя бы одно обучение (или выбранную программу).</li>
+        <li>Нажмите кнопку <strong>Применить</strong>, чтобы сформировать таблицу с данными.</li>
+        <li>Используйте кнопку <strong>Экспорт в Excel</strong> для сохранения отчета в формате Excel.</li>
+        <li>Легенда показывает статусы обучения, которые отображаются в таблице:</li>
+    </ol>
+    <h3>Описание статусов</h3>
+    <ol>
+        <li><strong>Пройдено</strong> (зеленый фон): Обучение успешно завершено в установленные сроки.</li>
+        <li><strong>Не пройдено</strong> (светло-красный фон): Обучение не было начато сотрудником.</li>
+        <li><strong>Просрочено</strong> (красный фон): Срок прохождения обучения истек, и оно не завершено.</li>
+        <li><strong>Скоро истекает</strong> (желтый фон): Обучение завершено, но до прохождения повторного обучения осталось менее 1 месяца.</li>
+    </ol>
 </div>
+{% endif %}
+<script>
+    document.getElementById('employees').addEventListener('change', function() {
+        const options = this.options;
+        const allEmployeesOption = options[0];
+        if (allEmployeesOption.selected) {
+            for (let i = 1; i < options.length; i++) {
+                options[i].selected = false;
+            }
+        } else if (this.selectedOptions.length > 0) {
+            allEmployeesOption.selected = false;
+        }
+    });
+</script>
 {% endblock %}

@@ -27,7 +27,8 @@ class ReportService:
                 if records.exists():
                     latest_record = records.first()
                     status_class = 'completed'
-                    if latest_record.recurrence_period:
+                    # Проверяем, есть ли training_program и recurrence_period
+                    if hasattr(latest_record, 'training_program') and latest_record.training_program.recurrence_period is not None:
                         next_training_date = latest_record.completion_date + timedelta(
                             days=latest_record.training_program.recurrence_period * 365
                         )
@@ -37,6 +38,9 @@ class ReportService:
                             status_class = 'overdue'
                         elif today >= warning_date:
                             status_class = 'warning'
+                    else:
+                        # Если recurrence_period не задан, оставляем статус completed
+                        logger.debug(f"No recurrence_period for TrainingProgram {latest_record.training_program} (Employee: {employee})")
                     employee_data['trainings'][program.id] = {
                         'date': latest_record.completion_date,
                         'class': status_class,
