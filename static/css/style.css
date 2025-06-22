@@ -1233,3 +1233,18 @@ main {
         font-size: 13px;
     }
 }
+
+.verified-icon, .not-verified-icon {
+    font-size: 14px;
+    margin-left: 4px;
+    vertical-align: middle;
+    cursor: default;
+}
+
+.verified-icon {
+    color: #27ae60; /* Зелёный для подтверждённого */
+}
+
+.not-verified-icon {
+    color: #c0392b; /* Красный для неподтверждённого */
+}
