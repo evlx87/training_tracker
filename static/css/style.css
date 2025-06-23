@@ -10,7 +10,6 @@ body {
     background-color: #f7f9fc;
 }
 
-/* Контейнер основной разметки */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -20,12 +19,12 @@ body {
 
 /* Сброс стилей для ссылок внутри таблиц */
 .table a {
-    color: inherit; /* Наследовать цвет от родителя */
-    text-decoration: none; /* Убрать подчеркивание */
+    color: inherit;
+    text-decoration: none;
 }
 
 /* ==========================================================================
-   Типография и заголовки
+   Типография
    ========================================================================== */
 
 h1 {
@@ -56,7 +55,6 @@ header h1 {
     color: #2c3e50;
 }
 
-/* Информация о пользователе */
 .user-info {
     display: flex;
     align-items: center;
@@ -81,7 +79,7 @@ main {
    ========================================================================== */
 
 .messages {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .messages p {
@@ -117,71 +115,69 @@ main {
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
+    border: 1px solid transparent;
+    transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     cursor: pointer;
-    border: 1px solid #000000;
-    transition: background-color 0.3s, transform 0.1s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
 }
 
 .button .icon {
     margin-right: 6px;
 }
 
-/* Варианты кнопок */
 .button--primary {
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: white;
+    border-color: #4caf50;
 }
 
 .button--danger {
     background-color: #f44336;
-    color: white;
+    color: #fff;
+    border-color: #f44336;
 }
 
 .button--info {
     background-color: #17a2b8;
     color: white;
+    border-color: #17a2b8;
 }
 
 .button--success {
     background-color: #28a745;
     color: white;
+    border-color: #28a745;
 }
 
-/* Состояния кнопок */
 .button:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-}
-
-.button--small {
-    width: 200px;
-    height: 40px;
-    font-size: 14px;
-    line-height: 1.5;
-    padding: 3px;
-}
-
-.button--small:hover {
-    background-color: #45a049;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .button--large {
     width: 200px;
     height: 80px;
     font-size: 16px;
-    line-height: 1.5;
-    padding: 10px;
+    padding: 12px;
 }
 
-/* Иконки для кнопок */
+.button--small {
+    width: 140px;
+    height: 40px;
+    font-size: 12px;
+    padding: 8px;
+}
+
+.button--small:hover {
+    background-color: #45a049;
+}
+
 .button[data-icon]::before {
     content: '';
     display: inline-block;
     width: 16px;
     height: 16px;
-    margin-right: 6px;
+    margin-right: 8px;
     background-size: cover;
     background-repeat: no-repeat;
 }
@@ -203,7 +199,7 @@ main {
 }
 
 .button[data-icon="reports"]::before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1"></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/></svg>');
 }
 
 .button[data-icon="add"]::before {
@@ -215,7 +211,7 @@ main {
 }
 
 .button[data-icon="password-change"]::before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 .modec1f37d4f4e3c 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7v3H4v8h16v-8h-1V9a7 7 0 0 0-7-7zm0 4a3 3 0 0 0-3 3v3h6V9a3 3 0 0 0-3-3z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7v3H4v8h16v-8h-1V9a7 7 0 0 0-7-7zm0 4a3 3 0 0 0-3 3v3h6V9a3 3 0 0 0-3-3z"/></svg>');
 }
 
 .button[data-icon="deletion-requests"]::before {
@@ -230,7 +226,6 @@ main {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v.01"/><path d="M12 8v4"/></svg>');
 }
 
-/* Контейнер кнопок */
 .button-container {
     display: flex;
     justify-content: center;
@@ -263,7 +258,7 @@ main {
 }
 
 .action-icon {
-    color: #4CAF50;
+    color: #4caf50;
 }
 
 .delete-icon {
@@ -289,11 +284,40 @@ main {
     transform: scale(1.1);
 }
 
-/* Контейнер для иконок действий */
 .actions {
     display: flex;
     justify-content: center;
     gap: 8px;
+}
+
+/* ==========================================================================
+   Иконки статусов
+   ========================================================================== */
+
+.manager-icon,
+.teacher-icon,
+.verified-icon,
+.not-verified-icon {
+    font-size: 14px;
+    margin-left: 4px;
+    vertical-align: middle;
+    cursor: default;
+}
+
+.manager-icon {
+    color: #e67e22; /* Оранжевый для руководителя */
+}
+
+.teacher-icon {
+    color: #2c5282; /* Синий для педагога */
+}
+
+.verified-icon {
+    color: #27ae60; /* Зелёный для подтверждённого */
+}
+
+.not-verified-icon {
+    color: #c0392b; /* Красный для неподтверждённого */
 }
 
 /* ==========================================================================
@@ -347,7 +371,6 @@ main {
    Таблицы
    ========================================================================== */
 
-/* Общие стили таблиц */
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -386,12 +409,12 @@ main {
 }
 
 .table tr.overdue {
-    background-color: #ffcccc;
-    color: #c0392b;
+    background-color: #ff3333;
+    color: #fff;
 }
 
 .table tr.overdue:hover {
-    background-color: #ffb3b3;
+    background-color: #ff1a1a;
 }
 
 .table-container {
@@ -399,10 +422,9 @@ main {
     overflow-x: auto;
     margin: 20px 0;
     border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 2, 0, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Таблица отчетов */
 .report-table {
     width: 100%;
     border-collapse: collapse;
@@ -455,25 +477,24 @@ main {
     align-items: center;
 }
 
-/* Статусы для таблиц */
 .not-completed {
-    background-color: #e6f3fa;
+    background-color: #e6f3fa; /* Светло-голубой (сохранён) */
     color: #2c5282;
 }
 
 .overdue {
-    background-color: #ffcccc;
-    color: #c0392b;
+    background-color: #ff3333; /* Красный */
+    color: #fff;
 }
 
 .warning {
-    background-color: #fff9e6;
-    color: #e67e22;
+    background-color: #ffff66; /* Жёлтый */
+    color: #856404;
 }
 
 .completed {
-    background-color: #e6f4e6;
-    color: #27ae60;
+    background-color: #99ff99; /* Зелёный */
+    color: #155724;
 }
 
 /* ==========================================================================
@@ -496,18 +517,13 @@ main {
     border-radius: 4px;
     font-size: 14px;
     font-weight: 500;
-    color: #34495e;
-    box-shadow: 0 2px 4px rgba(0, 0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.1s;
 }
 
 .legend-item:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-}
-
-.legend-item .icon {
-    margin-right: 6px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 .legend-item.not-completed {
@@ -516,18 +532,18 @@ main {
 }
 
 .legend-item.overdue {
-    background-color: #ffcccc;
-    color: #c0392b;
+    background-color: #ff3333;
+    color: #fff;
 }
 
 .legend-item.warning {
-    background-color: #fff9e6;
-    color: #e67e22;
+    background-color: #ffff66;
+    color: #856404;
 }
 
 .legend-item.completed {
-    background-color: #e6f4e6;
-    color: #27ae60;
+    background-color: #99ff99;
+    color: #155724;
 }
 
 /* ==========================================================================
@@ -540,32 +556,29 @@ main {
 }
 
 .table th .sort-icon {
-    color: #fff; /* Белый цвет текста */
-    text-decoration: none; /* Убираем подчеркивание */
-    display: inline-flex; /* Для корректного выравнивания текста и стрелок */
-    align-items: center; /* Вертикальное выравнивание */
+    color: #fff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
 }
 
 .table th .sort-icon:hover {
-    color: #e0e0e0; /* Легкое осветление при наведении */
+    color: #e0e0e0;
 }
 
 .table th .sort-icon::after {
-    content: '\25B2'; /* Стрелка вверх по умолчанию */
-    color: #fff; /* Белый цвет для стрелки */
+    content: '\25B2';
     font-size: 10px;
     margin-left: 5px;
     display: inline-block;
 }
 
 .table th .sort-icon.asc::after {
-    content: '\25BC'; /* Стрелка вниз для asc */
-    color: #fff; /* Белый цвет */
+    content: '\25BC';
 }
 
 .table th .sort-icon.desc::after {
-    content: '\25B2'; /* Стрелка вверх для desc */
-    color: #fff; /* Белый цвет */
+    content: '\25B2';
 }
 
 /* ==========================================================================
@@ -595,9 +608,8 @@ main {
 .pagination .page-link {
     display: inline-block;
     padding: 8px 12px;
-    border: 6px;
     border-radius: 6px;
-    color: #4CAF50;
+    color: #4caf50;
     text-decoration: none;
     font-size: 14px;
     transition: background-color 0.3s, color 0.3s;
@@ -608,14 +620,13 @@ main {
 }
 
 .pagination .page-item.active .page-link {
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: white;
-    border-color: #4CAF50;
+    border-color: #4caf50;
 }
 
 .pagination .page-item.disabled .page-link {
     color: #6c757d;
-    border-color: #e0e0e0;
     cursor: not-allowed;
 }
 
@@ -629,8 +640,8 @@ main {
     padding: 20px;
     background-color: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border-left: 4px solid #4CAF50;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #4caf50;
 }
 
 .form-input,
@@ -644,7 +655,7 @@ main {
     box-sizing: border-box;
     font-size: 14px;
     background-color: #fff;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
 }
 
@@ -659,8 +670,8 @@ main {
 .form-input:focus,
 .form-textarea:focus,
 .form-input select:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 8px rgba(76,175,80,0.3);
+    border-color: #4caf50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
     transform: translateY(-1px);
 }
 
@@ -699,7 +710,7 @@ main {
 
 .form-group label .icon {
     font-size: 16px;
-    color: #4CAF50;
+    color: #4caf50;
 }
 
 .form-group .field-errors {
@@ -728,14 +739,13 @@ main {
 .form-group.has-error .form-textarea,
 .form-group.has-error select {
     border-color: #f44336;
-    box-shadow: 0 0 8px rgba(244,67,54,0.3);
+    box-shadow: 0 0 8px rgba(244, 67, 54, 0.3);
 }
 
 .form-group.has-error label {
     color: #f44336;
 }
 
-/* Подсказки */
 .form-tooltip {
     position: relative;
 }
@@ -779,7 +789,7 @@ main {
     background-color: #ffffff;
     border-left: 4px solid #17a2b8;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
     font-size: 15px;
     color: #34495e;
@@ -805,7 +815,7 @@ main {
     padding: 20px;
     background-color: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     align-items: flex-end;
 }
 
@@ -824,17 +834,17 @@ main {
 }
 
 /* ==========================================================================
- Инструкции
- ========================================================================== */
+   Инструкции
+   ========================================================================== */
 
 .instructions {
     max-width: 800px;
     margin: 30px auto;
     padding: 25px;
     background-color: #ffffff;
-    border-left: 4px solid #4CAF50;
+    border-left: 4px solid #4caf50;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: left;
 }
 
@@ -848,7 +858,7 @@ main {
 
 .instructions h2 .icon {
     margin-right: 10px;
-    color: #4CAF50;
+    color: #4caf50;
 }
 
 .instructions p {
@@ -897,7 +907,7 @@ main {
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     padding: 8px 0;
 }
@@ -921,7 +931,7 @@ main {
 
 .dropdown-item:hover {
     background-color: #f4f4f4;
-    color: #4CAF50;
+    color: #4caf50;
 }
 
 /* ==========================================================================
@@ -1231,5 +1241,13 @@ main {
     .instructions ol,
     .instruction-content {
         font-size: 13px;
+    }
+
+    .manager-icon,
+    .teacher-icon,
+    .verified-icon,
+    .not-verified-icon {
+        font-size: 12px;
+        margin-left: 2px;
     }
 }

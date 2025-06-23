@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Список сотрудников</h1>
-<div class="filters-container">
-    <form class="filter-form" method="get">
-        <div class="form-group">
-            <label for="search_last_name"><span class="icon">🔍</span> Поиск по фамилии:</label>
-            <input type="text" name="search_last_name" id="search_last_name" class="form-input"
-                   value="{{ search_last_name|default_if_none:'' }}" placeholder="Введите фамилию">
-        </div>
-        <div class="buttons-group">
-            <button type="submit" class="button button--primary"><span class="icon">🔍</span> Найти</button>
-            <a href="{% url 'employees:employee_list' %}" class="button button--danger"><span class="icon">✖️</span> Сбросить</a>
-        </div>
-    </form>
+<div class="form-container">
+        <form class="filter-form" method="get">
+            <div class="form-group">
+                <label for="search_last_name"><span class="icon">🔍</span> Поиск по фамилии: </label>
+                <input type="text" name="search_last_name" id="search_last_name" class="form-input"
+                       value="{{ search_last_name|default_if_none:'' }}" placeholder="Введите фамилию">
+            </div>
+            <div class="buttons-group">
+                <button type="submit" class="button button--primary"><span class="icon">🔍</span> Найти</button>
+                <a href="{% url 'employees:employee_list' %}" class="button button--danger"><span class="icon">✖️</span> Сбросить</a>
+            </div>
+        </form>
 </div>
 <div class="form-group">
     <a href="{% url 'employees:employee_create' %}" class="button button--success"><span class="icon">➕</span> Добавить сотрудника</a>

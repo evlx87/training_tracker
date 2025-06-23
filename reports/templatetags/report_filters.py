@@ -1,4 +1,5 @@
 from django import template
+from urllib.parse import urlencode
 
 register = template.Library()
 
@@ -28,3 +29,18 @@ def dict_get(dictionary, key):
     Получает значение из словаря по ключу. Возвращает None, если ключ отсутствует или словарь пуст.
     """
     return dictionary.get(key) if dictionary else None
+
+@register.simple_tag(takes_context=True)
+def query_string(context, add=None, remove=None):
+    """
+    Формирует строку запроса, добавляя или удаляя параметры из текущих GET-параметров запроса.
+    Использование: {% query_string 'param=value' 'param_to_remove' %}
+    """
+    request = context.get('request')
+    params = request.GET.copy()
+    if add:
+        key, value = add.split('=', 1)
+        params[key] = value
+    if remove:
+        params.pop(remove, None)
+    return params.urlencode()
